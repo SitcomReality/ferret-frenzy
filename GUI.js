@@ -113,7 +113,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the game
     const initGameBtn = document.getElementById('initGame');
     if (initGameBtn) {
-        initGameBtn.addEventListener('click', initGame);
+        initGameBtn.addEventListener('click', function() {
+            initGame();
+            setStep(1, 'done'); setStep(2, 'active');
+            setStatus('Racers and tracks generated. Start Race Week.');
+        });
     }
 
     // Start a new week
@@ -122,10 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
         startRaceWeekBtn.addEventListener('click', function() {
             this.disabled = true;
             const setupRaceBtn = document.getElementById('setupRace');
-            if (setupRaceBtn) {
-                setupRaceBtn.disabled = false;
-            }
+            if (setupRaceBtn) { setupRaceBtn.disabled = false; }
             createNewRaceWeek();
+            setStep(2, 'done'); setStep(3, 'active');
+            setStatus('Race Week created. Setup the next race.');
         });
     }
 
@@ -135,13 +139,18 @@ document.addEventListener('DOMContentLoaded', function() {
         setupRaceBtn.addEventListener('click', function() {
             setupRace();
             setupBettingOptions();
+            setStep(3, 'done'); setStep(4, 'active');
+            setStatus('Track prepared and racers on the grid. Start the race!');
         });
     }
 
     // Start race when button is clicked
     const startRaceBtn = document.getElementById('startRace');
     if (startRaceBtn) {
-        startRaceBtn.addEventListener('click', startRace);
+        startRaceBtn.addEventListener('click', function() {
+            startRace();
+            setStatus('Race in progress... watch the leaderboard update live.');
+        });
     }
 
     // Place a bet when button is clicked
@@ -194,4 +203,16 @@ function refreshParametersPanel() {
             });
         });
     });
+}
+
+/* HUD helpers */
+function setStatus(text) {
+    const el = document.getElementById('statusText');
+    if (el) el.textContent = text;
+}
+function setStep(stepNumber, state) {
+    const step = document.querySelector(`#hud .step[data-step="${stepNumber}"]`);
+    if (!step) return;
+    ['active','done'].forEach(s => step.classList.remove(s));
+    if (state) step.classList.add(state);
 }

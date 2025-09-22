@@ -53,6 +53,15 @@
             <div class="ui-section raceNumbers" id="raceNumbers"><div class="ui-item"><div class="raceNumbersInfo">Race Week <span id="raceWeekNumber">-1</span></div><div class="raceNumbersInfo">Race <span id="raceNumberThisWeek">-1</span> (<span id="raceNumber">-1</span>)</div></div></div>
         </div>
     </div>
+    <div id="hud" class="ui gui-container">
+        <div class="hud-steps">
+            <div class="step" data-step="1"><span class="num">1</span> New Game</div>
+            <div class="step" data-step="2"><span class="num">2</span> Start Race Week</div>
+            <div class="step" data-step="3"><span class="num">3</span> Setup Race</div>
+            <div class="step" data-step="4"><span class="num">4</span> Start Race</div>
+        </div>
+        <div id="statusText" class="hud-status">Welcome! Click "New Game" to begin.</div>
+    </div>
     
     <main id="game-container">
         <div id="left-panel">
@@ -107,7 +116,11 @@
         </div>
 
         <div id="right-panel">
-             <div class="track track-container" id="raceTrack"></div>
+             <div id="liveLeaderboard" class="ui gui-container">
+            <h4>Live Leaderboard</h4>
+            <ol id="leaderList"></ol>
+         </div>
+         <div class="track track-container" id="raceTrack"></div>
              <div id="settings" class="ui gui-container debugui">
                 <div class="ui-section"><h4>Settings</h4></div>
                 <div class="ui-item"><button id="endRace" class="btn btn-outline">End Race</button></div>
