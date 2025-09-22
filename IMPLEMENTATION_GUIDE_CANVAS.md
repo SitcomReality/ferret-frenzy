@@ -1,4 +1,4 @@
-# Canvas Implementation Guide – Core Systems
+# Canvas Migration – Remaining Work (Current Status Aware)
 
 This guide explains how to migrate the current DOM-based track to an HTML5 Canvas renderer with adorable blobby racers, camera controls, optional 2.5D perspective, textured ground types, and contextual nameplates.
 
