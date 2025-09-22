@@ -1,5 +1,3 @@
-
-```javascript
 let gameState = {
     running: false,
     raceWeekRaceCounter: 0,
