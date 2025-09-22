@@ -9,12 +9,10 @@ class CanvasRenderer {
     this.camera = new Camera();
     this.hitIndex = new HitTestIndex();
     this.screenPositions = [];
-    this.blobs = new Map();
   }
   setData(currentRace, trackProps) {
     this.race = currentRace;
     this.props = trackProps;
-    (this.race.racers||[]).forEach(rid=>this.blobs.set(rid, this.blobs.get(rid)||BlobFactory.create(gameState.racers[rid])));
   }
   resizeToContainer() {
     const container = this.canvas.parentElement || document.body;
@@ -49,7 +47,7 @@ class CanvasRenderer {
     if (!this.race) return;
     ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
     this.drawTrack();
-    this.drawBlobs();
+    this.drawRacerMarkers();
   }
   drawTrack() {
     const ctx = this.ctx;
@@ -81,14 +79,30 @@ class CanvasRenderer {
     ctx.fillStyle = 'rgba(255,255,0,0.35)';
     ctx.fillRect(fx, pad, segW, lanes*h-4);
   }
-  drawBlobs() {
-    const ctx=this.ctx,pad=10,w=this.canvas.width-pad*2,h=this.laneHeight,now=performance.now()*0.002;
-    const laneOf={}; this.race.racers.forEach((rid,i)=>laneOf[rid]=i); this.screenPositions=[];
-    this.race.racers.forEach(rid=>{const pos=(this.race.liveLocations[rid]||0)/100,x=pad+Math.max(0,Math.min(1,pos))*w,y=pad+(laneOf[rid]||0)*h+h/2,blob=this.blobs.get(rid); const s=1+0.06*Math.sin(now);
-      ctx.beginPath(); blob.controlPoints.forEach((p,i)=>{const bx=x+Math.cos(p.ang)*(p.rad*s),by=y+Math.sin(p.ang)*(p.rad*s); i?ctx.lineTo(bx,by):ctx.moveTo(bx,by);});
-      ctx.closePath(); ctx.fillStyle='#fff'; ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.fill(); ctx.stroke();
-      ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(x+6,y-3,2.5,0,Math.PI*2); ctx.arc(x+6,y+3,2.5,0,Math.PI*2); ctx.fill();
-      this.screenPositions.push({rid,x,y,r: Math.max(6, blob.baseRadius*0.6)});
+  drawRacerMarkers() {
+    const ctx = this.ctx;
+    const pad = 10;
+    const segs = this.race.segments.length;
+    const w = (this.canvas.width - pad*2);
+    const h = this.laneHeight;
+    const laneIndexOf = {};
+    this.race.racers.forEach((rid, i) => laneIndexOf[rid] = i);
+    this.screenPositions = [];
+    this.race.racers.forEach((rid) => {
+      const pos = (this.race.liveLocations[rid] || 0) / 100;
+      const x = pad + Math.max(0, Math.min(1, pos)) * w;
+      const lane = laneIndexOf[rid] ?? 0;
+      const y = pad + lane*h + (h/2);
+      const r = gameState.racers[rid];
+      const col = (typeof racerColors !== 'undefined') ? racerColors[r.colors[0]] : '#fff';
+      this.screenPositions.push({ rid, x, y, r: 6 });
+      ctx.beginPath();
+      ctx.fillStyle = col;
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.arc(x, y, 6, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
     });
   }
   groundColor(type) {

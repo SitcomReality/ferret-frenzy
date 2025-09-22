@@ -36,11 +36,8 @@ function generateRacers(total) {
 
 function generateNewRacers(numberToGenerate) {
 	const racers = [];
-	// Safely reference global name lists; fallback to simple placeholders if missing
-	const namePrefixes = (typeof racerNamePrefixes !== 'undefined') ? racerNamePrefixes : Array.from({length:100}, (_,i)=>"Name"+(i+1));
-	const nameSuffixes = (typeof racerNameSuffixes !== 'undefined') ? racerNameSuffixes : Array.from({length:100}, (_,i)=>"Suf"+(i+1));
-	const namePrefixNumber = generateUniqueNumbers(0, namePrefixes.length - 1, numberToGenerate);
-	const nameSuffixNumber = generateUniqueNumbers(0, nameSuffixes.length - 1, numberToGenerate);
+	const namePrefixNumber = generateUniqueNumbers(0, racerNamePrefixes.length, numberToGenerate);
+	const nameSuffixNumber = generateUniqueNumbers(0, racerNameSuffixes.length, numberToGenerate);
 	for (let i = 0; i < numberToGenerate; i++) {
         const name = [namePrefixNumber[i],nameSuffixNumber[i]];
 		//const name = `${racerNamePrefixes[Math.floor(Math.random() * racerNamePrefixes.length)]} ${racerNameSuffixes[Math.floor(Math.random() * racerNameSuffixes.length)]}`;
