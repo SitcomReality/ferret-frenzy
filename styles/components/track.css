@@ -78,3 +78,119 @@
     transition: width var(--transition-fast);
 }
 
+.lane {
+    position: relative;
+    height: 60px;
+    margin: var(--spacing-xs) 0;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.segment {
+    position: relative;
+    display: inline-block;
+    height: 100%;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.finishLine {
+    background: repeating-linear-gradient(
+        45deg,
+        #ff6b6b,
+        #ff6b6b 10px,
+        #ffffff 10px,
+        #ffffff 20px
+    );
+}
+
+.racer {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: left 0.1s linear;
+    z-index: 10;
+}
+
+.racer.startingLine {
+    left: 0 !important;
+}
+
+.racer.finished {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.racerInner {
+    position: relative;
+    height: 40px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.racerStripe {
+    position: absolute;
+    width: 100%;
+    height: 33.33%;
+}
+
+.racerStripe1 { top: 0; }
+.racerStripe2 { top: 33.33%; }
+.racerStripe3 { top: 66.66%; }
+
+.racerNameContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.racerID {
+    font-weight: bold;
+    margin-right: var(--spacing-xs);
+}
+
+.remainingEndurance {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--color-accent);
+    transition: height 0.2s ease;
+}
+
+.laneResult1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.3) 0%, transparent 100%); }
+.laneResult2 { background: linear-gradient(90deg, rgba(192, 192, 192, 0.3) 0%, transparent 100%); }
+.laneResult3 { background: linear-gradient(90deg, rgba(205, 127, 50, 0.3) 0%, transparent 100%); }
+
+.livePosition1 { box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
+.livePosition2 { box-shadow: 0 0 8px rgba(192, 192, 192, 0.6); }
+.livePosition3 { box-shadow: 0 0 6px rgba(205, 127, 50, 0.6); }
+
+@keyframes stumble {
+    0%, 100% { transform: translateY(-50%) rotate(0deg); }
+    25% { transform: translateY(-50%) rotate(-5deg); }
+    75% { transform: translateY(-50%) rotate(5deg); }
+}
+
+.racer.stumbling {
+    animation: stumble 0.3s ease-in-out infinite;
+}
+
+@keyframes boost {
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.05); }
+}
+
+.racer.boosting {
+    animation: boost 0.2s ease-in-out infinite;
+}
