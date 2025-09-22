@@ -1,5 +1,3 @@
-
-```javascript
 window.racerNamePrefixes = [
     "The",
     "Inert",
