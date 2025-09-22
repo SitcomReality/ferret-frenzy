@@ -1,5 +1,3 @@
-
-```javascript
 class Nameplate {
   constructor() {
     this.visibleNames = new Map();
@@ -50,3 +48,4 @@ class Nameplate {
   }
 }
 window.Nameplate = Nameplate;
+
