@@ -1,4 +1,3 @@
-// Generate a unique blob shape for a racer seeded by racer.id, racer.name and colors
 seed = hash(racer.id + racer.name + colors)
 baseRadius = 22..32 from seed
 points = N=12 with angle step and radius variance per seed
