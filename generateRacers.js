@@ -40,7 +40,6 @@ function generateNewRacers(numberToGenerate) {
 	const nameSuffixNumber = generateUniqueNumbers(0, racerNameSuffixes.length, numberToGenerate);
 	for (let i = 0; i < numberToGenerate; i++) {
         const name = [namePrefixNumber[i],nameSuffixNumber[i]];
-		//const name = `${racerNamePrefixes[Math.floor(Math.random() * racerNamePrefixes.length)]} ${racerNameSuffixes[Math.floor(Math.random() * racerNameSuffixes.length)]}`;
 		const colors = [
 			Math.floor(Math.random() * 31),
 			Math.floor(Math.random() * 31),
