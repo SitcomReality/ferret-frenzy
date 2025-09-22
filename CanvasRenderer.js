@@ -183,6 +183,14 @@ class CanvasRenderer {
         this.particleSystem.emit(screen.x - (20 * screen.scale), screen.y, Math.PI, 80, 2);
       }
     }
+
+    // Update the DOM live leaderboard from current liveLocations (top 5)
+    const leaderList = document.getElementById('leaderList');
+    if (leaderList && this.race && Array.isArray(this.race.racers)) {
+      const sorted = this.race.racers.slice().sort((a,b)=> (this.race.liveLocations[b]||0)-(this.race.liveLocations[a]||0));
+      leaderList.innerHTML = '';
+      sorted.slice(0,5).forEach((rid,i)=>{ const r = gameState.racers[rid]; if(!r) return; const li = document.createElement('li'); li.textContent = `${i+1}. ${window.racerNamePrefixes[r.name[0]]} ${window.racerNameSuffixes[r.name[1]]}`; leaderList.appendChild(li); });
+    }
   }
 
   drawTrack() {
