@@ -92,6 +92,7 @@ function createNewRaceWeek() {
 		}
         
         // Create a new Race object with the track
+        const racersSelectedForThisRace = selectedRacersIndexes.map(idx => gameState.racers[selectedRacers[idx]]);
         const race = new Race(raceIndex, racersSelectedForThisRace, track);
 		
 		weekContainer.appendChild(weekHeader);
