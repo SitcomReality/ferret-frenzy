@@ -1,9 +1,10 @@
-/*
 
-	Functions to set up the GUI
+```javascript
+/* 
+
+    Functions to set up the GUI
 
 */
-
 
 function updateSetting(settingName, value) {
     // Split settingName into an array of keys
@@ -40,23 +41,22 @@ function updateSettingsFromInputs() {
 }
 
 function togglePlayPause() {
-	if (gameState.isPaused == false) {
-		console.log("trying to pause");
-		gameState.setPaused = true;
-	}
-	if (gameState.isPaused == true) {
-		console.log("trying to unpause");
-		gameState.setPaused = false;
-		gameLoop();
-	}
-	
-	refreshParametersPanel();
+    if (gameState.isPaused == false) {
+        console.log("trying to pause");
+        gameState.setPaused = true;
+    }
+    if (gameState.isPaused == true) {
+        console.log("trying to unpause");
+        gameState.setPaused = false;
+        gameLoop();
+    }
+
+    refreshParametersPanel();
 }
 
 
-	
 function generateSettingsHTML() {
-  let html = '<div id="settingsPanelInner">';
+  let html = '<div id=\"settingsPanelInner\">';
   let tabCount = 0;
 
   // Recursive function to generate HTML for nested categories
@@ -64,19 +64,20 @@ function generateSettingsHTML() {
     for (let key in categoryObj) {
       const fullKey = parentKey ? `${parentKey}.${key}` : key;
       const value = categoryObj[key];
-	  const terms = fullKey.split('.');
-	  const finalTerm = terms[terms.length - 1];
+      const terms = fullKey.split('.');
+      const finalTerm = terms[terms.length - 1];
       if (typeof value === 'object') {
         // Handle nested categories
-        html += `<div class="ui-section">`;
-        html += `<h3 class="category-toggle">${finalTerm}</h3>`;
+        html += `<div class=\"ui-section\">`;
+        html += `<h3 class=\"category-toggle\">${finalTerm}</h3>`;
         generateCategoryHTML(value, fullKey);
         html += `</div>`;
       } else {
         // Handle leaf settings
-        html += `<div class="ui-item">
-                   <label for="${fullKey}">${finalTerm}:</label>
-                   <input class="settings-input" type="number" id="${fullKey}" value="${value}" step="1" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">
+        const inputType = typeof value === 'number' ? 'number' : 'text';
+        html += `<div class=\"ui-item\">
+                   <label for=\"${fullKey}\">${finalTerm}:</label>
+                   <input class=\"settings-input\" type=\"${inputType}\" id=\"${fullKey}\" value=\"${value}\" step=\"1\" autocomplete=\"off\" onchange=\"updateSetting('${fullKey}', this.value)\" tabindex=\"${tabCount}\">
                  </div>`;
         tabCount++;
       }
@@ -88,14 +89,7 @@ function generateSettingsHTML() {
   document.getElementById('initButtonContainer').style = "display: block";
   return html;
 }
-/*
-function updateSetting(key, value) {
-  // Parse the key to extract category and sub-category
-  const [category, subCategory] = key.split('.');
-  settings[category][subCategory] = parseInt(value);
-  // Additional logic to handle the updated setting
-}
-*/
+
 const EventTargetPrototype = document.__proto__.__proto__.__proto__.__proto__;
 const origAddEventListener = EventTargetPrototype.addEventListener;
 EventTargetPrototype.addEventListener = function addEventListenerWrapper(type, listener) {
@@ -109,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (initGameBtn) {
         initGameBtn.addEventListener('click', initGame);
     }
-    
+
     // Start a new week
     const startRaceWeekBtn = document.getElementById('startRaceWeek');
     if (startRaceWeekBtn) {
@@ -151,9 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // DEBUG STUFF:
-    
+
     // End the race early:
     const endRaceBtn = document.getElementById('endRace');
     if (endRaceBtn) {
@@ -161,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             endRaceEarly();
         });
     }
-    
+
     // Change speed multiplier
     const speedMultiplier = document.getElementById('speedMultiplier');
     if (speedMultiplier) {
@@ -169,23 +163,23 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.settings.racerProperties.speedMultiplier = document.getElementById('speedMultiplier').value;
         });
     }
-    
+
     refreshParametersPanel();
 });
 
 function refreshParametersPanel() {
     document.getElementById('introSettings').innerHTML = generateSettingsHTML();
-	
-	// Hide/unhide settings menu
-	var categoryToggles = document.querySelectorAll('.category-toggle');
 
-	categoryToggles.forEach(function(toggle) {
-		toggle.addEventListener('click', function() {
-			var category = toggle.parentNode;
-			var items = category.querySelectorAll('.ui-item');
-			items.forEach(function(item) {
-				item.style.display = (item.style.display === 'none') ? 'block' : 'none';
-			});
-		});
-	});
+    // Hide/unhide settings menu
+    var categoryToggles = document.querySelectorAll('.category-toggle');
+
+    categoryToggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            var category = toggle.parentNode;
+            var items = category.querySelectorAll('.ui-item');
+            items.forEach(function(item) {
+                item.style.display = (item.style.display === 'none') ? 'block' : 'none';
+            });
+        });
+    });
 }
