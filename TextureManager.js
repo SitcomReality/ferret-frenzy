@@ -1,5 +1,3 @@
-
-```javascript
 class TextureManager {
   constructor() {
     this.patterns = new Map();
