@@ -29,16 +29,20 @@ class CanvasRenderer {
     const container = this.canvas.parentElement || document.body;
     this.dpr = window.devicePixelRatio || 1;
     
+    // Make canvas fill more of the parent vertically (use parent's height if available)
+    const containerWidth = container.clientWidth || 800;
+    // Prefer using a larger portion of the container height rather than deriving from lane count alone
+    const containerHeight = Math.max(container.clientHeight || 600, (this.props && this.props.numberOfLanes ? (this.props.numberOfLanes * this.laneHeight + 120) : 600));
+    
     // Set canvas dimensions accounting for device pixel ratio
-    this.canvas.width = Math.floor((container.clientWidth || 800) * this.dpr);
-    const lanes = (this.props && this.props.numberOfLanes) || (this.race && this.race.racers.length) || 10;
-    this.canvas.height = Math.floor((lanes * this.laneHeight + 20) * this.dpr);
+    this.canvas.width = Math.floor(containerWidth * this.dpr);
+    this.canvas.height = Math.floor(containerHeight * this.dpr);
     
     // Scale context to match device pixel ratio
     this.ctx.setTransform(1,0,0,1,0,0);
     this.ctx.scale(this.dpr, this.dpr);
     
-    // Set display size via CSS
+    // Set display size via CSS so it fills the area
     this.canvas.style.width = (this.canvas.width / this.dpr) + 'px';
     this.canvas.style.height = (this.canvas.height / this.dpr) + 'px';
   }
@@ -49,28 +53,28 @@ class CanvasRenderer {
     const h = this.laneHeight;
 
     // Perspective scaling: racers higher up are slightly smaller
-    const perspectiveFactor = 1 - (laneIndex / this.props.numberOfLanes) * 0.2;
+    const perspectiveFactor = 1 - (laneIndex / (this.props.numberOfLanes || 10)) * 0.2;
     const scaledLaneHeight = h * perspectiveFactor;
 
     // Total height of all lanes with perspective
     let totalPerspectiveHeight = 0;
-    for(let i = 0; i < this.props.numberOfLanes; i++) {
-        totalPerspectiveHeight += h * (1 - (i / this.props.numberOfLanes) * 0.2);
+    for(let i = 0; i < (this.props.numberOfLanes || 10); i++) {
+        totalPerspectiveHeight += h * (1 - (i / (this.props.numberOfLanes || 10)) * 0.2);
     }
     const trackCenterY = pad + totalPerspectiveHeight / 2;
 
     // Calculate Y position for this lane, accounting for perspective
     let yPos = pad;
     for(let i = 0; i < laneIndex; i++) {
-        yPos += h * (1 - (i / this.props.numberOfLanes) * 0.2);
+        yPos += h * (1 - (i / (this.props.numberOfLanes || 10)) * 0.2);
     }
     yPos += scaledLaneHeight / 2;
     
     const worldPixelWidth = w * 4; // Arbitrary world width for more zoom granularity
-    const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
+    const cameraPixelX = (this.camera.target.x / 100) * worldPixelWidth;
     
-    // Apply transformations
-    const screenX = (worldX / 100 * worldPixelWidth - cameraPixelX) * this.camera.zoom + w / 2;
+    // Apply transformations (respect canvas pixel dimensions)
+    const screenX = ((worldX / 100) * worldPixelWidth - cameraPixelX) * this.camera.zoom + w / 2;
     const screenY = (yPos - trackCenterY) * this.camera.zoom + (this.canvas.height / this.dpr) / 2;
     
     return { x: screenX, y: screenY, scale: perspectiveFactor * this.camera.zoom };
@@ -90,16 +94,34 @@ class CanvasRenderer {
     else if (this.camera.mode === 'single') desiredX = avg;
     else if (this.camera.mode === 'fitAll') {
       const w = (this.canvas.width / this.dpr);
-      const worldPixelWidth = w * 4; // must match worldToScreen/drawTrack
-      const worldUnitsVisibleAtZoom1 = (w * 100) / worldPixelWidth; // visible world units when zoom=1
-      const margin = 5; // world units
-      const rawSpan = (maxX - minX);
+      const h = (this.canvas.height / this.dpr);
+
+      // World pixel width (consistent with drawTrack/worldToScreen)
+      const worldPixelWidth = w * 4;
+      const marginWorldUnits = 5; // world units margin
+
+      const rawSpan = Math.max(0.001, (maxX - minX));
       const span = Math.max(5, rawSpan);
-      const needed = span + margin * 2;
+      const neededHorizontal = span + marginWorldUnits * 2;
+      const worldUnitsVisibleAtZoom1 = (w * 100) / worldPixelWidth; // world units visible horizontally at zoom=1
+
+      // Compute vertical requirement: total perspective track height in pixels at zoom=1
+      let totalPerspectiveHeight = 0;
+      const lanes = (this.props && this.props.numberOfLanes) || (this.race.racers.length) || 10;
+      for(let i = 0; i < lanes; i++) {
+          totalPerspectiveHeight += this.laneHeight * (1 - (i / lanes) * 0.2);
+      }
+      const verticalMarginPx = 40; // pixels of padding top/bottom
+      const neededVerticalScale = (totalPerspectiveHeight + verticalMarginPx*2) / h; // fraction of the canvas height required at zoom=1
+
+      // Determine desired zoom from both axes and pick the smaller (so everything fits)
+      const zFromHorizontal = Math.max(0.01, worldUnitsVisibleAtZoom1 / neededHorizontal);
+      const zFromVertical = 1 / Math.max(0.0001, neededVerticalScale);
       const zMin = (gameState.settings?.render?.camera?.zoomMin) || 0.5;
       const zMax = (gameState.settings?.render?.camera?.zoomMax) || 3.0;
+
       desiredX = (minX + maxX) / 2;
-      desiredZoom = Math.max(zMin, Math.min(zMax, worldUnitsVisibleAtZoom1 / needed));
+      desiredZoom = Math.max(zMin, Math.min(zMax, Math.min(zFromHorizontal, zFromVertical)));
     }
 
     this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
