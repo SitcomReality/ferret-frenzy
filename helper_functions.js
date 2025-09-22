@@ -57,6 +57,20 @@ function isValueExists(value, suppliedArray) {
     return suppliedArray.includes(value);
 }
 
+function getRacerNameString(racer) {
+    if (!racer || !racer.name) {
+        return "Unknown Racer";
+    }
+    
+    const prefix = window.racerNamePrefixes[racer.name[0]];
+    const suffix = window.racerNameSuffixes[racer.name[1]];
+
+    const prefixStr = (typeof prefix === 'function') ? prefix() : prefix;
+    const suffixStr = (typeof suffix === 'function') ? suffix() : suffix;
+
+    return `${prefixStr} ${suffixStr}`;
+}
+
 // Used to set the racer's weekly form
 function getRandomMultiplier(mulitiplierVariation, maxVal = 0.9, minVal = 1.1) {
     // Box-Muller transform to generate a random number following a normal distribution

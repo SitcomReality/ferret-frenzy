@@ -94,7 +94,7 @@ class DOMUtils {
         info.className = 'racer-info';
         const name = document.createElement('div');
         name.className = 'racer-name';
-        name.textContent = window.racerNamePrefixes[thisRacer.name[0]] + ' ' + window.racerNameSuffixes[thisRacer.name[1]];
+        name.textContent = getRacerNameString(thisRacer);
         info.appendChild(name);
 
         const flag = document.createElement('div');

@@ -1,3 +1,5 @@
+
+```javascript
 function updateLivePositionDisplayIndividual(racerid) {
     if (gameState.currentRace.results.length < gameState.settings.trackProperties.numberOfLanes) {
         const liveLocations = gameState.currentRace.liveLocations;
@@ -24,7 +26,7 @@ function updateLivePositionDisplayIndividual(racerid) {
             sortedRacerIds.slice(0,5).forEach((rid, i) => {
                 const li = document.createElement('li');
                 const r = gameState.racers[parseInt(rid,10)];
-                li.textContent = `${i+1}. ${window.racerNamePrefixes[r.name[0]]} ${window.racerNameSuffixes[r.name[1]]}`;
+                li.textContent = `${i+1}. ${getRacerNameString(r)}`;
                 leaderList.appendChild(li);
             });
         }

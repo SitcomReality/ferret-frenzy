@@ -189,7 +189,7 @@ class CanvasRenderer {
     if (leaderList && this.race && Array.isArray(this.race.racers)) {
       const sorted = this.race.racers.slice().sort((a,b)=> (this.race.liveLocations[b]||0)-(this.race.liveLocations[a]||0));
       leaderList.innerHTML = '';
-      sorted.slice(0,5).forEach((rid,i)=>{ const r = gameState.racers[rid]; if(!r) return; const li = document.createElement('li'); li.textContent = `${i+1}. ${window.racerNamePrefixes[r.name[0]]} ${window.racerNameSuffixes[r.name[1]]}`; leaderList.appendChild(li); });
+      sorted.slice(0,5).forEach((rid,i)=>{ const r = gameState.racers[rid]; if(!r) return; const li = document.createElement('li'); li.textContent = `${i+1}. ${getRacerNameString(r)}`; leaderList.appendChild(li); });
     }
   }
 

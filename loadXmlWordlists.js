@@ -1,5 +1,24 @@
+
+```javascript
 async function loadXmlWordlists() {
     try {
+        // Define dynamic affixes
+        const dynamicPrefixes = [
+            () => `00${Math.floor(Math.random()*9)}: Licensed To`,
+            () => `${Math.floor(1 + Math.random()*111)}%`,
+            () => `${Math.floor(1 + Math.random()*12)} O'Clock`,
+            () => `${Math.floor(Math.random()*1000)}mL Of`,
+            () => `${Math.floor(Math.random()*1000)}Kg Of`,
+            () => `${Math.floor(Math.random()*1000)}Km Of`,
+            () => `${Math.floor(Math.random()*99)} Units Of`,
+        ];
+
+        const dynamicSuffixes = [
+            () => `V${Math.floor(Math.random()*10)}.${Math.floor(Math.random()*10)}`,
+            () => `'${Math.floor(10 + Math.random()*89)}`,
+            () => `${Math.floor(1 + Math.random()*9)}000`,
+        ];
+
         // Load prefixes
         const prefixResponse = await fetch('wordlist/racerNamePrefixes.xml');
         const prefixXmlText = await prefixResponse.text();
@@ -13,6 +32,9 @@ async function loadXmlWordlists() {
             window.racerNamePrefixes[index] = item.textContent;
         }
 
+        // Add dynamic prefixes
+        window.racerNamePrefixes.push(...dynamicPrefixes);
+
         // Load suffixes
         const suffixResponse = await fetch('wordlist/racerNameSuffixes.xml');
         const suffixXmlText = await suffixResponse.text();
@@ -25,6 +47,9 @@ async function loadXmlWordlists() {
             const index = parseInt(item.getAttribute('index'));
             window.racerNameSuffixes[index] = item.textContent;
         }
+
+        // Add dynamic suffixes
+        window.racerNameSuffixes.push(...dynamicSuffixes);
 
         console.log('Loaded XML wordlists:', {
             prefixes: window.racerNamePrefixes.length,
