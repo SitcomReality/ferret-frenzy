@@ -2,7 +2,17 @@ function setupTrack(track) {
     document.getElementById('setupRace').disabled = true;
     document.getElementById('startRace').disabled = false;
     const trackDom = document.getElementById('raceTrack');
+    
+    // Save the leaderboard before clearing
+    const leaderboard = document.getElementById('liveLeaderboard');
+    
     trackDom.innerHTML = '';
+    
+    // Restore the leaderboard after clearing
+    if (leaderboard) {
+        trackDom.appendChild(leaderboard);
+    }
+    
     const canvas = document.createElement('canvas');
     canvas.id = 'raceCanvas';
     trackDom.appendChild(canvas);

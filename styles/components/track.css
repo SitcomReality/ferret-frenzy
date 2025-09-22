@@ -23,7 +23,7 @@
 }
 
 .overlay-leaderboard {
-    position: absolute; top: 8px; right: 8px; z-index: 10;
+    position: absolute; top: 8px; right: 8px; z-index: 2;
     background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px; padding: 6px 8px; max-width: 220px; pointer-events: none;
 }
@@ -33,3 +33,4 @@
 .overlay-leaderboard ol { margin: 0; padding-left: 18px; font-size: 12px; }
 
 .overlay-leaderboard li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
