@@ -51,8 +51,21 @@ class CanvasRenderer {
     const ctx = this.ctx;
     if (!this.race) return;
     ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+    
+    // Calculate delta time for particle system
+    const now = performance.now();
+    const deltaTime = (now - this.lastTime) / 1000;
+    this.lastTime = now;
+    
     this.drawTrack();
     this.drawRacerMarkers();
+    
+    // Update and render particles
+    this.particleSystem.update(deltaTime);
+    this.particleSystem.render(ctx);
+    
+    // Render nameplates
+    this.nameplate.render(ctx);
   }
   drawTrack() {
     const ctx = this.ctx;
@@ -123,6 +136,11 @@ class CanvasRenderer {
       
       // Store screen position for hit testing
       this.screenPositions.push({ rid, x, y, r: r.blobData.baseRadius });
+      
+      // Emit particles when moving
+      if (pos > 0.01) {
+        this.particleSystem.emit(x, y, Math.PI, 30, 1);
+      }
       
       // Draw blob with animation
       this.drawBlob(ctx, x, y, r, time);
