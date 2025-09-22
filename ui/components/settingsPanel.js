@@ -1,5 +1,3 @@
-
-```javascript
 class SettingsPanel {
     static generateSettingsHTML() {
         let html = '<div id=\"settingsPanelInner\">';

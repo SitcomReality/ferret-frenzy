@@ -1,5 +1,3 @@
-
-```javascript
 function updateSetting(settingName, value) {
     const keys = settingName.split('.');
     let currentSetting = gameState.settings;
