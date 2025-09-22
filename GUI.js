@@ -1,10 +1,13 @@
 
 ```javascript
-/* 
+/*
+
 
     Functions to set up the GUI
 
+
 */
+
 
 function updateSetting(settingName, value) {
     // Split settingName into an array of keys
@@ -24,7 +27,7 @@ function updateSetting(settingName, value) {
     }
 
     // Assign the value to the nested property
-    currentSetting[keys[keys.length - 1]] = value;
+    currentSetting[keys[keys.length - 1]] = parseFloat(value) || value;
 
     // Call any necessary refresh function
     refreshParametersPanel();
@@ -56,7 +59,7 @@ function togglePlayPause() {
 
 
 function generateSettingsHTML() {
-  let html = '<div id=\"settingsPanelInner\">';
+  let html = '<div id="settingsPanelInner">';
   let tabCount = 0;
 
   // Recursive function to generate HTML for nested categories
@@ -68,16 +71,15 @@ function generateSettingsHTML() {
       const finalTerm = terms[terms.length - 1];
       if (typeof value === 'object') {
         // Handle nested categories
-        html += `<div class=\"ui-section\">`;
-        html += `<h3 class=\"category-toggle\">${finalTerm}</h3>`;
+        html += `<div class="ui-section">`;
+        html += `<h3 class="category-toggle">${finalTerm}</h3>`;
         generateCategoryHTML(value, fullKey);
         html += `</div>`;
       } else {
         // Handle leaf settings
-        const inputType = typeof value === 'number' ? 'number' : 'text';
-        html += `<div class=\"ui-item\">
-                   <label for=\"${fullKey}\">${finalTerm}:</label>
-                   <input class=\"settings-input\" type=\"${inputType}\" id=\"${fullKey}\" value=\"${value}\" step=\"1\" autocomplete=\"off\" onchange=\"updateSetting('${fullKey}', this.value)\" tabindex=\"${tabCount}\">
+        html += `<div class="ui-item">
+                   <label for="${fullKey}">${finalTerm}:</label>
+                   <input class="settings-input" type="number" id="${fullKey}" value="${value}" step="1" autocomplete="off" onchange="updateSetting('${fullKey}', this.value)" tabindex="${tabCount}">
                  </div>`;
         tabCount++;
       }
