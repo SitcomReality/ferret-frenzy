@@ -1,3 +1,5 @@
+
+```javascript
 class DOMUtils {
     static createLane(racerId, sections, segmentsPerSection) {
         const lane = document.createElement('div');
@@ -11,22 +13,22 @@ class DOMUtils {
                 lane.appendChild(segment);
             }
         });
-		const finishLineSegment = document.createElement('div');
-		finishLineSegment.className = 'segment finishLine';
-		lane.appendChild(finishLineSegment);
+        const finishLineSegment = document.createElement('div');
+        finishLineSegment.className = 'segment finishLine';
+        lane.appendChild(finishLineSegment);
 
         return lane;
     }
 
-	static createRacerElement(racer, racerID, namePrefix, nameSuffix, totalSegments) {
-        const segmentWidth = 100 / totalSegments; // Assuming totalSegments is passed in and the lane width is 100%
+    static createRacerElement(racer, racerID, namePrefix, nameSuffix, totalSegments) {
+        const segmentWidth = 100 / totalSegments; 
 
         const racerElem = document.createElement('div');
         racerElem.className = 'racer';
         racerElem.id = 'racer' + racerID;
-        racerElem.style.width = `${segmentWidth}%`; // Set the width based on segment width
-		
-		racerElem.classList.add("startingLine");
+        racerElem.style.width = `${segmentWidth}%`; 
+
+        racerElem.classList.add("startingLine");
 
         const racerEndurance = document.createElement('div');
         racerEndurance.className = 'remainingEndurance';
@@ -59,67 +61,62 @@ class DOMUtils {
         racerInner.appendChild(racerStripe1);
         racerInner.appendChild(racerStripe2);
         racerInner.appendChild(racerStripe3);
-		
-		
-		const racerSmokeEle = document.createElement('div');
-		// racerSmokeEle.className = 'smoke';
-		racerSmokeEle.className = 'air';
-		
-		racerElem.appendChild(racerSmokeEle);
+
+        const racerSmokeEle = document.createElement('div');
+        racerSmokeEle.className = 'air';
+
+        racerElem.appendChild(racerSmokeEle);
         racerElem.appendChild(racerEndurance);
         racerElem.appendChild(racerInner);
 
         return racerElem;
     }
-	
-	static createRacerGuiElement(racerId, index) {
-		const thisRacer = gameState.racers[racerId];
-		if (!index || index === null || index < 0) {
-			index = 0;
-		}
-		
-		const newPlaceItem = document.createElement('div');
-		newPlaceItem.className = 'historyRacerPlacingContainer';
 
-		const placingContainerBackground = document.createElement('div');
-		placingContainerBackground.className = 'placingContainerBackground';
+    static createRacerGuiElement(racerId, index) {
+        const thisRacer = gameState.racers[racerId];
 
-		const racerStripe1 = document.createElement('div');
-		racerStripe1.className = 'racerStripe racerStripe1 racerColor' + thisRacer.colors[0];
+        const card = document.createElement('div');
+        card.className = 'racer-card';
+        card.setAttribute('data-racer-id', thisRacer.id);
 
-		const racerStripe2 = document.createElement('div');
-		racerStripe2.className = 'racerStripe racerStripe2 racerColor' + thisRacer.colors[1];
+        if (typeof index === 'number') {
+            const placing = document.createElement('div');
+            placing.className = 'placing-badge';
+            placing.textContent = index + 1;
+            card.appendChild(placing);
+        }
 
-		const racerStripe3 = document.createElement('div');
-		racerStripe3.className = 'racerStripe racerStripe3 racerColor' + thisRacer.colors[2];
+        const num = document.createElement('div');
+        num.className = 'racer-number';
+        num.textContent = thisRacer.id;
+        num.style.backgroundColor = racerColors[thisRacer.colors[2]];
+        card.appendChild(num);
 
-		placingContainerBackground.appendChild(racerStripe1);
-		placingContainerBackground.appendChild(racerStripe2);
-		placingContainerBackground.appendChild(racerStripe3);
+        const info = document.createElement('div');
+        info.className = 'racer-info';
+        const name = document.createElement('div');
+        name.className = 'racer-name';
+        name.textContent = racerNamePrefixes[thisRacer.name[0]] + ' ' + racerNameSuffixes[thisRacer.name[1]];
+        info.appendChild(name);
 
-		const newPlaceItemPlacingContainer = document.createElement('div');
-		newPlaceItemPlacingContainer.className = 'historyRacerPlacing';
-		newPlaceItemPlacingContainer.textContent = index + 1;
+        const flag = document.createElement('div');
+        flag.className = 'racer-flag';
+        const swatchPrimary = document.createElement('span');
+        swatchPrimary.className = 'swatch swatch-primary';
+        swatchPrimary.style.backgroundColor = racerColors[thisRacer.colors[0]];
+        const swatchSecondary = document.createElement('span');
+        swatchSecondary.className = 'swatch swatch-secondary';
+        swatchSecondary.style.backgroundColor = racerColors[thisRacer.colors[1]];
+        flag.appendChild(swatchPrimary);
+        flag.appendChild(swatchSecondary);
+        info.appendChild(flag);
 
-		const newPlaceItemNameContainer = document.createElement('div');
-		newPlaceItemNameContainer.className = 'racerName';
-		newPlaceItemNameContainer.textContent = 
-			racerNamePrefixes[thisRacer.name[0]] + ' ' + racerNameSuffixes[thisRacer.name[1]];
+        card.appendChild(info);
+        return card;
+    }
 
-		const newPlaceItemIdContainer = document.createElement('div');
-		newPlaceItemIdContainer.className = 'historyRacerId';
-		newPlaceItemIdContainer.textContent = thisRacer.id;
-
-		newPlaceItem.appendChild(placingContainerBackground);
-		newPlaceItem.appendChild(newPlaceItemPlacingContainer);
-		newPlaceItem.appendChild(newPlaceItemNameContainer);
-		newPlaceItem.appendChild(newPlaceItemIdContainer);
-
-		return newPlaceItem;
-	}
-	
-	static updateTrackDetails() {
-		document.getElementById("trackNameDisplay").innerHTML = gameState.currentRace.trackName;
-		document.getElementById("weatherDisplay").innerHTML = gameState.currentRace.weather;
-	}
+    static updateTrackDetails() {
+        document.getElementById("trackNameDisplay").innerHTML = gameState.currentRace.trackName;
+        document.getElementById("weatherDisplay").innerHTML = gameState.currentRace.weather;
+    }
 }
