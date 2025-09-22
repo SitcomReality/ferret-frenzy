@@ -1,5 +1,3 @@
-
-```javascript
 class HitTestIndex {
   constructor() {
     this.items = new Map(); // rid -> {x,y,r}
