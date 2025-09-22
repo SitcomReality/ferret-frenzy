@@ -89,12 +89,17 @@ class CanvasRenderer {
     if (this.camera.mode === 'leaders') desiredX = Math.max(...xs);
     else if (this.camera.mode === 'single') desiredX = avg;
     else if (this.camera.mode === 'fitAll') {
-      const margin = 8;
-      const span = Math.max(10, (maxX - minX) + margin*2);
-      desiredX = (minX + maxX) / 2;
+      const w = (this.canvas.width / this.dpr);
+      const worldPixelWidth = w * 4; // must match worldToScreen/drawTrack
+      const worldUnitsVisibleAtZoom1 = (w * 100) / worldPixelWidth; // visible world units when zoom=1
+      const margin = 5; // world units
+      const rawSpan = (maxX - minX);
+      const span = Math.max(5, rawSpan);
+      const needed = span + margin * 2;
       const zMin = (gameState.settings?.render?.camera?.zoomMin) || 0.5;
       const zMax = (gameState.settings?.render?.camera?.zoomMax) || 3.0;
-      desiredZoom = Math.max(zMin, Math.min(zMax, 100 / span));
+      desiredX = (minX + maxX) / 2;
+      desiredZoom = Math.max(zMin, Math.min(zMax, worldUnitsVisibleAtZoom1 / needed));
     }
 
     this.camera.target.x += (desiredX - this.camera.target.x) * this.camera.damping;
