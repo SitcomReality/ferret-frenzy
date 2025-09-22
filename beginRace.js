@@ -51,6 +51,11 @@ function beginRace() {
 
                 const distanceToTravel = updateRacerPosition(racerId, currentSegment, percentRaceComplete);
                 let nextPosition = currentMarginLeft + distanceToTravel;
+                
+                // Update live location for canvas rendering
+                gameState.currentRace.liveLocations[racerId] = nextPosition;
+                
+                // Keep DOM position for now as fallback
                 currentRacerElem.style.left = `${nextPosition}%`;
                 
                 if (!thisRacer.isExhausted) {
@@ -64,8 +69,6 @@ function beginRace() {
                 
                 thisRacer.shadowDistance = thisRacer.shadowDistance + (distanceToTravel / 50000);
                 updateBoxShadowX(currentRacerElem, thisRacer.shadowDistance);
-
-                gameState.currentRace.liveLocations[racerId] = nextPosition;                
             } else {
                 thisRacer.remainingStumble = thisRacer.stats.stumbleDuration;
                 currentRacerElem.classList.add("stumbling");

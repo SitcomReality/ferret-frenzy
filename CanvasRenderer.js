@@ -149,7 +149,7 @@ class CanvasRenderer {
   
   drawBlob(ctx, x, y, racer, time) {
     const blob = racer.blobData;
-    const breathing = Math.sin(time * 2) * 3; // Subtle breathing effect
+    const breathing = Math.sin(time * 2) * 3;
     
     ctx.save();
     ctx.translate(x, y);
@@ -181,7 +181,7 @@ class CanvasRenderer {
     ctx.closePath();
     
     // Fill with racer color
-    const col = (typeof racerColors !== 'undefined') ? racerColors[racer.colors[0]] : '#fff';
+    const col = racerColors[racer.colors[0]];
     ctx.fillStyle = col;
     ctx.fill();
     

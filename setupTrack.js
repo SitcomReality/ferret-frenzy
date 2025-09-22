@@ -18,6 +18,7 @@ function setupTrack(track) {
     gameState.currentRace.racers = [];
     gameState.currentRace.results = [];
     gameState.currentRace.winner = null;
+	gameState.currentRace.liveLocations = [];
 	DOMUtils.updateTrackDetails();
 	const selectedRacers = gameState.raceWeek.selectedRacers;
     const arrangedRacers = arrangeRacersByPerformance(selectedRacers, gameState);
@@ -25,6 +26,15 @@ function setupTrack(track) {
         const thisRacerID = arrangedRacers[i];
         const thisRacer = gameState.racers[thisRacerID];
         gameState.currentRace.racers[i] = thisRacerID;
+        
+        // Create blob data for this racer
+        if (!thisRacer.blobData) {
+            thisRacer.blobData = BlobFactory.create(thisRacer);
+        }
+        
+        // Initialize live location
+        gameState.currentRace.liveLocations[thisRacerID] = 0;
+        
         const lane = DOMUtils.createLane(thisRacerID, track.sections, gameState.settings.trackProperties.segmentsPerSection);
         trackDom.appendChild(lane);
         const totalSegments = gameState.settings.trackProperties.numberOfSegments;
@@ -32,8 +42,7 @@ function setupTrack(track) {
         thisRacer.reset();
         lane.appendChild(racer);
     }
-    gameState.currentRace.liveLocations = [];
-    gameState.currentRace.livePositions = [];
+    
    // init/update canvas renderer
    if (!window.canvasRenderer) {
        const canvas = document.getElementById('raceCanvas');
