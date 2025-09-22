@@ -5,8 +5,7 @@
 }
 
 body {
-    background: url(./assets/page_background.png) repeat;
+    background: url(./page_background.png) repeat;
     color: #E2E0E9;
     margin: 0;
 }
-
