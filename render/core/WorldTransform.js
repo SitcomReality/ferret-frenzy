@@ -34,3 +34,4 @@ export class WorldTransform {
   }
 }
 
+window.WorldTransform = WorldTransform;

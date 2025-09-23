@@ -18,3 +18,4 @@ export class AnimationLoop {
   }
 }
 
+window.AnimationLoop = AnimationLoop;

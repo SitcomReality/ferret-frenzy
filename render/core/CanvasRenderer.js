@@ -1,7 +1,8 @@
-// Removed module import lines and switched to using global classes
-class CanvasRenderer extends CanvasBase {
+class CanvasRenderer {
   constructor(canvas) {
-    super(canvas);
+    this.setCanvas(canvas);
+    this.dpr = 1;
+    this.lastTime = performance.now();
     this.props = null;
     this.laneHeight = 40;
     this.segmentWidth = 30;
@@ -14,6 +15,23 @@ class CanvasRenderer extends CanvasBase {
     this.nameplate = new Nameplate();
     this.animationLoop = new AnimationLoop();
     this.camera.damping = (gameState.settings?.render?.camera?.smoothing) || 0.15;
+  }
+
+  setCanvas(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+  }
+
+  resizeToContainer() {
+    const container = this.canvas.parentElement || document.body;
+    this.dpr = window.devicePixelRatio || 1;
+    const targetW = (container.clientWidth || 800);
+    const targetH = (container.clientHeight || 520);
+    this.canvas.width = Math.floor(targetW * this.dpr);
+    this.canvas.height = Math.floor(targetH * this.dpr);
+    this.ctx.setTransform(1,0,0,1,0,0); this.ctx.scale(this.dpr, this.dpr);
+    this.canvas.style.width = (this.canvas.width / this.dpr) + 'px';
+    this.canvas.style.height = (this.canvas.height / this.dpr) + 'px';
   }
 
   updateCamera() {

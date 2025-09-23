@@ -1,6 +1,4 @@
-import { TextureManager } from '../core/TextureManager.js';
-
-export class TrackRenderer {
+class TrackRenderer {
   constructor() {
     this.textureManager = new TextureManager();
     this.textureManager.loadTextures();
@@ -77,3 +75,5 @@ export class TrackRenderer {
     }
   }
 }
+
+window.TrackRenderer = TrackRenderer;

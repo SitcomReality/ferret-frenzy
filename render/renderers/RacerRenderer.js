@@ -131,3 +131,5 @@ export class RacerRenderer {
     return this.screenPositions;
   }
 }
+
+window.RacerRenderer = RacerRenderer;
