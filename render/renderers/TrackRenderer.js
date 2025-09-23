@@ -42,8 +42,13 @@ class TrackRenderer {
       }
       ctx.fillRect(0, currentY, worldPixelWidth, laneH - 2);
       // add lane separator line
-      ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      ctx.fillRect(0, currentY + laneH - 1, worldPixelWidth, 1);
+      // ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(0, currentY + laneH - 1, worldPixelWidth, 1);
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = Math.max(1, 2 / camera.zoom);
+      ctx.beginPath();
+      ctx.moveTo(0, currentY + laneH);
+      ctx.lineTo(worldPixelWidth, currentY + laneH);
+      ctx.stroke();
       currentY += laneH;
     }
 
