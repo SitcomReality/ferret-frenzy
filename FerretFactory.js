@@ -33,7 +33,12 @@ class FerretFactory {
     };
     const eye = {
       pupil: { x: 1, y: 0 }, // look forward right by default
+      targetPupilX: 1,
+      targetPupilY: 0,
       blinkTimer: pick(2.0, 8.0),
+      isBlinking: false,
+      blinkPhase: 0,
+      lastUpdateTime: 0,
       upperLid: clamp(pick(0.0, 0.3), 0, 1),
       lowerLid: clamp(pick(0.0, 0.2), 0, 1),
       targetRid: null
