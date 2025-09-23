@@ -1,4 +1,4 @@
-export class WorldTransform {
+class WorldTransform {
   constructor(laneHeight = 40, segmentWidth = 30) {
     this.laneHeight = laneHeight;
     this.segmentWidth = segmentWidth;
@@ -35,3 +35,4 @@ export class WorldTransform {
 }
 
 window.WorldTransform = WorldTransform;
+

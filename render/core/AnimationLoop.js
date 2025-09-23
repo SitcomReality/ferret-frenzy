@@ -1,4 +1,4 @@
-export class AnimationLoop {
+class AnimationLoop {
   constructor() {
     this.loop = null;
   }
@@ -19,3 +19,4 @@ export class AnimationLoop {
 }
 
 window.AnimationLoop = AnimationLoop;
+
