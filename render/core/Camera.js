@@ -4,6 +4,7 @@ class Camera {
     this.target = { x: 0, y: 0 };
     this.zoom = 1;
     this.damping = 0.15;
+    this.dpr = 1;
   }
   setMode(mode, opts = {}) {
     this.mode = mode || this.mode;
