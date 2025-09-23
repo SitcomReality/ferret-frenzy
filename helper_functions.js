@@ -1,5 +1,3 @@
-
-```javascript
 // Helper function to get a random value within a range
 function getRandomValue(base, variance) {
     const min = base - variance;
