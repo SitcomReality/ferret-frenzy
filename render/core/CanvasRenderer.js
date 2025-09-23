@@ -97,6 +97,10 @@ class CanvasRenderer {
   setData(currentRace, trackProps) {
     this.race = currentRace;
     this.props = trackProps;
+    // Clear banners when setting new race data to ensure fresh state
+    this.banners.clear();
+    this.currentHoveredLane = null;
+    this.previousHoveredLane = null;
   }
 
   start() {
