@@ -83,14 +83,23 @@
   height: 44px;
   border-radius: 8px;
   color: #fff;
-  -webkit-text-stroke: 1px rgba(0,0,0,0.45);
-  text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 0 4px rgba(0,0,0,0.6), 0 0 8px rgba(0,0,0,0.5);
   display: flex; align-items: center; justify-content: center;
   border: 1px solid rgba(0,0,0,0.4);
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
   position: relative;
   z-index: 1;
-  text-shadow: 0px 1px 1px white;
+  font-weight: 900;
+  font-size: 18px;
+  text-shadow: 
+    0 0 0 #000,
+    0 0 0 #000,
+    0 0 0 #000,
+    0 0 0 #000,
+    0 0 0 #000,
+    0 0 0 #000,
+    0 0 0 #000,
+    0 0 0 #000;
+  -webkit-text-stroke: 2px rgba(0,0,0,0.9);
 }
 
 .racer-card .racer-info { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
