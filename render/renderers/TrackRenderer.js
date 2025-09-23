@@ -1,5 +1,3 @@
-
-```javascript
 class TrackRenderer {
   constructor() {
     this.textureManager = new TextureManager();
