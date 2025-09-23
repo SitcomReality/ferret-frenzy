@@ -164,7 +164,7 @@ class CanvasRenderer {
       if (this.previousHoveredLane !== null && this.banners.has(this.previousHoveredLane)) {
         const prevBanner = this.banners.get(this.previousHoveredLane);
         prevBanner.active = false;
-        prevBanner.targetX = -600;
+        prevBanner.targetX = w + 100; // Slide out to the right
       }
       
       // Show new banner
@@ -176,7 +176,7 @@ class CanvasRenderer {
             this.banners.set(this.currentHoveredLane, {
               lane: this.currentHoveredLane,
               text: getRacerNameString(racer),
-              x: -600,
+              x: w + 100, // Start from the right side of screen
               targetX: 60,
               opacity: 0,
               active: true
@@ -185,7 +185,7 @@ class CanvasRenderer {
             const banner = this.banners.get(this.currentHoveredLane);
             banner.active = true;
             banner.targetX = 60;
-            if (banner.x < -500) banner.x = -600;
+            if (banner.x > w + 50) banner.x = w + 100;
             banner.opacity = Math.max(banner.opacity, 0.1);
           }
         }
@@ -217,16 +217,20 @@ class CanvasRenderer {
       const tw = ctx.measureText(banner.text).width;
       const pad = 14;
 
-      ctx.fillRect(banner.x - pad, laneY - 28, tw + pad * 2, 38);
+      // Make banner height match lane height
+      const bannerHeight = laneH * this.camera.zoom;
+      const bannerY = laneY - bannerHeight/2;
+
+      ctx.fillRect(banner.x - pad, bannerY, tw + pad * 2, bannerHeight);
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 2;
-      ctx.strokeRect(banner.x - pad, laneY - 28, tw + pad * 2, 38);
+      ctx.strokeRect(banner.x - pad, bannerY, tw + pad * 2, bannerHeight);
 
       ctx.shadowColor = 'rgba(0,0,0,0.6)';
       ctx.shadowBlur = 10;
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#fff';
-      ctx.fillText(banner.text, banner.x, laneY - 9);
+      ctx.fillText(banner.text, banner.x, laneY);
       ctx.restore();
     }
   }
