@@ -34,6 +34,18 @@ class CanvasRenderer {
     this.canvas.style.height = (this.canvas.height / this.dpr) + 'px';
   }
 
+  // helper for external callers (e.g., beginRace)
+  worldToScreen(worldX, laneIndex) {
+    return this.worldTransform.worldToScreen(
+      worldX,
+      laneIndex,
+      this.camera,
+      this.canvas.width,
+      this.canvas.height,
+      this.props && this.props.numberOfLanes
+    );
+  }
+
   updateCamera() {
     if (!this.race || !this.race.racers || this.race.racers.length === 0) return;
 
