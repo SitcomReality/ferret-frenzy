@@ -73,20 +73,9 @@ function setupTrack(track) {
         };
         window.addEventListener('resize', resizeHandler);
         
-        // Add mouse interaction
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const y = e.clientY - rect.top;
-            if (window.canvasRenderer) {
-                const lane = window.canvasRenderer.screenToLaneIndex(y);
-                window.canvasRenderer.setHoveredLane(lane);
-            }
-        });
-        canvas.addEventListener('mouseleave', () => {
-            if (window.canvasRenderer) {
-                window.canvasRenderer.setHoveredLane(null);
-            }
-        });
+        // remove mouse interaction listeners here; now handled in CanvasRenderer.setCanvas()
+        // canvas.addEventListener('mousemove', ...)
+        // canvas.addEventListener('mouseleave', ...)
     } else {
         window.canvasRenderer.setCanvas(canvas);
     }

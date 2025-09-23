@@ -23,8 +23,21 @@ class CanvasRenderer {
   }
 
   setCanvas(canvas) {
+    // unbind previous canvas listeners
+    if (this._boundCanvas && this._onMouseMove) {
+      this._boundCanvas.removeEventListener('mousemove', this._onMouseMove);
+      this._boundCanvas.removeEventListener('mouseleave', this._onMouseLeave);
+    }
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    // bind listeners to new canvas
+    if (!this._onMouseMove) {
+      this._onMouseMove = (e) => { const r=this.canvas.getBoundingClientRect(); const y=e.clientY-r.top; this.setHoveredLane(this.screenToLaneIndex(y)); };
+      this._onMouseLeave = () => this.setHoveredLane(null);
+    }
+    this.canvas.addEventListener('mousemove', this._onMouseMove);
+    this.canvas.addEventListener('mouseleave', this._onMouseLeave);
+    this._boundCanvas = this.canvas;
   }
 
   resizeToContainer() {
