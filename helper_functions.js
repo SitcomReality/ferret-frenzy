@@ -193,14 +193,13 @@ function showRacerStats(attribute, showOnlyThisWeek) {
     });
 }
 
-function getGroundParticleColor(type) {
-    switch(String(type).toLowerCase()) {
-        case 'grass': return 'rgba(10,77,31,0.9)';
-        case 'dirt': return 'rgba(90,59,31,0.9)';
-        case 'gravel': return 'rgba(70,70,70,0.9)';
-        case 'mud': return 'rgba(74,44,20,0.9)';
-        case 'rock': return 'rgba(47,59,63,0.9)';
-        case 'marble': return 'rgba(96,106,112,0.9)';
-        case 'asphalt': default: return 'rgba(43,43,43,0.9)';
-    }
+function getGroundParticleColor(type, variation = 0) {
+    const t = String(type).toLowerCase();
+    const base = {grass:[10,77,31], dirt:[90,59,31], gravel:[70,70,70], mud:[74,44,20], rock:[47,59,63], marble:[96,106,112], asphalt:[43,43,43]};
+    const rgb = base[t] || base.asphalt;
+    const f = 1 + (Math.random()*2 - 1) * Math.max(0, Math.min(1, variation));
+    const r = Math.max(0, Math.min(255, Math.round(rgb[0]*f)));
+    const g = Math.max(0, Math.min(255, Math.round(rgb[1]*f)));
+    const b = Math.max(0, Math.min(255, Math.round(rgb[2]*f)));
+    return `rgba(${r},${g},${b},0.9)`;
 }

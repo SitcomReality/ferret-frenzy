@@ -60,12 +60,13 @@ function beginRace() {
             } else {
                 thisRacer.remainingStumble = thisRacer.stats.stumbleDuration;
                 const laneIndex = gameState.currentRace.racers.indexOf(racerId);
-                const color = getGroundParticleColor(segmentType);
+                const color = getGroundParticleColor(segmentType, 0.25);
                 if (window.canvasRenderer && laneIndex >= 0) {
                     const screen = window.canvasRenderer.worldToScreen(currentMarginLeft, laneIndex);
-                    [0, Math.PI/2, Math.PI, 3*Math.PI/2].forEach(a => {
-                        window.canvasRenderer.particleSystem.emit(screen.x, screen.y, a, 120, 8, color);
-                    });
+                    // Strong forward (right) burst with slight spread and speed bias
+                    window.canvasRenderer.particleSystem.emit(screen.x, screen.y, 0, 180, 24, color, { spread: 1.0, forwardBoost: 0.8 });
+                    // Small backward splash for impact feel
+                    window.canvasRenderer.particleSystem.emit(screen.x, screen.y, Math.PI, 110, 6, color, { spread: 0.7, forwardBoost: 0.3 });
                 }
             }
         }
