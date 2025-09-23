@@ -23,9 +23,11 @@ class TrackRenderer {
     ctx.translate(-cameraPixelX, 0);
 
     const segs = race.segments.length;
-    // use logical (device-independent) pixel values then align to integer canvas pixels
     const segW = worldPixelWidth / Math.max(1, segs);
-    const dpr = (window.devicePixelRatio || 1);
+
+    // Solid base to prevent any background bleed
+    ctx.fillStyle = 'rgba(0,0,0,0.9)';
+    ctx.fillRect(0, 0, worldPixelWidth, totalHeight);
 
     // Draw lane backgrounds first
     let currentY = 0;
@@ -44,16 +46,11 @@ class TrackRenderer {
       currentY += laneH;
     }
 
-    // Draw segment textures with integer-aligned pixel boundaries to avoid subpixel gaps
+    // Draw segment textures
     currentY = 0;
     for (let i = 0; i < segs; i++) {
-      const x0 = i * segW;
-      const x1 = (i + 1) * segW;
-      // convert to device pixels and align to integer to prevent seams
-      const px0 = Math.floor(x0 * dpr) / dpr;
-      const px1 = Math.ceil(x1 * dpr) / dpr;
-      const drawW = Math.max(1, px1 - px0);
-
+      const x0 = Math.round(i * segW);
+      const x1 = Math.round((i + 1) * segW);
       const segmentType = race.segments[i];
       const pattern = this.textureManager.getPattern(segmentType, ctx);
       if (this.seamAligned.has(segmentType)) {
@@ -63,19 +60,18 @@ class TrackRenderer {
         }
       }
       ctx.fillStyle = pattern;
-      ctx.fillRect(px0, 0, drawW, totalHeight);
+      ctx.fillRect(x0, 0, (x1 - x0) + 1, totalHeight);
 
-      // draw subtle separators every 3 segments (aligned similarly)
       if ((i + 1) % 3 === 0 && i < segs - 1) {
-        const sepX = px1;
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
-        ctx.fillRect(sepX - (1 / dpr), 0, (1 / dpr), totalHeight);
+        ctx.fillRect(x1 - 1, 0, 1, totalHeight);
       }
     }
 
-    const fx = (segs - 1) * segW;
+    const fx0 = Math.round((segs - 1) * segW);
+    const fx1 = Math.round(segs * segW);
     ctx.fillStyle = 'rgba(255,255,0,0.35)';
-    ctx.fillRect(fx, 0, segW, totalHeight);
+    ctx.fillRect(fx0, 0, (fx1 - fx0) + 1, totalHeight);
 
     // Draw lane separators on top of everything
     currentY = 0;
