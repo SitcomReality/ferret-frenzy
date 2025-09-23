@@ -65,8 +65,28 @@ function getRacerNameString(racer) {
     const prefix = window.racerNamePrefixes[racer.name[0]];
     const suffix = window.racerNameSuffixes[racer.name[1]];
 
-    const prefixStr = (typeof prefix === 'function') ? prefix() : prefix;
-    const suffixStr = (typeof suffix === 'function') ? suffix() : suffix;
+    // Check if this is a function (dynamic name) that needs to be evaluated once
+    let prefixStr, suffixStr;
+    
+    if (typeof prefix === 'function') {
+        // Store the evaluated result if not already stored
+        if (!racer._evaluatedPrefix) {
+            racer._evaluatedPrefix = prefix();
+        }
+        prefixStr = racer._evaluatedPrefix;
+    } else {
+        prefixStr = prefix;
+    }
+    
+    if (typeof suffix === 'function') {
+        // Store the evaluated result if not already stored
+        if (!racer._evaluatedSuffix) {
+            racer._evaluatedSuffix = suffix();
+        }
+        suffixStr = racer._evaluatedSuffix;
+    } else {
+        suffixStr = suffix;
+    }
 
     return `${prefixStr} ${suffixStr}`;
 }
