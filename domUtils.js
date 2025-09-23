@@ -1,3 +1,5 @@
+
+```javascript
 class DOMUtils {
     static createLane(racerId, sections, segmentsPerSection) {
         const lane = document.createElement('div');
@@ -77,6 +79,15 @@ class DOMUtils {
         card.className = 'racer-card';
         card.setAttribute('data-racer-id', thisRacer.id);
 
+        // Set CSS custom properties for colors
+        const primaryColor = racerColors[thisRacer.colors[0]];
+        const secondaryColor = racerColors[thisRacer.colors[1]];
+        const tertiaryColor = racerColors[thisRacer.colors[2]];
+        
+        card.style.setProperty('--primary-color', primaryColor);
+        card.style.setProperty('--primary-color-dark', shadeColor(primaryColor, -20));
+        card.style.setProperty('--secondary-color', secondaryColor);
+
         if (typeof index === 'number') {
             const placing = document.createElement('div');
             placing.className = 'placing-badge';
@@ -87,7 +98,7 @@ class DOMUtils {
         const num = document.createElement('div');
         num.className = 'racer-number';
         num.textContent = thisRacer.id;
-        num.style.backgroundColor = racerColors[thisRacer.colors[2]];
+        num.style.backgroundColor = tertiaryColor;
         card.appendChild(num);
 
         const info = document.createElement('div');
@@ -101,10 +112,10 @@ class DOMUtils {
         flag.className = 'racer-flag';
         const swatchPrimary = document.createElement('span');
         swatchPrimary.className = 'swatch swatch-primary';
-        swatchPrimary.style.backgroundColor = racerColors[thisRacer.colors[0]];
+        swatchPrimary.style.backgroundColor = primaryColor;
         const swatchSecondary = document.createElement('span');
         swatchSecondary.className = 'swatch swatch-secondary';
-        swatchSecondary.style.backgroundColor = racerColors[thisRacer.colors[1]];
+        swatchSecondary.style.backgroundColor = secondaryColor;
         flag.appendChild(swatchPrimary);
         flag.appendChild(swatchSecondary);
         info.appendChild(flag);

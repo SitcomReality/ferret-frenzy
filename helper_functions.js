@@ -1,3 +1,5 @@
+
+```javascript
 // Helper function to get a random value within a range
 function getRandomValue(base, variance) {
     const min = base - variance;
@@ -61,13 +63,13 @@ function getRacerNameString(racer) {
     if (!racer || !racer.name) {
         return "Unknown Racer";
     }
-    
+
     const prefix = window.racerNamePrefixes[racer.name[0]];
     const suffix = window.racerNameSuffixes[racer.name[1]];
 
     // Check if this is a function (dynamic name) that needs to be evaluated once
     let prefixStr, suffixStr;
-    
+
     if (typeof prefix === 'function') {
         // Store the evaluated result if not already stored
         if (!racer._evaluatedPrefix) {
@@ -77,7 +79,7 @@ function getRacerNameString(racer) {
     } else {
         prefixStr = prefix;
     }
-    
+
     if (typeof suffix === 'function') {
         // Store the evaluated result if not already stored
         if (!racer._evaluatedSuffix) {
@@ -105,13 +107,13 @@ function getRandomMultiplier(mulitiplierVariation, maxVal = 0.9, minVal = 1.1) {
     let mean = 1;
     let standardDeviation = mulitiplierVariation;
     let gaussianRandom = generateGaussianRandom();
-    
+
     // Calculate the form value
     let multiplierValue = mean + gaussianRandom * standardDeviation;
-    
+
     // Ensure formValue is close to 1
     multiplierValue = Math.max(0.9, Math.min(1.1, multiplierValue));
-    
+
     return multiplierValue;
 }
 
@@ -131,10 +133,10 @@ function calculateBasePropertyAverage(category) {
 function updateBoxShadowX(element, newXValue) {
     // Get the current box-shadow value
     let boxShadow = element.style.boxShadow || getComputedStyle(element).boxShadow;
-    
-    let regex = /(rgba?\([^\)]+\)|#[0-9a-fA-F]{3,6})\s(-?\d+px)\s(-?\d+px)\s(-?\d+px)(\s-?\d+px)?/;
+
+    let regex = /(rgba?\([^)]+\)|#[0-9a-fA-F]{3,6})\s(-?\d+px)\s(-?\d+px)\s(-?\d+px)(\s-?\d+px)?/;
     let match = boxShadow.match(regex);
-    
+
     if (match) {
         // Extract parts from the regex match
         let color = match[1];
@@ -142,10 +144,10 @@ function updateBoxShadowX(element, newXValue) {
         let offsetY = match[3];
         let blurRadius = match[4];
         let spreadRadius = match[5] ? match[5] : '';
-        
+
         offsetX = Math.floor(parseFloat(offsetX) - newXValue);
         offsetX = offsetX + "px";
-        
+
         // Reconstruct the box-shadow value
         let newBoxShadow = `${color} ${offsetX} ${offsetY} ${blurRadius} ${spreadRadius}`.trim();
 
@@ -222,4 +224,29 @@ function getGroundParticleColor(type, variation = 0) {
     const g = Math.max(0, Math.min(255, Math.round(rgb[1]*f)));
     const b = Math.max(0, Math.min(255, Math.round(rgb[2]*f)));
     return `rgba(${r},${g},${b},0.9)`;
+}
+
+// Helper function to shade a hex color
+function shadeColor(color, percent) {
+    let R = parseInt(color.substring(1,3),16);
+    let G = parseInt(color.substring(3,5),16);
+    let B = parseInt(color.substring(5,7),16);
+
+    R = parseInt(R * (100 + percent) / 100);
+    G = parseInt(G * (100 + percent) / 100);
+    B = parseInt(B * (100 + percent) / 100);
+
+    R = (R<255)?R:255;  
+    G = (G<255)?G:255;  
+    B = (B<255)?B:255;  
+
+    R = Math.round(R);
+    G = Math.round(G);
+    B = Math.round(B);
+
+    const RR = ((R.toString(16).length===1)?"0"+R.toString(16):R.toString(16));
+    const GG = ((G.toString(16).length===1)?"0"+G.toString(16):G.toString(16));
+    const BB = ((B.toString(16).length===1)?"0"+B.toString(16):B.toString(16));
+
+    return "#"+RR+GG+BB;
 }
