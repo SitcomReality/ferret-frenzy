@@ -156,36 +156,34 @@ class CanvasRenderer {
     const w = ctx.canvas.width / (window.devicePixelRatio || 1);
     const h = ctx.canvas.height / (window.devicePixelRatio || 1);
     const laneH = this.laneHeight;
-    const totalH = laneH * this.props.numberOfLanes;
 
     // Update banner states based on hover changes
     if (this.currentHoveredLane !== this.previousHoveredLane) {
-      // Hide previous banner
       if (this.previousHoveredLane !== null && this.banners.has(this.previousHoveredLane)) {
         const prevBanner = this.banners.get(this.previousHoveredLane);
         prevBanner.active = false;
-        prevBanner.targetX = w + 100; // Slide out to the right
+        prevBanner.targetX = -400; // Animate off-screen to the left
       }
       
-      // Show new banner
       if (this.currentHoveredLane !== null) {
         const rid = this.race.racers[this.currentHoveredLane];
         const racer = gameState.racers[rid];
         if (racer) {
+            const startX = w + 100;
           if (!this.banners.has(this.currentHoveredLane)) {
             this.banners.set(this.currentHoveredLane, {
               lane: this.currentHoveredLane,
               text: getRacerNameString(racer),
-              x: w + 100, // Start from the right side of screen
-              targetX: 60,
+              x: startX,
+              targetX: 20,
               opacity: 0,
               active: true
             });
           } else {
             const banner = this.banners.get(this.currentHoveredLane);
             banner.active = true;
-            banner.targetX = 60;
-            if (banner.x > w + 50) banner.x = w + 100;
+            banner.targetX = 20;
+            if (banner.x > w + 50 || banner.x < -350) banner.x = startX;
             banner.opacity = Math.max(banner.opacity, 0.1);
           }
         }
@@ -198,7 +196,6 @@ class CanvasRenderer {
     for (const [laneIndex, banner] of this.banners.entries()) {
       if (!banner || (!banner.active && banner.opacity <= 0.02)) continue;
 
-      // Update animation
       banner.x += (banner.targetX - banner.x) * 0.18;
       const targetOpacity = banner.active ? 1 : 0;
       banner.opacity += (targetOpacity - banner.opacity) * 0.15;
@@ -207,30 +204,96 @@ class CanvasRenderer {
         this.banners.delete(laneIndex);
         continue;
       }
+      
+      const rid = this.race.racers[laneIndex];
+      const racer = gameState.racers[rid];
+      if (!racer) continue;
+      
+      const color1 = racerColors[racer.colors[0]];
+      const color2 = racerColors[racer.colors[1]];
+      const color3 = racerColors[racer.colors[2]];
 
+      const totalH = laneH * this.props.numberOfLanes;
       const laneY = (laneIndex * laneH + laneH/2 - totalH/2) * this.camera.zoom + (this.canvas.height/this.dpr)/2;
+      const bannerHeight = laneH * this.camera.zoom;
+      const bannerY = laneY - bannerHeight/2;
+      const startX = banner.x;
 
       ctx.save();
       ctx.globalAlpha = Math.max(0, Math.min(1, banner.opacity));
-      ctx.fillStyle = 'rgba(0,0,0,0.65)';
-      ctx.font = '700 28px Orbitron';
-      const tw = ctx.measureText(banner.text).width;
-      const pad = 14;
+      ctx.shadowColor = 'rgba(0,0,0,0.7)';
+      ctx.shadowBlur = 15;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
 
-      // Make banner height match lane height
-      const bannerHeight = laneH * this.camera.zoom;
-      const bannerY = laneY - bannerHeight/2;
+      // --- Drawing logic ---
+      const nameFontSize = Math.max(12, bannerHeight * 0.55);
+      ctx.font = `900 ${nameFontSize}px Orbitron`;
+      const nameText = banner.text.toUpperCase();
+      const nameMetrics = ctx.measureText(nameText);
+      const nameWidth = nameMetrics.width;
 
-      ctx.fillRect(banner.x - pad, bannerY, tw + pad * 2, bannerHeight);
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(banner.x - pad, bannerY, tw + pad * 2, bannerHeight);
+      const numberFontSize = Math.max(10, bannerHeight * 0.45);
+      ctx.font = `700 ${numberFontSize}px Orbitron`;
+      const numberText = String(racer.id);
 
-      ctx.shadowColor = 'rgba(0,0,0,0.6)';
-      ctx.shadowBlur = 10;
+      const numberCircleRadius = bannerHeight * 0.6;
+      const nameBarHeight = bannerHeight;
+      const nameBarPadding = bannerHeight * 0.5;
+      const totalNameBarWidth = nameWidth + nameBarPadding * 2;
+      const slant = bannerHeight * 0.3;
+
+      // 1. Name Bar (Primary Color)
+      ctx.fillStyle = color1;
+      ctx.beginPath();
+      ctx.moveTo(startX + numberCircleRadius, bannerY);
+      ctx.lineTo(startX + numberCircleRadius + totalNameBarWidth + slant, bannerY);
+      ctx.lineTo(startX + numberCircleRadius + totalNameBarWidth, bannerY + nameBarHeight);
+      ctx.lineTo(startX + numberCircleRadius - slant, bannerY + nameBarHeight);
+      ctx.closePath();
+      ctx.fill();
+      
+      // 2. Accent stripe (Secondary Color)
+      ctx.fillStyle = color2;
+      ctx.beginPath();
+      const stripeHeight = bannerHeight * 0.15;
+      ctx.moveTo(startX + numberCircleRadius - slant, bannerY + nameBarHeight - stripeHeight);
+      ctx.lineTo(startX + numberCircleRadius + totalNameBarWidth, bannerY + nameBarHeight - stripeHeight);
+      ctx.lineTo(startX + numberCircleRadius + totalNameBarWidth - slant, bannerY + nameBarHeight);
+      ctx.lineTo(startX + numberCircleRadius - slant * 2, bannerY + nameBarHeight);
+      ctx.closePath();
+      ctx.fill();
+
+      // 3. Number Circle (Tertiary Color)
+      ctx.beginPath();
+      ctx.arc(startX + numberCircleRadius, laneY, numberCircleRadius, 0, Math.PI*2);
+      ctx.fillStyle = color3;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // --- Text Rendering (with outlines for readability) ---
+      ctx.shadowColor = 'transparent'; // Disable shadow for text for crispness
       ctx.textBaseline = 'middle';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+
+      // 4. Racer Name Text
+      ctx.textAlign = 'center';
+      ctx.font = `900 ${nameFontSize}px Orbitron`;
+      const nameX = startX + numberCircleRadius + totalNameBarWidth/2;
+      ctx.strokeText(nameText, nameX, laneY + bannerHeight*0.05);
       ctx.fillStyle = '#fff';
-      ctx.fillText(banner.text, banner.x, laneY);
+      ctx.fillText(nameText, nameX, laneY + bannerHeight*0.05);
+      
+      // 5. Racer Number Text
+      ctx.font = `700 ${numberFontSize}px Orbitron`;
+      const numberX = startX + numberCircleRadius;
+      ctx.strokeText(numberText, numberX, laneY);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(numberText, numberX, laneY);
+
       ctx.restore();
     }
   }
