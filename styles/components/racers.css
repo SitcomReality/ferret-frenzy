@@ -122,8 +122,8 @@
   font-size: 12px;
 }
 
-.racers-list li .racer-card .swatch,
-#historyList li .racer-card .swatch,
+.racers-list li .swatch,
+#historyList li .swatch,
 .racer-card.this-racer-is-in-a-list .swatch {
   width: 10px; height: 10px;
 }
