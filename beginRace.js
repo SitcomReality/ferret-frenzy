@@ -59,6 +59,14 @@ function beginRace() {
                 }
             } else {
                 thisRacer.remainingStumble = thisRacer.stats.stumbleDuration;
+                const laneIndex = gameState.currentRace.racers.indexOf(racerId);
+                const color = getGroundParticleColor(segmentType);
+                if (window.canvasRenderer && laneIndex >= 0) {
+                    const screen = window.canvasRenderer.worldToScreen(currentMarginLeft, laneIndex);
+                    [0, Math.PI/2, Math.PI, 3*Math.PI/2].forEach(a => {
+                        window.canvasRenderer.particleSystem.emit(screen.x, screen.y, a, 120, 8, color);
+                    });
+                }
             }
         }
     }

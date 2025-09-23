@@ -14,14 +14,14 @@ class ParticleSystem {
     };
   }
 
-  emit(x, y, angle, speed, count = 3) {
+  emit(x, y, angle, speed, count = 3, color = null) {
     for (let i = 0; i < count && this.particles.length < this.maxParticles; i++) {
       const spread = (Math.random() - 0.5) * 0.5;
       const particleAngle = angle + spread;
       const vx = Math.cos(particleAngle) * speed * (0.5 + Math.random() * 0.5);
       const vy = Math.sin(particleAngle) * speed * (0.5 + Math.random() * 0.5);
       const life = 0.5 + Math.random() * 0.5;
-      this.particles.push(this.createParticle(x, y, vx, vy, null, life));
+      this.particles.push(this.createParticle(x, y, vx, vy, color, life));
     }
   }
 

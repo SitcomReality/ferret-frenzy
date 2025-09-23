@@ -192,3 +192,15 @@ function showRacerStats(attribute, showOnlyThisWeek) {
         console.log(value);
     });
 }
+
+function getGroundParticleColor(type) {
+    switch(String(type).toLowerCase()) {
+        case 'grass': return 'rgba(10,77,31,0.9)';
+        case 'dirt': return 'rgba(90,59,31,0.9)';
+        case 'gravel': return 'rgba(70,70,70,0.9)';
+        case 'mud': return 'rgba(74,44,20,0.9)';
+        case 'rock': return 'rgba(47,59,63,0.9)';
+        case 'marble': return 'rgba(96,106,112,0.9)';
+        case 'asphalt': default: return 'rgba(43,43,43,0.9)';
+    }
+}
