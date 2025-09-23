@@ -27,6 +27,7 @@ class TrackRenderer {
     const segs = race.segments.length;
     const segW = worldPixelWidth / Math.max(1, segs);
 
+    // Draw lane backgrounds first
     let currentY = 0;
     for (let l = 0; l < props.numberOfLanes; l++) {
       const perspectiveFactor = 1 - (l / props.numberOfLanes) * 0.2;
@@ -41,17 +42,10 @@ class TrackRenderer {
         ctx.fillStyle = l % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
       }
       ctx.fillRect(0, currentY, worldPixelWidth, laneH - 2);
-      // add lane separator line
-      // ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(0, currentY + laneH - 1, worldPixelWidth, 1);
-      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-      ctx.lineWidth = Math.max(1, 2 / camera.zoom);
-      ctx.beginPath();
-      ctx.moveTo(0, currentY + laneH);
-      ctx.lineTo(worldPixelWidth, currentY + laneH);
-      ctx.stroke();
       currentY += laneH;
     }
 
+    // Draw segment textures
     currentY = 0;
     for (let i = 0; i < segs; i++) {
       const x = i * segW;
@@ -70,6 +64,23 @@ class TrackRenderer {
     const fx = (segs - 1) * segW;
     ctx.fillStyle = 'rgba(255,255,0,0.35)';
     ctx.fillRect(fx, 0, segW, totalPerspectiveHeight);
+
+    // Draw lane separators on top of everything
+    currentY = 0;
+    for (let l = 0; l < props.numberOfLanes; l++) {
+      const perspectiveFactor = 1 - (l / props.numberOfLanes) * 0.2;
+      const laneH = laneHeight * perspectiveFactor;
+
+      // Draw lane separator line - bright white and visible
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = Math.max(2, 3 / camera.zoom);
+      ctx.beginPath();
+      ctx.moveTo(0, currentY + laneH);
+      ctx.lineTo(worldPixelWidth, currentY + laneH);
+      ctx.stroke();
+      
+      currentY += laneH;
+    }
 
     ctx.restore();
   }
