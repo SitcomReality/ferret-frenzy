@@ -70,7 +70,7 @@ class CanvasRenderer {
       const zMin = (gameState.settings?.render?.camera?.zoomMin) || 0.5;
       const zMax = (gameState.settings?.render?.camera?.zoomMax) || 3.0;
       const zoomH = worldUnitsVisibleAtZoom1 / neededUnits;
-      let totalH = 0; for (let i=0;i<this.props.numberOfLanes;i++) totalH += this.laneHeight * (1 - (i / this.props.numberOfLanes) * 0.2);
+      const totalH = this.laneHeight * this.props.numberOfLanes;
       const marginPx = 30; const zoomV = (h - marginPx * 2) / Math.max(1, totalH);
       desiredZoom = Math.max(zMin, Math.min(zMax, Math.min(zoomH, zoomV)));
       

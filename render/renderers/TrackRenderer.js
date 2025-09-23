@@ -12,12 +12,9 @@ class TrackRenderer {
     ctx.translate(w / 2, h / 2);
     ctx.scale(camera.zoom, camera.zoom);
 
-    let totalPerspectiveHeight = 0;
     const laneHeight = 40;
-    for(let i = 0; i < props.numberOfLanes; i++) {
-        totalPerspectiveHeight += laneHeight * (1 - (i / props.numberOfLanes) * 0.2);
-    }
-    const trackCenterOffsetY = totalPerspectiveHeight / 2;
+    const totalHeight = laneHeight * props.numberOfLanes;
+    const trackCenterOffsetY = totalHeight / 2;
     ctx.translate(0, -trackCenterOffsetY);
 
     const worldPixelWidth = w * 4;
@@ -30,8 +27,7 @@ class TrackRenderer {
     // Draw lane backgrounds first
     let currentY = 0;
     for (let l = 0; l < props.numberOfLanes; l++) {
-      const perspectiveFactor = 1 - (l / props.numberOfLanes) * 0.2;
-      const laneH = laneHeight * perspectiveFactor;
+      const laneH = laneHeight;
 
       const rid = race.racers[l];
       const racer = gameState.racers[rid];
@@ -53,23 +49,22 @@ class TrackRenderer {
       const pattern = this.textureManager.getPattern(segmentType, ctx);
 
       ctx.fillStyle = pattern;
-      ctx.fillRect(x, 0, segW, totalPerspectiveHeight);
+      ctx.fillRect(x, 0, segW, totalHeight);
 
       if ((i + 1) % 3 === 0 && i < segs - 1) {
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
-        ctx.fillRect(x + segW - 1, 0, 1, totalPerspectiveHeight);
+        ctx.fillRect(x + segW - 1, 0, 1, totalHeight);
       }
     }
 
     const fx = (segs - 1) * segW;
     ctx.fillStyle = 'rgba(255,255,0,0.35)';
-    ctx.fillRect(fx, 0, segW, totalPerspectiveHeight);
+    ctx.fillRect(fx, 0, segW, totalHeight);
 
     // Draw lane separators on top of everything
     currentY = 0;
     for (let l = 0; l < props.numberOfLanes; l++) {
-      const perspectiveFactor = 1 - (l / props.numberOfLanes) * 0.2;
-      const laneH = laneHeight * perspectiveFactor;
+      const laneH = laneHeight;
 
       // Draw lane separator line - bright white and visible
       ctx.strokeStyle = 'rgba(255,255,255,0.8)';
