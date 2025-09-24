@@ -24,13 +24,11 @@ export class ModuleLoader {
     }
 
     try {
-      // Try ES6 dynamic import first
-      if (typeof import === 'function') {
-        const module = await import(modulePath);
-        this.loadedModules.add(modulePath);
-        this.moduleCache.set(modulePath, module);
-        return module;
-      }
+      // Try ES6 dynamic import first (direct dynamic import; will throw in older environments)
+      const module = await import(modulePath);
+      this.loadedModules.add(modulePath);
+      this.moduleCache.set(modulePath, module);
+      return module;
     } catch (error) {
       console.warn(`Failed to load module ${modulePath} via dynamic import:`, error);
     }
