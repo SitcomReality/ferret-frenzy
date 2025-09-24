@@ -6,6 +6,8 @@ export class ModuleLoader {
     this.modules = new Map();
     this.loadedModules = new Set();
     this.moduleCache = new Map();
+    this.fallbackModules = new Map();
+    this.loadingPromises = new Map();
   }
 
   /**
@@ -23,18 +25,34 @@ export class ModuleLoader {
       return this.moduleCache.get(modulePath);
     }
 
+    if (this.loadingPromises.has(modulePath)) {
+      return this.loadingPromises.get(modulePath);
+    }
+
+    const loadingPromise = this._loadModuleInternal(modulePath);
+    this.loadingPromises.set(modulePath, loadingPromise);
+
     try {
-      // Try ES6 dynamic import first (direct dynamic import; will throw in older environments)
-      const module = await import(modulePath);
+      const module = await loadingPromise;
       this.loadedModules.add(modulePath);
       this.moduleCache.set(modulePath, module);
+      this.loadingPromises.delete(modulePath);
+      return module;
+    } catch (error) {
+      this.loadingPromises.delete(modulePath);
+      throw error;
+    }
+  }
+
+  async _loadModuleInternal(modulePath) {
+    try {
+      // Try ES6 dynamic import first
+      const module = await import(modulePath);
       return module;
     } catch (error) {
       console.warn(`Failed to load module ${modulePath} via dynamic import:`, error);
+      return this.loadModuleViaScript(modulePath);
     }
-
-    // Fallback to script tag loading for older browsers
-    return this.loadModuleViaScript(modulePath);
   }
 
   /**
@@ -47,12 +65,13 @@ export class ModuleLoader {
       script.src = modulePath;
 
       script.onload = () => {
-        this.loadedModules.add(modulePath);
-        // For script tag loading, modules are available globally
         const moduleName = this.extractModuleName(modulePath);
         const module = window[moduleName];
-        this.moduleCache.set(modulePath, module);
-        resolve(module);
+        if (module) {
+          resolve(module);
+        } else {
+          reject(new Error(`Module ${moduleName} not found on window object`));
+        }
       };
 
       script.onerror = () => {
@@ -68,7 +87,6 @@ export class ModuleLoader {
    */
   async loadModules(modulePaths) {
     if (!modulePaths) {
-      // Load default modules if no paths provided
       return this.loadDefaultModules();
     }
 
@@ -80,9 +98,22 @@ export class ModuleLoader {
    * Load default application modules
    */
   async loadDefaultModules() {
-    // This will be expanded as we convert individual modules
-    // For now, just return a resolved promise
-    return Promise.resolve();
+    const coreModules = [
+      './core/GameState.js',
+      './core/EventBus.js',
+      './game/RaceManager.js',
+      './game/betting/BettingManager.js',
+      './game/progression/ProgressionManager.js'
+    ];
+
+    try {
+      const results = await this.loadModules(coreModules);
+      console.log('Core modules loaded successfully');
+      return results;
+    } catch (error) {
+      console.error('Failed to load core modules:', error);
+      throw error;
+    }
   }
 
   /**
@@ -109,10 +140,18 @@ export class ModuleLoader {
   }
 
   /**
+   * Add fallback module for offline support
+   */
+  addFallbackModule(modulePath, moduleContent) {
+    this.fallbackModules.set(modulePath, moduleContent);
+  }
+
+  /**
    * Clear module cache
    */
   clearCache() {
     this.loadedModules.clear();
     this.moduleCache.clear();
+    this.loadingPromises.clear();
   }
 }
