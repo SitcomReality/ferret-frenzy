@@ -1,4 +1,4 @@
-class FerretFactory {
+export class FerretFactory {
   static _hash(str) {
     let h = 2166136261;
     for (let i = 0; i < str.length; i++) {
@@ -60,4 +60,3 @@ class FerretFactory {
     };
   }
 }
-window.FerretFactory = FerretFactory;
