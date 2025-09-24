@@ -127,9 +127,10 @@ class CanvasRenderer {
   tick(dt) {
     this.updateCamera(dt);
     this.render();
-    const racerRenderer = new RacerRenderer();
-    racerRenderer.render(this.ctx, this.race, this.worldTransform, performance.now() / 1000);
-    this.hitIndex.update(racerRenderer.getScreenPositions());
+    // remove duplicate per-frame racer rendering (caused extra legs)
+    // const racerRenderer = new RacerRenderer();
+    // racerRenderer.render(this.ctx, this.race, this.worldTransform, performance.now() / 1000);
+    // this.hitIndex.update(racerRenderer.getScreenPositions());
   }
 
   render() {
