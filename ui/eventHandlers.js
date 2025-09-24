@@ -52,7 +52,11 @@ class EventHandlers {
         const startRaceBtn = document.getElementById('startRace');
         if (startRaceBtn) {
             startRaceBtn.addEventListener('click', function() {
-                startRace();
+                if (typeof window.startRace === 'function') {
+                    window.startRace();
+                } else if (window.app && window.app.raceManager) {
+                    window.app.raceManager.startRace();
+                }
                 window.app.hud.setStatus('Race in progress... watch the leaderboard update live.');
             });
         }

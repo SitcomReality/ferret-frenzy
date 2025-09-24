@@ -1,5 +1,6 @@
 import { DOMUtils } from './domUtils.js';
 import { arrangeRacersByPerformance } from './arrangeRacersByPerformance.js';
+import { RenderManager } from './render/RenderManager.js';
 
 function setupTrack(track) {
     document.getElementById('setupRace').disabled = true;

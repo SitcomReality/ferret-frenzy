@@ -13,7 +13,7 @@ export class RacerPerformance {
   }
 
   initialize() {
-    // Fix: Use direct stats access instead of getStat method
+    // Fix: Use direct stats access instead of getStat method, as stats component is not fully ready
     const stats = this.racer.getComponent('stats');
     if (stats && stats.stats) {
       this.remainingEndurance = stats.stats.endurance || 2000;
@@ -26,24 +26,30 @@ export class RacerPerformance {
   }
 
   calculateSpeed(racerForm, percentRaceComplete, groundType, weatherType) {
+    const stats = this.racer.getComponent('stats');
+    if (!stats) {
+        console.warn('RacerPerformance: Stats component not found for racer', this.racer.id);
+        return this.config.racerProperties.speedBase;
+    }
+
     let returnSpeed = this.config.racerProperties.speedBase;
-    returnSpeed *= this.racer.stats.getStat(`ground.${groundType}`) || 1;
-    returnSpeed *= this.racer.stats.getStat(`weather.${weatherType}`) || 1;
+    returnSpeed *= stats.getStat(`ground.${groundType}`) || 1;
+    returnSpeed *= stats.getStat(`weather.${weatherType}`) || 1;
     
     const currentThird = percentRaceComplete < 34 ? 1 : percentRaceComplete > 66 ? 3 : 2;
     let thirdName = "one";
     if (currentThird === 2) { thirdName = "two" }
     if (currentThird === 3) { thirdName = "three" }
     
-    returnSpeed *= this.racer.stats.getStat(`third.${thirdName}`);
+    returnSpeed *= stats.getStat(`third.${thirdName}`) || 1;
     returnSpeed *= racerForm;
     
     if (this.isExhausted) {
-      returnSpeed *= this.racer.stats.getStat('exhaustionMultiplier');
+      returnSpeed *= stats.getStat('exhaustionMultiplier');
     }
     
     if (this.isBoosting) {
-      returnSpeed += this.racer.stats.getStat('boostPower');
+      returnSpeed += stats.getStat('boostPower');
     }
     
     returnSpeed = Math.trunc(returnSpeed * this.config.racerProperties.speedMultiplier, 4);
@@ -93,8 +99,10 @@ export class RacerPerformance {
   }
 
   reset() {
-    this.remainingEndurance = this.racer.stats.getStat('endurance');
-    this.remainingBoost = this.racer.stats.getStat('boostDuration');
+    const stats = this.racer.getComponent('stats');
+    if (!stats) return;
+    this.remainingEndurance = stats.getStat('endurance');
+    this.remainingBoost = stats.getStat('boostDuration');
     this.isBoosting = false;
     this.isExhausted = false;
     this.speedThisRace = [];

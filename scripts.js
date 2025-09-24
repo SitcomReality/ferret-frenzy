@@ -24,7 +24,9 @@ function startRace() {
 	gameState.running = true;
 	beginRace();
 	
-    if (gameState.settings.autoStart) {
+    // The new system does not use autoStart in this way,
+    // so this block is commented out to prevent legacy behavior.
+    /* if (gameState.settings.autoStart) {
         // pick racers randomly for the race
         gameState.currentRace.racers = selectRacersForRace();
         // simulates a race and determines a winner.
@@ -33,7 +35,7 @@ function startRace() {
         // Clear current race data
         gameState.currentRace = { id: null, racers: [], winner: null };
         updateDisplay();
-    }
+    } */
 }
 
 function placeBet(racerId, betAmount) {
