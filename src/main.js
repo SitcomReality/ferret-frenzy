@@ -183,6 +183,14 @@ class Application {
   }
 
   initializeUI() {
+    // Ensure root container exists
+    let root = document.getElementById('app');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'app';
+      document.body.appendChild(root);
+    }
+    document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') || 'dark');
     // Hide no-js message
     const noJsDiv = document.getElementById('no-js');
     if (noJsDiv) noJsDiv.style.display = 'none';
