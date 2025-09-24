@@ -93,3 +93,16 @@ export function getGroundParticleColor(type, variation = 0) {
     const b = Math.max(0, Math.min(255, Math.round(rgb[2]*f)));
     return `rgba(${r},${g},${b},0.9)`;
 }
+
+// Get an average of all the base values in gameState.settings.[category]Properties
+export function calculateBasePropertyAverage(category) {
+    let sum = 0;
+    let count = 0;
+    for (const property in category) {
+        if (property.endsWith('Base')) {
+            sum += category[property];
+            count++;
+        }
+    }
+    return count > 0 ? sum / count : 0;
+}

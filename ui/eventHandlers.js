@@ -6,11 +6,8 @@ class EventHandlers {
                 if (window.eventBus && typeof window.eventBus.emit === 'function') {
                     window.eventBus.emit('game:initialize');
                 } else if (typeof window.initGame === 'function') {
-                    window.initGame();
+                    window.initGame(window.gameState);
                 }
-                HUD.setStep(1, 'done'); 
-                HUD.setStep(2, 'active');
-                HUD.setStatus('Racers and tracks generated. Start Race Week.');
             });
         }
     }
@@ -22,10 +19,10 @@ class EventHandlers {
                 this.disabled = true;
                 const setupRaceBtn = document.getElementById('setupRace');
                 if (setupRaceBtn) { setupRaceBtn.disabled = false; }
-                createNewRaceWeek();
-                HUD.setStep(2, 'done'); 
-                HUD.setStep(3, 'active');
-                HUD.setStatus('Race Week created. Setup the next race.');
+                window.app.progressionManager.startNewRaceWeek();
+                window.app.hud.setStep(2, 'done'); 
+                window.app.hud.setStep(3, 'active');
+                window.app.hud.setStatus('Race Week created. Setup the next race.');
             });
         }
     }
@@ -35,10 +32,10 @@ class EventHandlers {
         if (setupRaceBtn) {
             setupRaceBtn.addEventListener('click', function() {
                 setupRace();
-                setupBettingOptions();
-                HUD.setStep(3, 'done'); 
-                HUD.setStep(4, 'active');
-                HUD.setStatus('Track prepared and racers on the grid. Start the race!');
+                // setupBettingOptions(); // Betting component will handle this
+                window.app.hud.setStep(3, 'done'); 
+                window.app.hud.setStep(4, 'active');
+                window.app.hud.setStatus('Track prepared and racers on the grid. Start the race!');
             });
         }
     }
@@ -48,7 +45,7 @@ class EventHandlers {
         if (startRaceBtn) {
             startRaceBtn.addEventListener('click', function() {
                 startRace();
-                HUD.setStatus('Race in progress... watch the leaderboard update live.');
+                window.app.hud.setStatus('Race in progress... watch the leaderboard update live.');
             });
         }
     }

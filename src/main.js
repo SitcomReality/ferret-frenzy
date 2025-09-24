@@ -5,10 +5,7 @@ import { EventBus } from './core/EventBus.js';
 import { RaceManager } from './game/RaceManager.js';
 import { BettingManager } from './game/betting/BettingManager.js';
 import { ProgressionManager } from './game/progression/ProgressionManager.js';
-// import { UIManager } from './ui/UIManager.js';
-// import { GameScreen } from './ui/screens/GameScreen.js';
-// import { BettingComponent } from './ui/components/BettingComponent.js';
-// import { HUDComponent } from './ui/components/HUDComponent.js';
+import { HUDComponent } from '../ui/components/HUDComponent.js';
 // Ensure legacy UI helpers are available
 import '../ui/components/settingsPanel.js';
 import '../ui/components/tabs.js';
@@ -19,18 +16,21 @@ import { initGame } from '../init.js';
 class Application {
   constructor() {
     this.moduleLoader = new ModuleLoader();
-    this.gameState = new GameState();
+    this.gameStateManager = new GameState();
+    this.gameState = this.gameStateManager.state; // direct access for legacy code
     this.eventBus = new EventBus();
     
     // Initialize game logic managers
-    this.raceManager = new RaceManager(this.eventBus, this.gameState);
-    this.bettingManager = new BettingManager(this.eventBus, this.gameState);
-    this.progressionManager = new ProgressionManager(this.eventBus, this.gameState);
+    this.raceManager = new RaceManager(this.eventBus, this.gameStateManager);
+    this.bettingManager = new BettingManager(this.eventBus, this.gameStateManager);
+    this.progressionManager = new ProgressionManager(this.eventBus, this.gameStateManager);
+    
+    // UI Components
+    this.hud = new HUDComponent(document.getElementById('hud'));
     
     // Make gameState available globally for compatibility
-    window.gameState = this.gameState.state;
     window.eventBus = this.eventBus;
-    window.initGame = initGame;
+    window.gameState = this.gameState;
     
     // Setup event listeners
     this.setupEventListeners();
@@ -91,12 +91,10 @@ class Application {
     });
     
     this.eventBus.on('game:initialize', () => {
-      initGame();
-      if (window.HUD) {
-        HUD.setStep(1, 'done');
-        HUD.setStep(2, 'active');
-        HUD.setStatus('Racers and tracks generated. Start Race Week.');
-      }
+      initGame(this.gameState);
+      this.hud.setStep(1, 'done');
+      this.hud.setStep(2, 'active');
+      this.hud.setStatus('Racers and tracks generated. Start Race Week.');
       const intro = document.getElementById('introScreen');
       if (intro) intro.remove();
     });
@@ -196,12 +194,12 @@ class Application {
 // Initialize the application when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    const app = new Application();
-    app.initialize().catch(console.error);
+    window.app = new Application();
+    window.app.initialize().catch(console.error);
   });
 } else {
-  const app = new Application();
-  app.initialize().catch(console.error);
+  window.app = new Application();
+  window.app.initialize().catch(console.error);
 }
 
 // Export for use in other modules

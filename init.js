@@ -1,4 +1,10 @@
-function initGame() {
+import { calculateBasePropertyAverage, generateUniqueNumbers } from './src/utils/helpers.js';
+import { Racer } from './src/entities/racer/Racer.js';
+import { Track } from './Track.js';
+
+window.Track = Track; // for save/load compatibility
+
+function initGame(gameState) {
 
 	const avgSpeed = 
 		gameState.settings.racerProperties.speedBase *
@@ -16,12 +22,12 @@ function initGame() {
 	gameState.settings.racerProperties.enduranceVariance = Math.floor(gameState.settings.racerProperties.enduranceBase * 0.15);
 	
 
-	gameState.racers = generateNewRacers(gameState.settings.racerProperties.totalPoolSize);
+	gameState.racers = generateNewRacers(gameState.settings.racerProperties.totalPoolSize, gameState.settings);
 	
 	let trackNamePrefixes = [];
 	let trackNameSuffixes = [];
 	
-	const trackNamePrefixesId = generateUniqueNumbers(0, racerNamePrefixes.length - 1, gameState.settings.trackProperties.totalPoolSize);
+	const trackNamePrefixesId = generateUniqueNumbers(0, window.racerNamePrefixes.length - 1, gameState.settings.trackProperties.totalPoolSize);
 	const trackNameSuffixesId = generateUniqueNumbers(0, locationSuffixes.length - 1, gameState.settings.trackProperties.totalPoolSize);
 
 	for (let i = 0; i < gameState.settings.trackProperties.totalPoolSize; i++) {
@@ -33,6 +39,22 @@ function initGame() {
 	
 	// Initialize other elements like starting money, settings, etc.	
 	document.getElementById('introScreen').remove();
+}
+
+function generateNewRacers(numberToGenerate, settings) {
+	const racers = [];
+	const namePrefixNumber = generateUniqueNumbers(0, window.racerNamePrefixes.length - 1, numberToGenerate);
+	const nameSuffixNumber = generateUniqueNumbers(0, window.racerNameSuffixes.length - 1, numberToGenerate);
+	for (let i = 0; i < numberToGenerate; i++) {
+        const name = [namePrefixNumber[i],nameSuffixNumber[i]];
+		const colors = [
+			Math.floor(Math.random() * 31),
+			Math.floor(Math.random() * 31),
+			Math.floor(Math.random() * 31),
+		];
+		racers.push(new Racer(i, name, colors, settings));
+	}
+	return racers;
 }
 
 export { initGame };

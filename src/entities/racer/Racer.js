@@ -2,6 +2,7 @@ import { racerComponents } from './RacerComponents.js';
 
 /**
  * Racer - Lightweight entity that composes components
+ * NOTE: This is becoming the new source of truth for racer objects.
  */
 export class Racer {
   constructor(id, name, colors, config) {
@@ -439,3 +440,6 @@ export class Racer {
 
 // Export the component registry for external use
 export { racerComponents };
+
+// Make Racer available on the window for legacy code and save/load compatibility
+window.Racer = Racer;
