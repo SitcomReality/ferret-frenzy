@@ -63,8 +63,8 @@ class RacerRenderer {
 
     // Ferret body proportions
     const bodyLength = ferret.body.length * 30;
-    const bodyHeight = ferret.body.height * 20;
-    const stockiness = ferret.body.stockiness;
+    let bodyHeight = ferret.body.height * 20;
+    bodyHeight *= ferret.body.stockiness;
 
     // Calculate running animation based on current speed
     const currentSpeed = racer.speedThisRace[racer.speedThisRace.length - 1] || 10;
@@ -115,16 +115,39 @@ class RacerRenderer {
     ctx.lineWidth = 2;
     ctx.stroke();
 
+    // Coat pattern: dorsal banding
+    if (ferret.coat && ferret.coat.pattern === 'banded') {
+      ctx.fillStyle = colors[ferret.coat.stripeIndex] || colors[1];
+      ctx.globalAlpha = 0.6;
+      ctx.fillRect(-bodyLength/2 + 6, -bodyHeight*0.15, bodyLength - 12, bodyHeight*0.3);
+      ctx.globalAlpha = 1.0;
+    }
+
     // Draw head (circle at front of body)
     const headX = bodyLength/2 - 8;
     const headY = 0;
-    const headSize = 12 * ferret.head.earSize;
+    const headSize = 12 * (ferret.head.headType === 'rounded' ? 1.1 : 0.9) * ferret.head.earSize;
     
     ctx.beginPath();
     ctx.arc(headX, headY, headSize, 0, Math.PI * 2);
     ctx.fillStyle = colors[0];
     ctx.fill();
     ctx.stroke();
+
+    // Ears (shape/size variation)
+    ctx.fillStyle = colors[2];
+    const earR = Math.max(3, headSize * 0.35);
+    if (ferret.head.earShape === 'pointy') {
+      [[-headSize*0.2,-headSize*0.9],[headSize*0.2,-headSize*0.9]].forEach(offset=>{
+        ctx.beginPath(); ctx.moveTo(headX+offset[0], headY+offset[1]);
+        ctx.lineTo(headX+offset[0]-earR, headY+offset[1]+earR);
+        ctx.lineTo(headX+offset[0]+earR, headY+offset[1]+earR); ctx.closePath(); ctx.fill(); ctx.stroke();
+      });
+    } else {
+      [[-headSize*0.3,-headSize*0.8],[headSize*0.3,-headSize*0.8]].forEach(offset=>{
+        ctx.beginPath(); ctx.arc(headX+offset[0], headY+offset[1], earR, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      });
+    }
 
     // Draw nose/snout
     const noseLength = ferret.head.noseLength * 8;
@@ -133,6 +156,15 @@ class RacerRenderer {
     ctx.fillStyle = colors[1];
     ctx.fill();
     ctx.stroke();
+
+    // Underbite/jaw
+    if (ferret.head.underbiteDepth > 0.02) {
+      const d = ferret.head.underbiteDepth * 6;
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath(); ctx.moveTo(headX + headSize*0.6, headY + headSize*0.3);
+      ctx.lineTo(headX + headSize*0.3 + d, headY + headSize*0.45 + d*0.4);
+      ctx.lineTo(headX + headSize*0.1, headY + headSize*0.3); ctx.closePath(); ctx.fill();
+    }
 
     // Draw eye with independent tracking and blinking
     this.drawFerretEye(ctx, headX, headY, ferret, time);

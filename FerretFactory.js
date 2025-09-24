@@ -31,6 +31,9 @@ class FerretFactory {
       underbiteDepth: pick(0.0, 0.3),
       earSize: pick(0.8, 1.2)
     };
+    head.headType = rnd() < 0.5 ? 'pointed' : 'rounded';
+    head.earShape = rnd() < 0.5 ? 'pointy' : 'round';
+    const coat = { pattern: rnd() < 0.5 ? 'solid' : 'banded', stripeIndex: Math.floor(rnd() * racer.colors.length) };
     const eye = {
       pupil: { x: 1, y: 0 }, // look forward right by default
       targetPupilX: 1,
@@ -52,7 +55,8 @@ class FerretFactory {
     return { 
       body, legs, tail, head, eye, gait, seed,
       isStumbling: false,
-      crashPhase: 0
+      crashPhase: 0,
+      coat
     };
   }
 }
