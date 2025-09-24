@@ -90,20 +90,18 @@ With modular system in place, easily add:
 ### Phase 5: Data and Configuration
 **Goal**: Externalize configuration and improve data management
 
-#### Phase 5.1: Configuration System
-- `src/config/` - All game configuration files
-- `src/config/gameSettings.js` - Default settings with validation
+#### Phase 5.1: Configuration System ✅ COMPLETED
+- `src/config/gameSettings.js` - Centralized settings with validation
 - `src/config/racerProperties.js` - Racer generation parameters
-- Support for user settings overrides
+- Support for user settings overrides and config validation
 
-#### Phase 5.2: Data Management
+#### Phase 5.2: Data Management 🔄 IN PROGRESS
 - `src/data/` - Game data persistence and loading
 - `src/data/SaveGame.js` - Save/load functionality
 - `src/data/WordListManager.js` - Handle name generation data
 
 ## Refactor Progress
-- **Phases 1-3**: ✅ COMPLETED - Module system, Racer components, Render architecture
-- **Phase 4**: ✅ COMPLETED - UI module system and Game logic modules
+- **Phases 1-4**: ✅ COMPLETED - Module system, Racer components, Render architecture, UI and Game Logic
 - **Phase 5**: 🔄 IN PROGRESS - Configuration and data management
 
 ## Mid-Refactor Maintenance – ✅ COMPLETED
