@@ -38,6 +38,11 @@ class Application {
     // UI Manager
     this.uiManager = new UIManager(this.eventBus);
     
+    // Loading system
+    this.loadingManager = new LoadingManager();
+    this.isLoading = false;
+    this.loadingProgress = 0;
+    
     // Make eventBus and app available globally for compatibility/debugging
     window.eventBus = this.eventBus;
     window.app = this;
@@ -52,6 +57,9 @@ class Application {
 
   async initialize() {
     try {
+      // Start loading sequence
+      this.startLoading();
+      
       // Load XML wordlists first
       await this.loadXmlWordlists();
 
@@ -65,10 +73,50 @@ class Application {
       this.initializeUI();
 
       console.log('Application initialized successfully');
+      this.completeLoading();
     } catch (error) {
       console.error('Failed to initialize application:', error);
+      this.failLoading(error.message);
       throw error;
     }
+  }
+
+  /**
+   * Start loading sequence
+   */
+  startLoading() {
+    this.isLoading = true;
+    this.loadingProgress = 0;
+    this.eventBus.emit('loading:started');
+  }
+
+  /**
+   * Update loading progress
+   */
+  updateLoadingProgress(progress, message) {
+    this.loadingProgress = Math.min(100, Math.max(0, progress));
+    this.eventBus.emit('loading:progress', { 
+      progress: this.loadingProgress, 
+      message: message || 'Loading...' 
+    });
+  }
+
+  /**
+   * Complete loading sequence
+   */
+  completeLoading() {
+    this.isLoading = false;
+    this.loadingProgress = 100;
+    this.eventBus.emit('loading:completed');
+  }
+
+  /**
+   * Fail loading sequence
+   */
+  failLoading(errorMessage) {
+    this.isLoading = false;
+    this.loadingProgress = 0;
+    this.eventBus.emit('loading:failed', { error: errorMessage });
   }
 
   /**
@@ -130,6 +178,8 @@ class Application {
   }
 
   async loadXmlWordlists() {
+    this.updateLoadingProgress(10, 'Loading word lists...');
+    
     // Implementation moved from loadXmlWordlists.js
     try {
       const dynamicPrefixes = [
@@ -180,6 +230,7 @@ class Application {
       // Add dynamic suffixes
       window.racerNameSuffixes.push(...dynamicSuffixes);
 
+      this.updateLoadingProgress(30, 'Word lists loaded');
       console.log('Loaded XML wordlists:', {
         prefixes: window.racerNamePrefixes.length,
         suffixes: window.racerNameSuffixes.length
@@ -194,11 +245,20 @@ class Application {
   }
 
   async initializeCoreSystems() {
+    this.updateLoadingProgress(50, 'Initializing core systems...');
+    
     // Initialize core game systems
     // This will be expanded as we convert individual modules
+    
+    // Simulate some initialization time
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    this.updateLoadingProgress(70, 'Core systems initialized');
   }
 
   initializeUI() {
+    this.updateLoadingProgress(80, 'Setting up user interface...');
+    
     // Ensure root container exists
     let root = document.getElementById('app');
     if (!root) {
@@ -220,6 +280,68 @@ class Application {
 
     // Initialize legacy UI components that might still be needed globally
     if (window.Tabs) window.Tabs.initialize();
+    
+    this.updateLoadingProgress(90, 'Interface ready');
+  }
+}
+
+// LoadingManager class to handle loading state
+class LoadingManager {
+  constructor() {
+    this.loadingElement = null;
+    this.createLoadingElement();
+  }
+
+  createLoadingElement() {
+    this.loadingElement = document.createElement('div');
+    this.loadingElement.id = 'loadingOverlay';
+    this.loadingElement.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+        <div class="loading-bar">
+          <div class="loading-progress"></div>
+        </div>
+      </div>
+    `;
+    this.loadingElement.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+    `;
+  }
+
+  show() {
+    if (!this.loadingElement.parentNode) {
+      document.body.appendChild(this.loadingElement);
+    }
+  }
+
+  hide() {
+    if (this.loadingElement.parentNode) {
+      document.body.removeChild(this.loadingElement);
+    }
+  }
+
+  updateProgress(progress, message) {
+    const progressBar = this.loadingElement.querySelector('.loading-progress');
+    const textElement = this.loadingElement.querySelector('.loading-text');
+    
+    if (progressBar) {
+      progressBar.style.width = `${progress}%`;
+    }
+    if (textElement) {
+      textElement.textContent = message || 'Loading...';
+    }
   }
 }
 

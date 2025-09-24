@@ -8,7 +8,6 @@ export class IntroScreen {
     this.element = null;
     this.eventBus = null;
     this.settingsPanel = null;
-    this.currentGameState = null; // use instance reference instead of global
   }
 
   initialize(eventBus) {
@@ -68,9 +67,9 @@ export class IntroScreen {
   show(data = {}) {
     (data?.container || document.getElementById('app') || document.body).appendChild(this.element);
     
-    this.currentGameState = data.gameState || this.currentGameState;
-    if (this.settingsPanel && this.currentGameState) {
-      this.settingsPanel.refresh(this.currentGameState);
+    // Initialize settings panel if available
+    if (this.settingsPanel) {
+      this.settingsPanel.refresh(data.gameState);
     }
   }
 
@@ -82,7 +81,7 @@ export class IntroScreen {
   
   updateSetting(settingName, value) {
     const keys = settingName.split('.');
-    let currentSetting = this.currentGameState?.settings;
+    let currentSetting = window.app.gameState.settings;
 
     for (let i = 0; i < keys.length - 1; i++) {
         if (!currentSetting.hasOwnProperty(keys[i])) {
@@ -92,8 +91,8 @@ export class IntroScreen {
     }
     
     currentSetting[keys[keys.length - 1]] = value;
-    if (this.settingsPanel && this.currentGameState) {
-        this.settingsPanel.refresh(this.currentGameState);
+    if (this.settingsPanel) {
+        this.settingsPanel.refresh(window.app.gameState);
     }
   }
 
