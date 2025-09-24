@@ -413,5 +413,3 @@ function getRacerNameString(racer) {
 
   return `${prefixStr} ${suffixStr}`;
 }
-
-export { RenderManager };
