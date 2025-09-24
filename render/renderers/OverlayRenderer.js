@@ -23,11 +23,17 @@ export class OverlayRenderer {
     const currentLane = this.renderManager.interactionController.currentHoveredLane;
 
     if (currentLane !== null) {
+      // Deactivate all non-current lane banners (so only one stays active)
+      for (const [laneIndex, banner] of this.renderManager.interactionController.banners.entries()) {
+        if (laneIndex !== currentLane) { banner.active = false; banner.targetX = -350; }
+      }
       const rid = this.renderManager.currentRace.racers[currentLane];
       const racer = this.renderManager.gameState?.racers[rid];
-
-      if (racer) {
-        this.createHoverBanner(racer, currentLane, w);
+      if (racer) { this.createHoverBanner(racer, currentLane, w); }
+    } else {
+      // No hover: send all banners off-screen to the left and fade out
+      for (const banner of this.renderManager.interactionController.banners.values()) {
+        banner.active = false; banner.targetX = -350;
       }
     }
   }
