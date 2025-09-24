@@ -108,6 +108,12 @@ class Application {
       initGame(this.gameStateManager);
       this.uiManager.showScreen('game');
     });
+
+    this.eventBus.on('race:update', (raceData) => {
+        if (this.uiManager.activeScreen?.renderManager) {
+            this.uiManager.activeScreen.renderManager.setRace(raceData.race, { numberOfLanes: raceData.race.racers.length});
+        }
+    });
   }
 
   /**

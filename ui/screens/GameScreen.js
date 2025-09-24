@@ -31,6 +31,7 @@ export class GameScreen {
     this.eventBus.on('race:start', (data) => this.onRaceStart(data));
     this.eventBus.on('race:finish', (raceData) => this.onRaceFinish(raceData));
     this.eventBus.on('bets:settled', () => this.updatePlayerBalance());
+    this.eventBus.on('race:update', (data) => this.onRaceUpdate(data));
   }
 
   createElement() {
@@ -184,6 +185,10 @@ export class GameScreen {
     this.renderManager.setRace(race, {
       numberOfLanes: race.racers.length
     });
+    const weatherDisplay = this.element.querySelector("#overlayWeather");
+    if(weatherDisplay) {
+        weatherDisplay.textContent = `Weather: ${race.weather}`;
+    }
     // Initial render of the track and racers at starting line
     this.renderManager.tick(performance.now());
   }
@@ -194,6 +199,10 @@ export class GameScreen {
     this.renderManager.start();
   }
   
+  onRaceUpdate(data) {
+    // This is handled by the main.js now to avoid tight coupling
+  }
+
   onRaceFinish(raceData) {
     this.renderManager.stop();
     this.hudComponent.setStep(3, 'active'); // Ready for next race setup

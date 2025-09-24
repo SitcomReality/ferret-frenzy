@@ -86,7 +86,7 @@ export class RaceManager {
     // Initialize racer positions
     this.currentRace.racers.forEach(racerId => {
       this.currentRace.liveLocations[racerId] = 0;
-      const racer = this.gameState.racers[racerId];
+      const racer = this.gameState.racers.find(r => r.id === racerId);
       if (racer) {
         racer.reset();
         racer.formThisWeek = this.calculateRacerForm(racer);
@@ -163,11 +163,11 @@ export class RaceManager {
    */
   updateRacerPositions() {
     this.currentRace.racers.forEach(racerId => {
-      const racer = this.gameState.racers[racerId];
+      const racer = this.gameState.racers.find(r => r.id === racerId);
       if (!racer || racer.visual.finished) return;
 
       const currentPosition = this.currentRace.liveLocations[racerId] || 0;
-      const segmentIndex = Math.floor((currentPosition / 100) * this.currentRace.segments.length);
+      const segmentIndex = Math.floor((currentPosition / 100) * (this.currentRace.segments.length -1) );
 
       if (segmentIndex >= this.currentRace.segments.length - 1) {
         // Racer has finished
@@ -178,13 +178,13 @@ export class RaceManager {
       const segmentType = this.currentRace.segments[segmentIndex];
       const speed = racer.calculateSpeed(
         racer.formThisWeek,
-        (currentPosition / 100) * 100,
+        currentPosition,
         segmentType,
         this.currentRace.weather
       );
 
       // Update position
-      const distanceToTravel = speed / (100 * this.currentRace.segments.length);
+      const distanceToTravel = (speed * 16) / (1000 * 5); // 16ms interval, 5 seconds approx race time
       this.currentRace.liveLocations[racerId] = Math.min(100, currentPosition + distanceToTravel);
     });
   }
@@ -226,7 +226,7 @@ export class RaceManager {
     const finishingPosition = this.currentRace.results.length + 1;
     this.currentRace.results.push(racerId);
 
-    const racer = this.gameState.racers[racerId];
+    const racer = this.gameState.racers.find(r => r.id === racerId);
     if (racer) {
       racer.visual.finished = true;
       racer.updateRacerHistory(this.currentRace.id, finishingPosition);
@@ -289,7 +289,7 @@ export class RaceManager {
         const position = this.currentRace.results.length + 1;
         this.currentRace.results.push(racerId);
 
-        const racer = this.gameState.racers[racerId];
+        const racer = this.gameState.racers.find(r => r.id === racerId);
         if (racer) {
           racer.didNotFinish = true;
           racer.updateRacerHistory(this.currentRace.id, position);

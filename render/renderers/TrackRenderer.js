@@ -12,18 +12,19 @@ export class TrackRenderer {
     const w = ctx.canvas.width / (window.devicePixelRatio || 1);
     const h = ctx.canvas.height / (window.devicePixelRatio || 1);
 
-    ctx.save();
-    ctx.translate(w / 2, h / 2);
-    ctx.scale(camera.zoom, camera.zoom);
+    // No need to save/restore here as it's handled by RenderManager
+    // ctx.save();
+    // ctx.translate(w / 2, h / 2);
+    // ctx.scale(camera.zoom, camera.zoom);
 
     const laneHeight = 40;
     const totalHeight = laneHeight * props.numberOfLanes;
-    const trackCenterY = totalHeight / 2;
-    ctx.translate(0, -trackCenterY);
+    // const trackCenterY = totalHeight / 2;
+    // ctx.translate(0, -trackCenterY);
 
     const worldPixelWidth = w * 4;
-    const cameraPixelX = camera.target.x / 100 * worldPixelWidth;
-    ctx.translate(-cameraPixelX, 0);
+    // const cameraPixelX = camera.target.x / 100 * worldPixelWidth;
+    // ctx.translate(-cameraPixelX, 0);
 
     const segs = race.segments.length;
     const segW = worldPixelWidth / Math.max(1, segs);
@@ -38,14 +39,14 @@ export class TrackRenderer {
       const laneH = laneHeight;
 
       const rid = race.racers[l];
-      const racer = window.gameState?.racers[rid];
+      const racer = window.gameState?.racers.find(r => r.id === rid);
 
       if (racer && racer.visual.finished) {
         ctx.fillStyle = this.getPlacingColor(race.results.indexOf(rid) + 1);
       } else {
         ctx.fillStyle = l % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
       }
-      ctx.fillRect(0, currentY, laneH - 2, laneH);
+      ctx.fillRect(0, currentY, worldPixelWidth, laneH - 2);
       currentY += laneH;
     }
 
@@ -92,7 +93,8 @@ export class TrackRenderer {
       currentY += laneH;
     }
 
-    ctx.restore();
+    // No need to restore here
+    // ctx.restore();
   }
 
   getPlacingColor(place) {

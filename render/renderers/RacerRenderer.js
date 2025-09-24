@@ -12,7 +12,7 @@ export class RacerRenderer {
 
     for (let idx = 0; idx < race.racers.length; idx++) {
       const rid = race.racers[idx];
-      const racer = window.gameState?.racers[rid];
+      const racer = window.gameState?.racers.find(r => r.id === rid);
       const worldX = race.liveLocations[rid] || 0;
       const screen = worldTransform.worldToScreen(worldX, idx);
 
@@ -58,7 +58,7 @@ export class RacerRenderer {
       const sorted = race.racers.slice().sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       leaderList.innerHTML = '';
       sorted.slice(0, 5).forEach((rid, i) => { 
-        const r = window.gameState?.racers[rid]; 
+        const r = window.gameState?.racers.find(r => r.id === rid); 
         if (!r) return; 
         const li = document.createElement('li'); 
         li.textContent = `${i + 1}. ${this.getRacerNameString(r)}`; 

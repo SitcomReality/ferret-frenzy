@@ -111,12 +111,19 @@ export class RenderManager {
     this.applyCameraTransform();
     
     this.trackRenderer.render(this.ctx, this.currentRace, this.renderProps, this.camera);
-    this.renderWeatherEffects();
-    this.particleSystem.render(this.ctx);
     this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time / 1000);
+    
+    this.ctx.restore();
+    
+    this.ctx.save();
+    this.applyCameraTransform();
+    this.particleSystem.render(this.ctx);
+    this.ctx.restore();
+
+    this.ctx.save();
+    this.renderWeatherEffects();
     this.hitIndex.update(this.racerRenderer.getScreenPositions());
     this.nameplate.render(this.ctx);
-    
     this.ctx.restore();
   }
 
@@ -170,7 +177,7 @@ export class RenderManager {
    * Render weather effects
    */
   renderWeatherEffects() {
-    const weather = this.currentRace.weather;
+    const weather = this.currentRace?.weather;
     if (!weather) return;
     
     const dims = this.canvasAdapter.getDimensions();
