@@ -1,3 +1,4 @@
+import { TextureManager } from '../core/TextureManager.js';
 /**
  * TrackRenderer - Renders the racing track with segments and textures
  */
