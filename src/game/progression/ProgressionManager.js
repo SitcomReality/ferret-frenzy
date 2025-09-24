@@ -158,6 +158,14 @@ export class ProgressionManager {
     const selectedTracks = [];
     const trackTypeKeys = Object.keys(trackTypes);
 
+    if (trackTypeKeys.length === 0) {
+      while (selectedTracks.length < count && allTracks.length > 0) {
+        const randomTrack = allTracks[Math.floor(Math.random() * allTracks.length)];
+        if (!selectedTracks.includes(randomTrack)) selectedTracks.push(randomTrack);
+      }
+      return selectedTracks;
+    }
+
     for (let i = 0; i < count; i++) {
       const typeIndex = i % trackTypeKeys.length;
       const typeTracks = trackTypes[trackTypeKeys[typeIndex]];

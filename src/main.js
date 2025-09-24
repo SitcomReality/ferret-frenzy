@@ -32,6 +32,7 @@ class Application {
     this.raceManager = new RaceManager(this.eventBus, this.gameStateManager);
     this.bettingManager = new BettingManager(this.eventBus, this.gameStateManager);
     this.progressionManager = new ProgressionManager(this.eventBus, this.gameStateManager);
+    this.eventBus._progressionManager = this.progressionManager;
     
     // UI Components
     this.uiManager = new UIManager(this.eventBus);
@@ -72,7 +73,11 @@ class Application {
   setupEventListeners() {
     // Race events
     this.eventBus.on('race:startWeek', () => {
-      this.raceManager.startRaceWeek();
+      const week = this.progressionManager.startNewRaceWeek();
+      if (week && this.hud) {
+        this.hud.setStep(2, 'done');
+        this.hud.setStep(3, 'active');
+      }
     });
     
     this.eventBus.on('race:setup', () => {
