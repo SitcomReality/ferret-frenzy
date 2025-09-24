@@ -1,10 +1,13 @@
---- a/Track.js
-+++ b/Track.js
-@@ -1,4 +1,4 @@
--class Track {
-+export class Track {
-     constructor(id, name) {
-         this.id = id;
-         this.name = name;
-
+export class Track {
+  constructor(id, name, numberOfSections, groundTypes = []) {
+    this.id = id;
+    this.name = name;
+    this.sections = [];
+    const types = Array.isArray(groundTypes) && groundTypes.length ? groundTypes : ["asphalt","gravel","dirt","grass","mud","rock","marble"];
+    for (let i = 0; i < numberOfSections; i++) {
+      const t = types[Math.floor(Math.random() * types.length)];
+      this.sections.push(t);
+    }
+  }
+}
 

@@ -31,9 +31,11 @@ function initGame(gameState) {
 	const trackNameSuffixesId = generateUniqueNumbers(0, locationSuffixes.length - 1, gameState.settings.trackProperties.totalPoolSize);
 
 	for (let i = 0; i < gameState.settings.trackProperties.totalPoolSize; i++) {
-        // Generate a track		
-		const trackName = racerNamePrefixes[trackNamePrefixesId[i]] + " " + locationSuffixes[(trackNameSuffixesId[i])];
-        const track = new Track(i, trackName, gameState.settings.trackProperties.numberOfSections);
+        const trackName = window.racerNamePrefixes[trackNamePrefixesId[i]] + " " + window.locationSuffixes[(trackNameSuffixesId[i])];
+        const min = gameState.settings.trackProperties.minSectionsPerTrack;
+        const max = gameState.settings.trackProperties.maxSectionsPerTrack;
+        const numSections = Math.floor(Math.random() * (max - min + 1)) + min;
+        const track = new Track(i, trackName, numSections, gameState.settings.worldProperties.groundTypes);
 		gameState.tracks.push(track);
 	}
 	
@@ -46,7 +48,7 @@ function generateNewRacers(numberToGenerate, settings) {
 	const namePrefixNumber = generateUniqueNumbers(0, window.racerNamePrefixes.length - 1, numberToGenerate);
 	const nameSuffixNumber = generateUniqueNumbers(0, window.racerNameSuffixes.length - 1, numberToGenerate);
 	for (let i = 0; i < numberToGenerate; i++) {
-        const name = [namePrefixNumber[i],nameSuffixNumber[i]];
+        const name = window.racerNamePrefixes[namePrefixNumber[i]] + ' ' + window.racerNameSuffixes[nameSuffixNumber[i]];
 		const colors = [
 			Math.floor(Math.random() * 31),
 			Math.floor(Math.random() * 31),
