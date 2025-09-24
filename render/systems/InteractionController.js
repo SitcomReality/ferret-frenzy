@@ -28,6 +28,8 @@ export class InteractionController {
   }
 
   screenToLaneIndex(clientY) {
+    if (!this.renderManager.renderProps) return null;
+    
     const dpr = this.renderManager.dpr;
     const w = this.renderManager.canvas.width / dpr;
     const h = this.renderManager.canvas.height / dpr;
