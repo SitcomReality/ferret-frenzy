@@ -1,4 +1,9 @@
 function arrangeRacersByPerformance(selectedRacers, gameState) {
+    if (!gameState) {
+        console.error('arrangeRacersByPerformance: gameState is required');
+        return [];
+    }
+
     let racerPerformances = [];
     for (let i = 0; i < selectedRacers.length; i++) {
         let racerID = selectedRacers[i];

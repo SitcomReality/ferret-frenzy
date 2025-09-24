@@ -5,13 +5,20 @@ class Camera {
     this.zoom = 1;
     this.damping = 0.15;
   }
+  
   setMode(mode, opts = {}) {
     this.mode = mode || this.mode;
     if (opts.zoom) this.zoom = Math.max(0.5, Math.min(3, opts.zoom));
     if (opts.target) this.target = { x: opts.target.x || 0, y: opts.target.y || 0 };
   }
+  
   update(race) {
     if (!race || !race.racers || race.racers.length === 0) return;
+    
+    // Get gameState from the app instance
+    const gameState = window.app?.gameState;
+    if (!gameState) return;
+    
     const loc = race.liveLocations;
     const xs = race.racers.map(rid => loc[rid] || 0);
     const avg = xs.reduce((a,b)=>a+b,0) / xs.length;

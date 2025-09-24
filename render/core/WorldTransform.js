@@ -10,7 +10,14 @@ class WorldTransform {
     const dpr = (window.devicePixelRatio || 1);
     canvasWidth = canvasWidth || (window.canvasRenderer && window.canvasRenderer.canvas && window.canvasRenderer.canvas.width) || 800;
     canvasHeight = canvasHeight || (window.canvasRenderer && window.canvasRenderer.canvas && window.canvasRenderer.canvas.height) || 520;
-    numberOfLanes = numberOfLanes || (window.canvasRenderer && window.canvasRenderer.props && window.canvasRenderer.props.numberOfLanes) || (gameState.settings && gameState.settings.trackProperties.numberOfLanes) || 1;
+    numberOfLanes = numberOfLanes || (window.canvasRenderer && window.canvasRenderer.props && window.canvasRenderer.props.numberOfLanes) || 10;
+    
+    // Get gameState from the app instance
+    const gameState = window.app?.gameState;
+    if (!gameState) {
+      console.warn('WorldTransform: gameState not available');
+      return { x: 0, y: 0, scale: 1 };
+    }
 
     const pad = 10;
     const w = canvasWidth / dpr;

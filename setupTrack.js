@@ -3,6 +3,13 @@ import { arrangeRacersByPerformance } from './arrangeRacersByPerformance.js';
 import { RenderManager } from './render/RenderManager.js';
 
 function setupTrack(track) {
+    if (!window.app?.gameState) {
+        console.error('setupTrack: gameState not available');
+        return;
+    }
+
+    const gameState = window.app.gameState;
+    
     document.getElementById('setupRace').disabled = true;
     document.getElementById('startRace').disabled = false;
     const trackDom = document.getElementById('raceTrack');
@@ -50,19 +57,21 @@ function setupTrack(track) {
         gameState.currentRace.segments.push(track.sections[section]);
     }
     gameState.currentRace.segments.push("finishLine");
-    const weekRace = gameState.raceWeek && gameState.raceWeek.races[gameState.currentRaceIndex - 1];
+    const weekRace = gameState.raceWeek && gameState.raceWeek.races[gameState.currentRaceIndex];
     gameState.currentRace.weather = gameState.currentRace.weather || (weekRace && weekRace.weather) || gameState.settings.worldProperties.weatherTypes[Math.floor(Math.random()*gameState.settings.worldProperties.weatherTypes.length)];
     gameState.currentRace.racers = [];
     gameState.currentRace.results = [];
     gameState.currentRace.winner = null;
     gameState.currentRace.liveLocations = [];
     
-    DOMUtils.updateTrackDetails();
+    if (DOMUtils.updateTrackDetails) {
+        DOMUtils.updateTrackDetails();
+    }
     
     // Get racers from the current race week if available
     let selectedRacers = [];
-    if (gameState.raceWeek && gameState.raceWeek.races[gameState.currentRaceIndex - 1]) {
-        const currentRaceWeek = gameState.raceWeek.races[gameState.currentRaceIndex - 1];
+    if (gameState.raceWeek && gameState.raceWeek.races[gameState.currentRaceIndex]) {
+        const currentRaceWeek = gameState.raceWeek.races[gameState.currentRaceIndex];
         selectedRacers = currentRaceWeek.racers.map(racer => racer.id);
     } else {
         // Fallback to selected racers from race week
@@ -108,7 +117,8 @@ function setupTrack(track) {
     
     window.renderManager.setRace(gameState.currentRace, gameState.settings.trackProperties);
     const icon = ({sunny:'☀️',rainy:'🌧️',windy:'💨',cloudy:'☁️',dusty:'🌫️',stormy:'⛈️',snowy:'❄️',foggy:'🌁'})[gameState.currentRace.weather] || '⛅';
-    const ow = document.getElementById('overlayWeather'); if (ow) ow.textContent = `${icon} ${gameState.currentRace.weather}`;
+    const ow = document.getElementById('overlayWeather'); 
+    if (ow) ow.textContent = `${icon} ${gameState.currentRace.weather}`;
     window.renderManager.resizeToContainer();
     window.renderManager.start();
 }
