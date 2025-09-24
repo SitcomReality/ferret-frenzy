@@ -1,4 +1,5 @@
 import { DOMUtils } from './domUtils.js';
+import { arrangeRacersByPerformance } from './arrangeRacersByPerformance.js';
 
 function setupTrack(track) {
     document.getElementById('setupRace').disabled = true;

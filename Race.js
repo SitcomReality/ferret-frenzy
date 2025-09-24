@@ -9,3 +9,6 @@ class Race {
         this.livePositions = [];
     }
 }
+
+window.Race = Race;
+export { Race };

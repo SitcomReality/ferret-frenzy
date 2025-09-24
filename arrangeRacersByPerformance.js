@@ -47,3 +47,6 @@ function arrangeRacersByPerformance(selectedRacers, gameState) {
 
     return arrangedRacers;
 }
+
+export { arrangeRacersByPerformance };
+window.arrangeRacersByPerformance = arrangeRacersByPerformance;

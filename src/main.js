@@ -16,6 +16,9 @@ import '../ui/eventHandlers.js';
 import { initGame } from '../init.js';
 import '../setupRace.js';
 import '../setupTrack.js';
+import '../Race.js';
+import '../RaceWeek.js';
+import '../domUtils.js';
 
 // Initialize the application
 class Application {

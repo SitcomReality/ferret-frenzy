@@ -125,3 +125,5 @@ export class DOMUtils {
         document.getElementById("weatherDisplay").innerHTML = gameState.currentRace.weather;
     }
 }
+
+window.DOMUtils = DOMUtils;
