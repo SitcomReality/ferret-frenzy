@@ -90,13 +90,13 @@ With modular system in place, easily add:
 ### Phase 5: Data and Configuration
 **Goal**: Externalize configuration and improve data management
 
-#### Step 5.1: Configuration System
+#### Phase 5.1: Configuration System
 - `src/config/` - All game configuration files
 - `src/config/gameSettings.js` - Default settings with validation
 - `src/config/racerProperties.js` - Racer generation parameters
 - Support for user settings overrides
 
-#### Step 5.2: Data Management
+#### Phase 5.2: Data Management
 - `src/data/` - Game data persistence and loading
 - `src/data/SaveGame.js` - Save/load functionality
 - `src/data/WordListManager.js` - Handle name generation data
@@ -106,19 +106,38 @@ With modular system in place, easily add:
 - Racer componentized (Stats, Performance, History, Betting) + new features; render stack consolidated with central RenderManager.
 
 ## Mid-Refactor Maintenance – Next Steps
-1) Split render/RenderManager.js into modules: RenderPipeline, SceneRenderer, OverlayRenderer, InteractionController, CanvasAdapter.
-2) Remove redundancies: delete Racer.js (legacy), ParticleSystem duplicates (root/effects), Camera/WorldTransform duplicates (root/render/core), HitTestIndex duplicate (root vs render/core).
-3) Update imports to new pieces; run verification (race flow, particles, nameplates, camera, leaderboard, countdown) and keep index.html, src/main.js unchanged.
 
-## Implementation Guidelines
+### ✅ Completed
+1) **Split render/RenderManager.js into modules**: Completed successfully
+   - `RenderPipeline` - Manages render pipeline phases
+   - `SceneRenderer` - Handles main scene rendering
+   - `OverlayRenderer` - Manages UI overlays and lane banners
+   - `InteractionController` - Handles mouse interactions and hover effects
+   - `CanvasAdapter` - Manages canvas operations and device pixel ratio
 
-### Module Standards
+### 🔄 In Progress
+2) **Remove redundant files**: Identified for cleanup
+   - `Racer.js` (legacy monolith) - Can be deleted
+   - `ParticleSystem.js` duplicates - Keep `render/systems/ParticleSystem.js`
+   - `Camera.js` and `WorldTransform.js` duplicates - Keep `render/core/` versions
+   - `HitTestIndex.js` duplicate - Keep `render/core/HitTestIndex.js`
+
+### 📝 Next Steps
+3) **Update imports and verify functionality**:
+   - Update all import statements to use new modular structure
+   - Test race flow, particles, nameplates, camera, leaderboard, countdown
+   - Ensure `index.html` and `src/main.js` remain unchanged
+   - Verify no breaking changes in the refactor
+
+### 🔧 Implementation Guidelines
+
+#### Module Standards
 - **Single Responsibility**: Each module has one clear purpose
 - **Explicit Dependencies**: Use imports/exports, avoid global references
 - **Interface Contracts**: Define clear APIs between modules
 - **Error Handling**: Each module handles its own errors gracefully
 
-### Component Pattern for Racers
+#### Component Pattern for Racers
 ```javascript
 // Example component interface
 class RacerComponent {
