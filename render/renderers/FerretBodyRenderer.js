@@ -46,18 +46,53 @@ class FerretBodyRenderer {
   renderEars(ctx, ferret, colors, headX, headY, headSize) {
     ctx.fillStyle = colors[2];
     const earR = Math.max(3, headSize * 0.35);
-    const earFlap = Math.sin(ferret.gait.cyclePhase * 3) * Math.min(6, 6 * (ferret.isStumbling ? 0.5 : 1));
+    // Reduced ear movement from ±6 to ±2 for more subtle animation
+    const earFlap = ferret.isStumbling ? Math.sin(ferret.crashPhase * 5) * 3 : Math.sin(ferret.gait.cyclePhase * 3) * Math.min(2, 2 * (ferret.isStumbling ? 0.5 : 1));
 
     if (ferret.head.earShape === 'pointy') {
-      [[-headSize*0.2,-headSize*0.9 + earFlap],[headSize*0.2,-headSize*0.9 + earFlap]].forEach(offset=>{
-        ctx.beginPath(); ctx.moveTo(headX+offset[0], headY+offset[1]);
-        ctx.lineTo(headX+offset[0]-earR, headY+offset[1]+earR);
-        ctx.lineTo(headX+offset[0]+earR, headY+offset[1]+earR); ctx.closePath(); ctx.fill(); ctx.stroke();
-      });
+      // Left ear - draw behind when overlapping
+      const leftEarPoints = [
+        [headX-headSize*0.2, headY-headSize*0.9 + earFlap],
+        [headX-headSize*0.2-earR, headY-headSize*0.9 + earFlap + earR],
+        [headX-headSize*0.2+earR, headY-headSize*0.9 + earFlap + earR]
+      ];
+      
+      // Right ear - draw in front
+      const rightEarPoints = [
+        [headX+headSize*0.2, headY-headSize*0.9 + earFlap],
+        [headX+headSize*0.2-earR, headY-headSize*0.9 + earFlap + earR],
+        [headX+headSize*0.2+earR, headY-headSize*0.9 + earFlap + earR]
+      ];
+
+      // Draw left ear first (behind)
+      ctx.beginPath();
+      ctx.moveTo(leftEarPoints[0][0], leftEarPoints[0][1]);
+      ctx.lineTo(leftEarPoints[1][0], leftEarPoints[1][1]);
+      ctx.lineTo(leftEarPoints[2][0], leftEarPoints[2][1]);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Draw right ear on top
+      ctx.beginPath();
+      ctx.moveTo(rightEarPoints[0][0], rightEarPoints[0][1]);
+      ctx.lineTo(rightEarPoints[1][0], rightEarPoints[1][1]);
+      ctx.lineTo(rightEarPoints[2][0], rightEarPoints[2][1]);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
     } else {
-      [[-headSize*0.3,-headSize*0.8 + earFlap],[headSize*0.3,-headSize*0.8 + earFlap]].forEach(offset=>{
-        ctx.beginPath(); ctx.arc(headX+offset[0], headY+offset[1], earR, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-      });
+      // Round ears - left ear first (behind)
+      ctx.beginPath();
+      ctx.arc(headX-headSize*0.3, headY-headSize*0.8 + earFlap, earR, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Right ear on top
+      ctx.beginPath();
+      ctx.arc(headX+headSize*0.3, headY-headSize*0.8 + earFlap, earR, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
     }
   }
 
