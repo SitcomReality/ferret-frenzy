@@ -158,7 +158,7 @@ class FerretBodyRenderer {
 
       const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
       // Skip any leg that doesn't have horizontal stride (removes duplicate "up–down only" legs)
-      if (Math.abs(pos.x - startX) < 1) return;
+      // if (Math.abs(pos.x - startX) < 1) return;
 
       ctx.beginPath();
       ctx.moveTo(startX + (farSideOnly ? -sideOffset : sideOffset), bodyHeight/4);
