@@ -106,7 +106,27 @@ class Application {
 
   initializeUI() {
     // Initialize UI components
-    // This will be expanded as we convert UI modules
+    if (window.SettingsPanel) {
+      SettingsPanel.refresh();
+    }
+    if (window.Tabs) {
+      Tabs.initialize();
+    }
+    if (window.EventHandlers) {
+      EventHandlers.initializeAll();
+    }
+
+    // Hide the no-js message and show the game interface
+    const noJsDiv = document.getElementById('no-js');
+    if (noJsDiv) {
+      noJsDiv.style.display = 'none';
+    }
+
+    // Show the intro screen with settings
+    const introScreen = document.getElementById('introScreen');
+    if (introScreen) {
+      introScreen.style.display = 'block';
+    }
   }
 }
 
