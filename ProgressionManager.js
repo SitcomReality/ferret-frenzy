@@ -1,6 +1,6 @@
-/** 
+/**
  * ProgressionManager - Handles week/season progression
- */ 
+ */
 export class ProgressionManager {
   constructor(eventBus, gameState) {
     this.eventBus = eventBus;
@@ -11,9 +11,9 @@ export class ProgressionManager {
     this.achievements = new Set();
   }
 
-  /** 
+  /**
    * Start a new race week
-   */ 
+   */
   startNewRaceWeek() {
     this.gameState.raceWeekCounter++;
     this.weekInSeason++;
@@ -38,9 +38,9 @@ export class ProgressionManager {
     return raceWeek;
   }
 
-  /** 
+  /**
    * Create a new race week
-   */ 
+   */
   createRaceWeek() {
     const settings = this.gameState.settings;
 
@@ -75,8 +75,7 @@ export class ProgressionManager {
       const raceRacers = this.selectRaceRacers(selectedRacers);
       const weather = this.selectWeather();
 
-      // Fix: Use the global Race class instead of importing
-      const race = new window.Race(`${this.gameState.raceWeekCounter}-${i + 1}`, raceRacers, track);
+      const race = new Race(`${this.gameState.raceWeekCounter}-${i + 1}`, raceRacers, track);
       race.weather = weather;
       races.push(race);
     }
@@ -90,9 +89,9 @@ export class ProgressionManager {
     };
   }
 
-  /** 
+  /**
    * Select racers for the week
-   */ 
+   */
   selectRacersForWeek(count) {
     const allRacers = Array.from({ length: this.gameState.settings.racerProperties.totalPoolSize }, (_, i) => i);
 
@@ -127,9 +126,9 @@ export class ProgressionManager {
     return selected;
   }
 
-  /** 
+  /**
    * Select racers for a single race
-   */ 
+   */
   selectRaceRacers(availableRacers) {
     const laneCount = this.gameState.settings.trackProperties.numberOfLanes;
     const selectedCount = Math.min(laneCount, availableRacers.length);
@@ -139,9 +138,9 @@ export class ProgressionManager {
     return shuffled.slice(0, selectedCount).map(racerId => this.gameState.racers[racerId]);
   }
 
-  /** 
+  /**
    * Select tracks for the week
-   */ 
+   */
   selectTracksForWeek(count) {
     const allTracks = this.gameState.tracks;
     const selected = [];
@@ -181,9 +180,9 @@ export class ProgressionManager {
     return selected;
   }
 
-  /** 
+  /**
    * Select weather for a race
-   */ 
+   */
   selectWeather() {
     const weatherTypes = this.gameState.settings.worldProperties.weatherTypes;
     const weights = {
@@ -210,9 +209,9 @@ export class ProgressionManager {
     return weatherTypes[0]; // Fallback
   }
 
-  /** 
+  /**
    * Calculate racer form
-   */ 
+   */
   calculateRacerForm(racer) {
     const baseForm = 1.0;
     const variation = this.gameState.settings.racerProperties.formVariationBase;
@@ -221,9 +220,9 @@ export class ProgressionManager {
     return Math.max(0.8, Math.min(1.2, baseForm + formVariation));
   }
 
-  /** 
+  /**
    * Start a new season
-   */ 
+   */
   startNewSeason() {
     this.currentSeason++;
     this.weekInSeason = 1;
@@ -239,9 +238,9 @@ export class ProgressionManager {
     });
   }
 
-  /** 
+  /**
    * Improve racers for new season
-   */ 
+   */
   improveRacersForNewSeason() {
     // Slightly improve all racers to keep the game challenging
     this.gameState.racers.forEach(racer => {
@@ -257,9 +256,9 @@ export class ProgressionManager {
     });
   }
 
-  /** 
+  /**
    * Get progression statistics
-   */ 
+   */
   getProgressionStats() {
     return {
       currentSeason: this.currentSeason,
@@ -270,9 +269,9 @@ export class ProgressionManager {
     };
   }
 
-  /** 
+  /**
    * Check and award achievements
-   */ 
+   */
   checkAchievements(eventType, data) {
     switch (eventType) {
       case 'race:finish':
@@ -293,11 +292,10 @@ export class ProgressionManager {
     }
   }
 
-  /** 
+  /**
    * Helper function to get random integer
-   */ 
+   */
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
-```
