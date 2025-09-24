@@ -15,12 +15,9 @@ export class Race {
   initializeSegments(segmentsPerSection = 3) {
     this.segments = [];
     (this.track?.sections || []).forEach(section => {
-      for (let i = 0; i < segmentsPerSection; i++) {
-        this.segments.push(section);
-      }
+      for (let i = 0; i < segmentsPerSection; i++) this.segments.push(section);
     });
     this.segments.push('finishLine');
   }
 }
-
 window.Race = Race;
