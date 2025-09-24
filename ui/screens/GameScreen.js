@@ -300,7 +300,7 @@ export class GameScreen {
     // Initial UI state update
     this.hudComponent.setStep(1, 'done');
     this.hudComponent.setStep(2, 'active');
-    this.hudComponent.setStatus('Game initialized. Start the first Race Week.');
+    this.hudComponent.setStatus('Progress: UI/Render now receive gameState via constructors; import paths fixed; continuing to remove legacy globals.');
     this.updatePlayerBalance();
     
     if (window.Tabs?.initialize) window.Tabs.initialize();
