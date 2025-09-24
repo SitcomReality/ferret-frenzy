@@ -14,8 +14,9 @@ import '../ui/components/settingsPanel.js';
 import '../ui/components/tabs.js';
 import '../ui/eventHandlers.js';
 import { initGame } from '../init.js';
-import '../setupRace.js';
-import '../setupTrack.js';
+// removed obsolete legacy module imports that cause 404s
+// import '../setupRace.js';
+// import '../setupTrack.js';
 import '../domUtils.js';
 
 // Initialize the application
