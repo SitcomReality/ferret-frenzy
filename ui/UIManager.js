@@ -45,8 +45,9 @@ export class UIManager {
     // Hide current screen
     if (this.activeScreen) {
       this.activeScreen.hide?.();
-      if (this.root) this.root.innerHTML = '';
     }
+    
+    if (this.root) this.root.innerHTML = '';
 
     // Show new screen
     this.activeScreen = screen;

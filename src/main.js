@@ -8,27 +8,18 @@ import { ProgressionManager } from './game/progression/ProgressionManager.js';
 import { HUDComponent } from '../ui/components/HUDComponent.js';
 import { BettingComponent } from '../ui/components/BettingComponent.js';
 import { GameScreen } from '../ui/screens/GameScreen.js';
+import { IntroScreen } from '../ui/screens/IntroScreen.js';
 import { UIManager } from '../ui/UIManager.js';
 import { SettingsPanel } from '../ui/components/settingsPanel.js';
 // Ensure legacy UI helpers are available
 import '../ui/components/tabs.js';
-import '../ui/eventHandlers.js';
+// ui/eventHandlers.js is deprecated and will be removed.
+// import '../ui/eventHandlers.js'; 
 import { initGame } from '../init.js';
 // removed obsolete legacy module imports that cause 404s
 // import '../setupRace.js';
 // import '../setupTrack.js';
 import '../domUtils.js';
-
-// Initialize the application when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    window.app = new Application();
-    window.app.initialize().catch(console.error);
-  });
-} else {
-  window.app = new Application();
-  window.app.initialize().catch(console.error);
-}
 
 // Initialize the application
 class Application {
@@ -44,11 +35,10 @@ class Application {
     this.progressionManager = new ProgressionManager(this.eventBus, this.gameStateManager);
     this.eventBus._progressionManager = this.progressionManager;
     
-    // UI Components
+    // UI Manager
     this.uiManager = new UIManager(this.eventBus);
-    this.hud = new HUDComponent(document.getElementById('hud'));
     
-    // Make eventBus available globally for compatibility
+    // Make eventBus and app available globally for compatibility/debugging
     window.eventBus = this.eventBus;
     window.app = this;
     
@@ -83,11 +73,7 @@ class Application {
   setupEventListeners() {
     // Race events
     this.eventBus.on('race:startWeek', () => {
-      const week = this.progressionManager.startNewRaceWeek();
-      if (week && this.hud) {
-        this.hud.setStep(2, 'done');
-        this.hud.setStep(3, 'active');
-      }
+      this.progressionManager.startNewRaceWeek();
     });
     
     this.eventBus.on('race:setup', () => {
@@ -116,11 +102,7 @@ class Application {
     
     this.eventBus.on('game:initialize', () => {
       initGame(this.gameStateManager);
-      this.hud.setStep(1, 'done');
-      this.hud.setStep(2, 'active');
-      this.hud.setStatus('Racers and tracks generated. Start Race Week.');
-      const intro = document.getElementById('introScreen');
-      if (intro) intro.remove();
+      this.uiManager.showScreen('game');
     });
   }
 
@@ -151,7 +133,7 @@ class Application {
       ];
 
       // Load prefixes
-      const prefixResponse = await fetch('wordlist/racerNamePrefixes.xml');
+      const prefixResponse = await fetch('../wordlist/racerNamePrefixes.xml');
       const prefixXmlText = await prefixResponse.text();
       const prefixParser = new DOMParser();
       const prefixXml = prefixParser.parseFromString(prefixXmlText, "text/xml");
@@ -167,7 +149,7 @@ class Application {
       window.racerNamePrefixes.push(...dynamicPrefixes);
 
       // Load suffixes
-      const suffixResponse = await fetch('wordlist/racerNameSuffixes.xml');
+      const suffixResponse = await fetch('../wordlist/racerNameSuffixes.xml');
       const suffixXmlText = await suffixResponse.text();
       const suffixParser = new DOMParser();
       const suffixXml = suffixParser.parseFromString(suffixXmlText, "text/xml");
@@ -201,18 +183,31 @@ class Application {
   }
 
   initializeUI() {
-    // Legacy UI initialization: hide no-js and show intro
+    // Hide no-js message
     const noJsDiv = document.getElementById('no-js');
     if (noJsDiv) noJsDiv.style.display = 'none';
 
-    const introScreen = document.getElementById('introScreen');
-    if (introScreen) introScreen.style.display = 'block';
+    // Register screens
+    this.uiManager.registerScreen('intro', new IntroScreen());
+    this.uiManager.registerScreen('game', new GameScreen());
 
-    // Initialize legacy UI components
-    if (window.SettingsPanel) SettingsPanel.refresh();
+    // Show the intro screen
+    this.uiManager.showScreen('intro', { gameState: this.gameState });
+
+    // Initialize legacy UI components that might still be needed globally
     if (window.Tabs) Tabs.initialize();
-    if (window.EventHandlers) EventHandlers.initializeAll();
   }
+}
+
+// Initialize the application when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.app = new Application();
+    window.app.initialize().catch(console.error);
+  });
+} else {
+  window.app = new Application();
+  window.app.initialize().catch(console.error);
 }
 
 // Export for use in other modules

@@ -47,7 +47,14 @@ export class SettingsPanel extends BaseComponent {
     }
 
     static refresh(gameState) {
-        document.getElementById('introSettings').innerHTML = SettingsPanel.generateSettingsHTML(gameState);
+        if (!gameState) {
+            console.error("SettingsPanel.refresh requires gameState.");
+            return;
+        }
+        const settingsContainer = document.getElementById('introSettings');
+        if (settingsContainer) {
+            settingsContainer.innerHTML = SettingsPanel.generateSettingsHTML(gameState);
+        }
 
         var categoryToggles = document.querySelectorAll('.category-toggle');
 

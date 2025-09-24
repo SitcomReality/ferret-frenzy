@@ -38,11 +38,11 @@ export class IntroScreen {
   }
 
   show(data = {}) {
-    document.body.appendChild(this.element);
+    (data?.container || document.getElementById('app') || document.body).appendChild(this.element);
     
     // Initialize settings panel if available
     if (window.SettingsPanel) {
-      SettingsPanel.refresh();
+      SettingsPanel.refresh(data.gameState);
     }
   }
 

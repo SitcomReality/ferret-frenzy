@@ -43,8 +43,7 @@ function initGame(gameState) {
 		gameState.tracks.push(track);
 	}
 	
-	// Initialize other elements like starting money, settings, etc.	
-	document.getElementById('introScreen').remove();
+	// Initialize other elements like starting money, settings, etc.
 }
 
 function generateNewRacers(numberToGenerate, settings) {
