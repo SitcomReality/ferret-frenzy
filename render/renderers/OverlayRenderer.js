@@ -38,7 +38,7 @@ export class OverlayRenderer {
     if (!this.renderManager.interactionController.banners.has(laneIndex)) {
       this.renderManager.interactionController.banners.set(laneIndex, {
         lane: laneIndex,
-        text: getRacerNameString(racer),
+        text: this.getRacerNameString(racer),
         x: startX,
         targetX: 20,
         opacity: 0,
@@ -51,6 +51,15 @@ export class OverlayRenderer {
       if (banner.x > w + 50 || banner.x < -350) banner.x = startX;
       banner.opacity = Math.max(banner.opacity, 0.1);
     }
+  }
+
+  getRacerNameString(racer) {
+    if (!racer || !racer.name) return "Unknown Racer";
+    const p = window.racerNamePrefixes?.[racer.name[0]];
+    const s = window.racerNameSuffixes?.[racer.name[1]];
+    const pref = typeof p === 'function' ? (racer._evaluatedPrefix ||= p()) : p;
+    const suff = typeof s === 'function' ? (racer._evaluatedSuffix ||= s()) : s;
+    return `${pref} ${suff}`;
   }
 
   renderBanners(ctx, w, h, laneH) {
