@@ -1,3 +1,5 @@
+import { Race } from '../../models/Race.js';
+
 /**
  * ProgressionManager - Handles week/season progression
  */
@@ -42,9 +44,6 @@ export class ProgressionManager {
    * Create a new race week
    */
   createRaceWeek() {
-    // Import Race class
-    const { Race } = window;
-
     const settings = this.gameState.settings;
 
     // Select racers for the week
