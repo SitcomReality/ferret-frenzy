@@ -73,6 +73,14 @@ class DOMUtils {
     static createRacerGuiElement(racerId, index) {
         const thisRacer = gameState.racers[racerId];
 
+        if (!thisRacer) {
+            console.error(`Racer with ID ${racerId} not found.`);
+            const errorCard = document.createElement('div');
+            errorCard.className = 'racer-card';
+            errorCard.textContent = `Error: Racer ${racerId} not found.`;
+            return errorCard;
+        }
+
         const card = document.createElement('div');
         card.className = 'racer-card';
         card.setAttribute('data-racer-id', thisRacer.id);

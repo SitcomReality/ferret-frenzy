@@ -105,8 +105,7 @@
 
 /* Compact list variant (when inside lists or explicitly flagged) */
 .racers-list li .racer-card,
-#historyList li .racer-card,
-.racer-card.this-racer-is-in-a-list {
+#historyList li .racer-card {
   grid-template-columns: 28px 1fr;
   gap: 8px;
   padding: 6px 8px;
@@ -114,19 +113,16 @@
 }
 
 .racers-list li .racer-card .racer-number,
-#historyList li .racer-card .racer-number,
-.racer-card.this-racer-is-in-a-list .racer-number {
+#historyList li .racer-card .racer-number {
   width: 28px; height: 28px; font-size: 12px; border-radius: 6px;
 }
 
 .racers-list li .racer-card .racer-name,
-#historyList li .racer-card .racer-name,
-.racer-card.this-racer-is-in-a-list .racer-name {
+#historyList li .racer-card .racer-name {
   font-size: 12px;
 }
 
 .racers-list li .racer-card .swatch,
-#historyList li .racer-card .swatch,
-.racer-card.this-racer-is-in-a-list .swatch {
+#historyList li .racer-card .swatch {
   width: 10px; height: 10px;
 }

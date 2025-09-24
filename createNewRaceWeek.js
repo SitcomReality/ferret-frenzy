@@ -96,7 +96,8 @@ function createNewRaceWeek() {
             }
 
             const selectedRacerListDom = document.createElement('li');
-            selectedRacerListDom.append(DOMUtils.createRacerGuiElement(gameState.racers[selectedRacers[selectedRacersIndexes[racerIndex]]].id));
+            const racerIdForCard = gameState.racers[selectedRacers[selectedRacersIndexes[racerIndex]]].id;
+            selectedRacerListDom.append(DOMUtils.createRacerGuiElement(racerIdForCard));
             racersList.appendChild(selectedRacerListDom);
         }
 
