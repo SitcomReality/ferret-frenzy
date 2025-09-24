@@ -100,13 +100,13 @@ export class OverlayRenderer {
     ctx.shadowOffsetX = 5;
     ctx.shadowOffsetY = 5;
 
-    this.drawBannerBackground(ctx, startX, bannerY, bannerHeight, color1, color2);
+    this.drawBannerBackground(ctx, banner, startX, bannerY, bannerHeight, color1, color2);
     this.drawBannerContent(ctx, banner, startX, laneY, bannerHeight, color3, racer);
 
     ctx.restore();
   }
 
-  drawBannerBackground(ctx, startX, bannerY, bannerHeight, color1, color2) {
+  drawBannerBackground(ctx, banner, startX, bannerY, bannerHeight, color1, color2) {
     const nameFontSize = Math.max(12, bannerHeight * 0.55);
     ctx.font = `900 ${nameFontSize}px Orbitron`;
     const nameMetrics = ctx.measureText(banner.text.toUpperCase());
