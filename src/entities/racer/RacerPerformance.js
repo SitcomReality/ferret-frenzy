@@ -13,8 +13,16 @@ export class RacerPerformance {
   }
 
   initialize() {
-    this.remainingEndurance = this.racer.stats.getStat('endurance');
-    this.remainingBoost = this.racer.stats.getStat('boostDuration');
+    // Fix: Use direct stats access instead of getStat method
+    const stats = this.racer.getComponent('stats');
+    if (stats && stats.stats) {
+      this.remainingEndurance = stats.stats.endurance || 2000;
+      this.remainingBoost = stats.stats.boostDuration || 600;
+    } else {
+      // Fallback to config values
+      this.remainingEndurance = this.config.racerProperties.enduranceBase || 2000;
+      this.remainingBoost = this.config.racerProperties.boostDurationBase || 600;
+    }
   }
 
   calculateSpeed(racerForm, percentRaceComplete, groundType, weatherType) {

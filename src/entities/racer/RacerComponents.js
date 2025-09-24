@@ -55,10 +55,19 @@ export class RacerComponents {
 
       // Create component instance
       const component = new componentInfo.class(racer, config, ...deps);
-      component.initialize?.();
-
+      
+      // Store instance before initializing to avoid circular dependency issues
       componentInfo.instances.set(racer, component);
       instances.set(name, component);
+      
+      // Initialize component after all dependencies are resolved
+      if (component.initialize) {
+        try {
+          component.initialize();
+        } catch (error) {
+          console.error(`Failed to initialize component ${name}:`, error);
+        }
+      }
     }
 
     return instances;
