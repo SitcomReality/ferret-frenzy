@@ -136,25 +136,57 @@ class FerretBodyRenderer {
       ];
     }
 
-    // Draw all four legs
-    legPositions.forEach((pos, i) => {
-      const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
+    // Draw legs on the far side first (behind the body)
+    const farSideLegs = [1, 2]; // Front right and back left
+    const nearSideLegs = [0, 3]; // Front left and back right
 
-      ctx.beginPath();
-      ctx.moveTo(startX, bodyHeight/4);
-      ctx.lineTo(pos.x, pos.y + legLength);
-      ctx.lineWidth = 3 * legThickness;
-      ctx.strokeStyle = colors[1];
-      ctx.lineCap = 'round';
-      ctx.stroke();
-
-      // Draw paw
-      const pawSize = ferret.isStumbling ? 2 : 3;
-      ctx.fillStyle = 'rgba(0,0,0,0.4)';
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y + legLength, pawSize, 0, Math.PI * 2);
-      ctx.fill();
+    // Draw far side legs first (behind the body)
+    farSideLegs.forEach(legIndex => {
+      this.renderLeg(ctx, ferret, colors, legPositions[legIndex], legIndex, bodyHeight, legLength, legThickness);
     });
+
+    // Draw the ferret body to obscure the far side legs
+    this.renderBodyOverlay(ctx, ferret);
+
+    // Draw near side legs (in front)
+    nearSideLegs.forEach(legIndex => {
+      this.renderLeg(ctx, ferret, colors, legPositions[legIndex], legIndex, bodyHeight, legLength, legThickness);
+    });
+  }
+
+  renderLeg(ctx, ferret, colors, pos, legIndex, bodyHeight, legLength, legThickness) {
+    const startX = legIndex % 2 === 0 
+      ? (legIndex === 0 ? bodyHeight/3 : -bodyHeight/4)
+      : (legIndex === 1 ? bodyHeight/3 - 5 : -bodyHeight/4 - 5);
+
+    ctx.beginPath();
+    ctx.moveTo(startX, bodyHeight/4);
+    ctx.lineTo(pos.x, pos.y + legLength);
+    ctx.lineWidth = 3 * legThickness;
+    ctx.strokeStyle = colors[1];
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Draw paw
+    const pawSize = ferret.isStumbling ? 2 : 3;
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y + legLength, pawSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  renderBodyOverlay(ctx, ferret) {
+    // Draw a slightly larger body to create a clean overlay
+    const bodyLength = ferret.body.length * 30;
+    const bodyHeight = ferret.body.height * 20 * ferret.body.stockiness;
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.beginPath();
+    ctx.ellipse(-5, 0, bodyLength/2 + 1, bodyHeight/2 + 1, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fill();
+    ctx.restore();
   }
 }
 
