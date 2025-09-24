@@ -15,18 +15,18 @@
     transition: all 0.3s ease;
 }
 
-.race-week-container.current-week {
+.race-week-container.current-race {
     border-color: var(--accent-color);
     background: linear-gradient(135deg, rgba(0,123,255,0.1) 0%, rgba(0,0,0,0.3) 100%);
     box-shadow: 0 0 15px rgba(0,123,255,0.3);
 }
 
-.race-week-container.past-week {
+.race-week-container.past-race {
     opacity: 0.6;
     border-color: #555;
 }
 
-.race-week-container.past-week:hover {
+.race-week-container.past-race:hover {
     opacity: 0.8;
 }
 
@@ -60,14 +60,15 @@
 }
 
 .racers-list {
-    margin: 0;
-    padding-left: 0;
-    list-style: none;
+    margin-top: 8px;
+    padding-left: 20px;
+    list-style: disc;
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
 .racers-list li {
     margin: 4px 0;
-    font-size: 11px;
 }
 
 .stat {

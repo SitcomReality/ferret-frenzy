@@ -33,6 +33,7 @@ export class GameScreen {
     this.eventBus.on('race:finish', (raceData) => this.onRaceFinish(raceData));
     this.eventBus.on('bets:settled', () => this.updatePlayerBalance());
     this.eventBus.on('race:update', (data) => this.onRaceUpdate(data));
+    this.eventBus.on('progression:weekStarted', (data) => this.displayRaceWeekInfo(this.gameState.raceWeek));
   }
 
   createElement() {
@@ -73,12 +74,19 @@ export class GameScreen {
         <div id="left-panel">
           <div class="ui gui-container tabs" id="sidebarTabs">
             <div class="tab-buttons">
-              <button class="tab-button active" data-tab="betting">Betting</button>
+              <button class="tab-button active" data-tab="raceweek">Race Week</button>
+              <button class="tab-button" data-tab="betting">Betting</button>
               <button class="tab-button" data-tab="history">History</button>
               <button class="tab-button" data-tab="settings">Settings</button>
             </div>
             <div class="tab-content">
-              <div class="tab-panel active" data-tab-panel="betting">
+              <div class="tab-panel active" data-tab-panel="raceweek">
+                <div id="raceWeekPanel" class="ui gui-container">
+                  <h4>Race Week Info</h4>
+                  <div id="raceWeekRacesContainer">Press "Start Race Week" to see races.</div>
+                </div>
+              </div>
+              <div class="tab-panel" data-tab-panel="betting">
                 <div id="bettingPanel" class="ui gui-container">
                   <!-- Betting content will be managed by BettingComponent -->
                 </div>
@@ -190,6 +198,8 @@ export class GameScreen {
     if(weatherDisplay) {
         weatherDisplay.textContent = `Weather: ${race.weather}`;
     }
+    // Highlight the current race in the race week panel
+    this.highlightCurrentRace(this.gameState.currentRaceIndex);
     // Initial render of the track and racers at starting line
     this.renderManager.tick(performance.now());
   }
@@ -223,6 +233,7 @@ export class GameScreen {
       this.hudComponent.setStatus('Race week complete! Start a new week.');
       setupRaceBtn.disabled = true;
       startRaceWeekBtn.disabled = false;
+      this.clearRaceWeekInfo();
     } else {
       setupRaceBtn.disabled = false;
     }
@@ -292,6 +303,85 @@ export class GameScreen {
     if (raceWeekNumberEl) raceWeekNumberEl.textContent = gameState.raceWeekCounter;
     if (raceNumberThisWeekEl) raceNumberThisWeekEl.textContent = gameState.currentRaceIndex + 1;
     if (raceNumberEl) raceNumberEl.textContent = gameState.raceHistory.length + 1;
+  }
+
+  displayRaceWeekInfo(raceWeek) {
+    const container = this.element.querySelector('#raceWeekRacesContainer');
+    if (!container || !raceWeek) return;
+    container.innerHTML = '';
+
+    raceWeek.races.forEach((race, index) => {
+      const raceEl = document.createElement('div');
+      raceEl.className = 'race-week-container';
+      raceEl.id = `race-week-race-${index}`;
+
+      const trackLength = race.track.sections.length;
+      const groundTypes = [...new Set(race.track.sections)].join(', ');
+
+      let racersHTML = '<ul class="racers-list">';
+      race.racers.forEach(racer => {
+        racersHTML += `<li>- ${this.getRacerNameString(racer)}</li>`;
+      });
+      racersHTML += '</ul>';
+
+      raceEl.innerHTML = `
+        <div class="race-week-header">
+          <h4>Race ${index + 1}: ${race.track.name}</h4>
+          <div class="track-info">
+            <span class="track-length">Length: ${trackLength} sections</span>
+            <span class="ground-types">Ground: ${groundTypes}</span>
+          </div>
+        </div>
+        <h5>Participants:</h5>
+        ${racersHTML}
+      `;
+      container.appendChild(raceEl);
+    });
+  }
+
+  highlightCurrentRace(raceIndex) {
+    this.element.querySelectorAll('.race-week-container').forEach(el => {
+      el.classList.remove('current-race');
+      if (parseInt(el.id.split('-').pop()) < raceIndex) {
+        el.classList.add('past-race');
+      } else {
+         el.classList.remove('past-race');
+      }
+    });
+    const currentRaceEl = this.element.querySelector(`#race-week-race-${raceIndex}`);
+    if (currentRaceEl) {
+      currentRaceEl.classList.add('current-race');
+    }
+  }
+  
+  clearRaceWeekInfo() {
+      const container = this.element.querySelector('#raceWeekRacesContainer');
+      if(container) {
+        container.innerHTML = 'Race week complete. Press "Start Race Week" to begin a new one.';
+      }
+  }
+  
+  getRacerNameString(racer) {
+    if (!racer || !racer.name) return "Unknown Racer";
+
+    const prefix = window.racerNamePrefixes?.[racer.name[0]];
+    const suffix = window.racerNameSuffixes?.[racer.name[1]];
+
+    let prefixStr, suffixStr;
+
+    if (typeof prefix === 'function') {
+      prefixStr = racer._evaluatedPrefix || (racer._evaluatedPrefix = prefix());
+    } else {
+      prefixStr = prefix;
+    }
+
+    if (typeof suffix === 'function') {
+      suffixStr = racer._evaluatedSuffix || (racer._evaluatedSuffix = suffix());
+    } else {
+      suffixStr = suffix;
+    }
+
+    return `${prefixStr} ${suffixStr}`;
   }
 
   show(data = {}) {

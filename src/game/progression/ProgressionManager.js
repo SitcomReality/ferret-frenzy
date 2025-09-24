@@ -56,7 +56,7 @@ export class ProgressionManager {
 
     // Set racer form for the week
     selectedRacers.forEach(racerId => {
-      const racer = this.gameState.racers[racerId];
+      const racer = this.gameState.racers.find(r => r.id === racerId);
       if (racer) {
         racer.formThisWeek = this.calculateRacerForm(racer);
       }
@@ -94,11 +94,15 @@ export class ProgressionManager {
    * Select racers for the week
    */
   selectRacersForWeek(count) {
-    const allRacers = Array.from({ length: this.gameState.settings.racerProperties.totalPoolSize }, (_, i) => i);
+    const allRacerIds = this.gameState.racers.map(r => r.id);
+    if (allRacerIds.length === 0) {
+      console.error("No racers in gameState to select from!");
+      return [];
+    }
 
     // Use performance-based selection with some randomization
-    const racerPerformances = allRacers.map(racerId => {
-      const racer = this.gameState.racers[racerId];
+    const racerPerformances = allRacerIds.map(racerId => {
+      const racer = this.gameState.racers.find(r => r.id === racerId);
       const avgPosition = racer ? racer.getAverageFinishingPosition(5) : 999;
       return { id: racerId, performance: avgPosition };
     });
@@ -136,7 +140,7 @@ export class ProgressionManager {
 
     // Shuffle and select
     const shuffled = [...availableRacers].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, selectedCount).map(racerId => this.gameState.racers[racerId]);
+    return shuffled.slice(0, selectedCount).map(racerId => this.gameState.racers.find(r => r.id === racerId));
   }
 
   /**
