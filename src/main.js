@@ -16,9 +16,6 @@ class Application {
 
   async initialize() {
     try {
-      // Hide the no-js warning immediately
-      this.hideNoJSDiv();
-      
       // Load XML wordlists first
       await this.loadXmlWordlists();
 
@@ -35,13 +32,6 @@ class Application {
     } catch (error) {
       console.error('Failed to initialize application:', error);
       throw error;
-    }
-  }
-
-  hideNoJSDiv() {
-    const noJsDiv = document.getElementById('no-js');
-    if (noJsDiv) {
-      noJsDiv.style.display = 'none';
     }
   }
 
@@ -116,30 +106,7 @@ class Application {
 
   initializeUI() {
     // Initialize UI components
-    if (window.initializeUI) {
-      window.initializeUI();
-    } else {
-      // Fallback UI initialization
-      this.fallbackInitializeUI();
-    }
-  }
-
-  fallbackInitializeUI() {
-    // Basic UI initialization when modules aren't loaded yet
-    const settingsPanel = document.getElementById('introSettings');
-    if (settingsPanel && window.SettingsPanel) {
-      settingsPanel.innerHTML = SettingsPanel.generateSettingsHTML();
-    }
-    
-    // Initialize tabs if available
-    if (window.Tabs) {
-      Tabs.initialize();
-    }
-    
-    // Initialize event handlers if available
-    if (window.EventHandlers) {
-      EventHandlers.initializeAll();
-    }
+    // This will be expanded as we convert UI modules
   }
 }
 
