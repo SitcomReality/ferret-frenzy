@@ -1,11 +1,12 @@
 #settingsPanelInner {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 10px;
+    /* remove inner scrolling; let #introSettings handle it */
+    max-height: none;
+    overflow: visible;
+    padding: 0;
 }
 /* Ensure inner tabs layout is compact for dev settings */
-#settingsPanelInner .tab-buttons { position: sticky; top: 0; background: rgba(0,0,0,0.3); padding: 6px; border-bottom: 1px solid #444; z-index: 1; }
-#settingsPanelInner .tab-button { font-size: 11px; padding: 4px 8px; }
+#settingsPanelInner .tab-buttons { position: static; background: none; border-bottom: 1px solid #444; display: flex; flex-wrap: wrap; gap: 8px; overflow: hidden; padding: 8px 0; }
+#settingsPanelInner .tab-button { font-size: 12px; padding: 6px 10px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .category-toggle {
     cursor: pointer;
@@ -14,6 +15,9 @@
     padding: 5px;
     border-radius: 4px;
     background: rgba(0,0,0,0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .category-toggle:hover {
@@ -38,8 +42,8 @@
 }
 
 #initButtonContainer {
-    text-align: center;
-    margin-top: 20px;
+    text-align: right;
+    margin-top: 0;
 }
 
 #initButtonContainer .btn {

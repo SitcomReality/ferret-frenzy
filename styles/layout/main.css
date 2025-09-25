@@ -33,24 +33,26 @@
 }
 
 #introSettingsContainer {
-    width: 400px;
     position: absolute;
-    left: calc(50% - 240px);
-    padding: 20px;
-    background-color: #0c021c;
-    border-radius: 10px;
-    border: 1px solid #18005b;
-    height: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(960px, 92vw);
+    height: min(80vh, 720px);
+    display: flex;
+    flex-direction: column;
 }
 
 #introSettings {
-    max-height: none;
-    overflow: visible;
-    border: 1px solid #18005b;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px;
 }
 
 #initButtonContainer {
-    height: 100px;
+    flex: 0 0 auto;
+    padding: 12px;
 }
 
 #header {
