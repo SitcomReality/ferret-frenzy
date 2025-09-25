@@ -98,8 +98,10 @@ export class CameraCalculator {
    */
   calculateOptimalTarget(racers, race, shotDef) {
     if (racers.length === 0) {
-      // If no racers to frame, find and focus on the race leader
-      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      const activeRacers = race.racers.filter(rid => {
+        const t = race.finishedAt?.[rid];
+        return !t || (Date.now() - t) < 1500;
+      }).filter(rid => !(race.results || []).includes(rid));
       if (activeRacers.length > 0) {
         const sorted = [...activeRacers].sort((a,b) => (race.liveLocations[b]||0) - (race.liveLocations[a]||0));
         return { x: race.liveLocations[sorted[0]] || 50, y: 0 };

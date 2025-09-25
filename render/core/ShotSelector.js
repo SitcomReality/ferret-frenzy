@@ -29,7 +29,10 @@ export class ShotSelector {
       return; // Don't change shots too frequently
     }
 
-    const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+    const activeRacers = race.racers.filter(rid => {
+      const t = race.finishedAt?.[rid];
+      return !t || (Date.now() - t) < 1500;
+    }).filter(rid => !(race.results || []).includes(rid));
     if (activeRacers.length === 0) {
       this.director.setShot('finish_focus', now, -1); // Use -1 for section as race is over
       return;

@@ -82,7 +82,8 @@ export class RaceManager {
       results: [],
       liveLocations: {},
       livePositions: [],
-      startTime: race.startTime
+      startTime: race.startTime,
+      finishedAt: {} // track finish timestamps
     };
     // Reset any prior race countdown
     this.raceEndCountdown = null;
@@ -226,6 +227,7 @@ export class RaceManager {
   finishRacer(racerId) {
     const finishingPosition = this.currentRace.results.length + 1;
     this.currentRace.results.push(racerId);
+    this.currentRace.finishedAt[racerId] = Date.now(); // record finish time
 
     const racer = this.gameState.racers.find(r => r.id === racerId);
     if (racer) {
