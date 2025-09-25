@@ -1,5 +1,3 @@
-
-```
 /**
  * ShotSelector - Handles shot selection logic
  */

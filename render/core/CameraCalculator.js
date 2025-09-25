@@ -1,5 +1,3 @@
-
-```
 /**
  * CameraCalculator - Handles camera calculations
  */
