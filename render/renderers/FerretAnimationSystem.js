@@ -9,20 +9,14 @@ export class FerretAnimationSystem {
   update(ferret, racer, time, raceState) {
     const liveX = (raceState?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
-    
-    // Use actual world displacement to advance gait phase so footcycling is tied to ground travel
-    const deltaX = liveX - (ferret._lastX ?? liveX); // world units moved since last update
-    const worldSpeed = Math.abs(deltaX) / dt; // world units/sec (for stride sizing)
+    const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
 
-    if (Math.abs(deltaX) > 0.00001) {
-      // Map distance travelled directly to phase advance so steps match ground movement
-      const distanceToPhase = 0.18; // tuning: how many phase units per world unit travelled
-      ferret.gait.cyclePhase += deltaX * distanceToPhase;
-      // stride magnitude can still reflect speed but clamp aggressively to avoid overshoot
-      ferret.gait.stride = Math.min(1.3, 0.45 + worldSpeed * 0.09);
+    if (velocity > 0.0005) {
+      const k = 0.22; // maps world velocity to gait speed
+      ferret.gait.cyclePhase += velocity * k;
+      ferret.gait.stride = Math.min(1.3, 0.6 + velocity * 0.12);
     } else {
-      // stationary: feet remain planted and small damping to stride
-      ferret.gait.stride = Math.max(0, ferret.gait.stride * 0.1);
+      ferret.gait.stride = 0; // feet planted when not moving
     }
     if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
     ferret._lastX = liveX; ferret._lastTime = time;
