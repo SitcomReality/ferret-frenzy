@@ -44,8 +44,8 @@
 }
 
 #introSettings {
-    max-height: calc(100% - 100px);
-    overflow-y: scroll;
+    max-height: none;
+    overflow: visible;
     border: 1px solid #18005b;
 }
 
@@ -469,6 +469,3 @@ li .historyRacerPlacingContainer .racerName {
         filter: blur(10px);
     }
 }
-
-
-
