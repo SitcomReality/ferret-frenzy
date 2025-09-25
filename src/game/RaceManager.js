@@ -167,7 +167,6 @@ export class RaceManager {
     this.currentRace.racers.forEach(racerId => {
       const racer = this.gameState.racers.find(r => r.id === racerId);
       if (!racer || racer.visual.finished) return;
-
       const currentPosition = this.currentRace.liveLocations[racerId] || 0;
       const segmentIndex = Math.floor((currentPosition / 100) * (this.currentRace.segments.length -1) );
 
@@ -178,6 +177,15 @@ export class RaceManager {
       }
 
       const segmentType = this.currentRace.segments[segmentIndex];
+      // Activate boost near finish (or when threshold reached) and drain while active
+      const perf = racer.getComponent('performance'), stats = racer.getComponent('stats'), pers = racer.getComponent('personality');
+      const activation = stats?.getStat('boostActivationPercent') || 70;
+      if (!racer.isBoosting && perf?.remainingBoost > 0 && currentPosition >= activation) {
+        const locs = this.currentRace.liveLocations; let nearby = { ahead:0, behind:0 };
+        this.currentRace.racers.forEach(id => { if (id!==racerId) { const d=(locs[id]||0)-currentPosition; if (Math.abs(d)<8) { d>0?nearby.ahead++:nearby.behind++; } } });
+        if (!pers || pers.shouldActivateBoost(0, currentPosition, nearby)) racer.activateBoost();
+      }
+      if (racer.isBoosting && perf) { perf.reduceRemainingBoost(deltaTime * 60); if (perf.remainingBoost <= 0) racer.deactivateBoost(); }
       const speed = racer.calculateSpeed(
         racer.formThisWeek,
         currentPosition,
