@@ -46,12 +46,12 @@ export class SettingsPanel extends BaseComponent {
         return html;
     }
 
-    static refresh(gameState) {
+    refresh(gameState) {
         if (!gameState) {
             console.error("SettingsPanel.refresh requires gameState.");
             return;
         }
-        const settingsContainer = document.getElementById('introSettings');
+        const settingsContainer = this.element;
         if (settingsContainer) {
             settingsContainer.innerHTML = SettingsPanel.generateSettingsHTML(gameState);
         }
