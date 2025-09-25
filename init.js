@@ -39,7 +39,7 @@ function initGame(gameState) {
         const min = gameState.settings.trackProperties.minSectionsPerTrack;
         const max = gameState.settings.trackProperties.maxSectionsPerTrack;
         const numSections = Math.floor(Math.random() * (max - min + 1)) + min;
-        const track = new Track(i, trackName, numSections, gameState.settings.worldProperties.groundTypes);
+        const track = new Track(i, trackName, numSections, gameState.settings.worldProperties.groundTypes, gameState.settings.trackProperties);
 		gameState.tracks.push(track);
 	}
 	

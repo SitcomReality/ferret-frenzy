@@ -315,7 +315,7 @@ export class GameScreen {
       raceEl.className = 'race-week-container';
       raceEl.id = `race-week-race-${index}`;
 
-      const trackLength = race.track.sections.length;
+      const trackLength = Math.max(0, (race.segments?.length || 0) - 1);
       const groundTypes = [...new Set(race.track.sections)].join(', ');
 
       let racersHTML = '<ul class="racers-list">';
@@ -328,7 +328,7 @@ export class GameScreen {
         <div class="race-week-header">
           <h4>Race ${index + 1}: ${race.track.name}</h4>
           <div class="track-info">
-            <span class="track-length">Length: ${trackLength} sections</span>
+            <span class="track-length">Length: ${trackLength} segments</span>
             <span class="ground-types">Ground: ${groundTypes}</span>
           </div>
         </div>
