@@ -1,5 +1,3 @@
-
-```
 /**
  * ShotDefinitions - Defines available camera shots
  */

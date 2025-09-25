@@ -1,5 +1,3 @@
-
-```
 /**
  * RaceEventManager - Handles race event detection and management
  */
