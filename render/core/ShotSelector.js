@@ -55,16 +55,13 @@ export class ShotSelector {
     const recentEvents = this.director.eventManager.getRecentEvents(4000);
     const highPriorityEvent = recentEvents.some(e => e.type === 'stumble' || e.type === 'leadChange');
 
-    // 1. FINISH LINE SEQUENCE
-    if (race.results && race.results.length > 0) {
-      // If some have finished but others are still racing far from the end, focus on them.
-      if (leaderPos < 90) {
-         this.trySetShot('pack_focus', now, currentSection, isSameSection, highPriorityEvent);
-      } else {
-         this.trySetShot('finish_focus', now, currentSection, isSameSection, true); // Finishing is high priority
-      }
+    // 1. FINISH LINE SEQUENCE - ABSOLUTE TOP PRIORITY
+    if (race.results && (race.results.length >= 1 || (leaderPos >= 95))) {
+      // If first three racers are finishing (or we have any results), focus always on finish
+      this.trySetShot('finish_focus', now, currentSection, isSameSection, true); // Finishing is ALWAYS high priority
       return;
     }
+    
     if (leaderPos >= 92) {
       this.trySetShot('finish_approach', now, currentSection, isSameSection, true);
       return;
