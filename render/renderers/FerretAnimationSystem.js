@@ -11,10 +11,6 @@ export class FerretAnimationSystem {
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
     const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
 
-    // Calculate ground speed factor for leg synchronization
-    const baseSpeed = 0.005; // base movement speed
-    ferret.groundSpeed = 1.0 + (velocity - baseSpeed) * 0.5; // Adjust stride to match ground speed
-
     if (velocity > 0.0005) {
       const k = 0.22; // maps world velocity to gait speed
       ferret.gait.cyclePhase += velocity * k;
@@ -65,6 +61,69 @@ export class FerretAnimationSystem {
     }
 
     ferret._prevPhase = phase;
+
+    // Foot planting IK-ish leg positions
+    const bodyLength = ferret.body.length * 30;
+    const bodyHeight = ferret.body.height * 20 * ferret.body.stockiness;
+    const strideLen = ferret.gait.stride * 10;
+    const p = ferret.gait.cyclePhase;
+
+    // hip anchors (local body space) matching renderer
+    const hips = [
+      bodyLength/3,           // front near
+      bodyLength/3 - 5,       // front far
+      -bodyLength/4,          // rear near
+      -bodyLength/4 - 5       // rear far
+    ];
+    const phaseOffsets = [0, Math.PI, Math.PI, 0]; // pair gaiting
+
+    ferret._feet = ferret._feet || [
+      { anchorWorldX: null, inStance: false, x: hips[0] },
+      { anchorWorldX: null, inStance: false, x: hips[1] },
+      { anchorWorldX: null, inStance: false, x: hips[2] },
+      { anchorWorldX: null, inStance: false, x: hips[3] }
+    ];
+
+    const liftHeight = 8;
+    ferret.legPositions = new Array(4);
+
+    for (let i = 0; i < 4; i++) {
+      const legPhase = p + phaseOffsets[i];
+      const s = Math.sin(legPhase);
+      const c = Math.cos(legPhase);
+      const isSwing = s > 0;        // moving forward relative to body
+      const isStance = !isSwing;    // moving backward relative to body
+
+      const desiredStride = s * strideLen;
+      const hipX = hips[i];
+
+      const foot = ferret._feet[i];
+
+      if (isStance) {
+        if (!foot.inStance) {
+          // Enter stance: lock world anchor at current foot world X
+          foot.anchorWorldX = liveX + hipX + desiredStride;
+          foot.inStance = true;
+        }
+        // Keep foot world X at anchor -> local x adjusts opposite body motion
+        foot.x = foot.anchorWorldX - liveX;
+      } else {
+        // Swing phase: release anchor and move foot forward smoothly
+        foot.inStance = false;
+        foot.anchorWorldX = null;
+        // Approach desired forward stride with smoothing to avoid skating
+        const targetLocalX = hipX + desiredStride;
+        foot.x += (targetLocalX - foot.x) * Math.min(1, dt * 6);
+      }
+
+      const lift = isSwing ? Math.max(0, c) * liftHeight : 0;
+
+      ferret.legPositions[i] = {
+        x: foot.x,
+        y: bodyHeight/4,
+        lift
+      };
+    }
 
     // Update stumble/crash animation
     if (ferret.isStumbling) {
