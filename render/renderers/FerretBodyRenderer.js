@@ -167,9 +167,7 @@ export class FerretBodyRenderer {
     const legThickness = ferret.legs.thickness;
 
     let legPositions;
-    if (Array.isArray(ferret.legPositions)) {
-      legPositions = ferret.legPositions;
-    } else {
+    if (ferret.isStumbling) {
       // Scrambling/crashing leg positions
       const scramblePhase = ferret.crashPhase * 6;
       legPositions = [
@@ -178,21 +176,42 @@ export class FerretBodyRenderer {
         { x: -bodyLength/4 + Math.sin(scramblePhase + 2) * 7, y: bodyLength/4 + Math.cos(scramblePhase * 0.9) * 5, lift: 0 },
         { x: -bodyLength/4 - 5 + Math.sin(scramblePhase + 3) * 5, y: bodyLength/4 + Math.cos(scramblePhase * 1.2) * 4, lift: 0 }
       ];
+    } else {
+      // Normal running stride
+      const strideLength = ferret.gait.stride * 10;
+      const stridePhase = ferret.gait.cyclePhase;
+      const strideOffset = Math.sin(stridePhase) * strideLength;
+      const strideOffset2 = Math.sin(stridePhase + Math.PI) * strideLength * (ferret.legs.length > 1 ? 1.05 : 0.95);
+
+      // Determine foot lift. Lift happens when foot is moving forward (positive velocity)
+      const liftHeight = 8;
+      const cosPhase = Math.cos(stridePhase);
+      const liftAmount = cosPhase > 0 ? cosPhase * liftHeight : 0;
+      const liftAmount2 = -cosPhase > 0 ? -cosPhase * liftHeight : 0;
+
+      legPositions = [
+        { x: bodyLength/3 + strideOffset, y: bodyHeight/4, lift: liftAmount },
+        { x: bodyLength/3 - 5 + strideOffset2, y: bodyHeight/4, lift: liftAmount2 },
+        { x: -bodyLength/4 + strideOffset2, y: bodyHeight/4, lift: liftAmount2 },
+        { x: -bodyLength/4 - 5 + strideOffset, y: bodyHeight/4, lift: liftAmount }
+      ];
     }
 
+    // Decide which legs to draw this pass:
+    // legs 0 (front near),1 (front far),2 (rear near),3 (rear far) - we'll treat indices 1 and 3 as far-side.
     const farIndices = [1, 3];
     const nearIndices = [0, 2];
     const indicesToDraw = farSideOnly ? farIndices : nearIndices;
 
     indicesToDraw.forEach((i) => {
       const pos = legPositions[i];
-      const sideOffset = farSideOnly ? 2 : 0;
+      const sideOffset = farSideOnly ? 2 : 0; // subtle horizontal offset for depth
       const finalLegLength = legLength - pos.lift;
 
       const startX = i < 2 ? (i === 0 ? bodyLength/3 : bodyLength/3 - 5) : (i === 2 ? -bodyLength/4 : -bodyLength/4 - 5);
       const hipX = startX + (farSideOnly ? -sideOffset : sideOffset);
       const hipY = bodyHeight/4;
-      const footX = (pos.x ?? startX) + (farSideOnly ? -sideOffset : sideOffset);
+      const footX = pos.x + (farSideOnly ? -sideOffset : sideOffset);
       const footY = hipY + finalLegLength;
       const bendDir = (footX - hipX) >= 0 ? 1 : -1;
       const kneeX = (hipX + footX) * 0.5 + bendDir * Math.min(6, Math.abs(footX - hipX) * 0.3);
