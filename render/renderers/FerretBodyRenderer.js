@@ -66,13 +66,12 @@ export class FerretBodyRenderer {
     // Draw single ear with rotation based on earAngle
     ctx.save();
     ctx.translate(earBaseX, earBaseY);
-    // rotate in opposite direction so the triangular tip points backwards during the flap
-    ctx.rotate(-earAngle);
+    ctx.rotate(earAngle);
     ctx.beginPath();
     ctx.moveTo(-w, 0);
     ctx.lineTo(w, 0);
-    // flip the triangle tip to point the other way (backwards)
-    ctx.lineTo(0, len);
+    // Remove the flipped triangle tip - keep original direction
+    ctx.lineTo(0, -len);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
