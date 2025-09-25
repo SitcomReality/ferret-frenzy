@@ -44,32 +44,42 @@ export class RacerRenderer {
 
       // Handle boost particles
       this.renderBoostEffects(ctx, racer, { x: screenX, y: screenY, scale: this.renderManager.camera.zoom }, idx, worldTransform);
+
+      // Add subtle movement trail particles
+      this.renderTrailEffects({ x: screenX, y: screenY, scale: this.renderManager.camera.zoom });
     }
 
     this.updateLeaderboard(race);
   }
 
   renderBoostEffects(ctx, racer, screen, laneIndex, worldTransform) {
-    // Only emit if particle system exists and is enabled
-    const ps = this.renderManager?.particleSystem;
-    if (!ps || ps.enabled === false) return;
-
-    // Increase chance/quantity slightly so particles are noticeable post-refactor
-    const emitChance = 0.45;
-    if (racer?.isBoosting && Math.random() < emitChance) {
-      // Emit a small burst, scaled by camera zoom and particle system limits
-      const count = Math.min(4, Math.max(1, Math.round(2 * (screen.scale || 1))));
-      const baseSpeed = 80 * (screen.scale || 1);
-      for (let i = 0; i < count; i++) {
-        ps.emit(
-          screen.x + (Math.random() - 0.5) * 6, 
-          screen.y + (Math.random() - 0.5) * 6, 
-          Math.PI + (Math.random() - 0.5) * 0.6, 
-          baseSpeed * (0.6 + Math.random() * 0.8), 
-          1, 
-          'rgba(255,255,255,0.9)'
+    if (racer?.isBoosting && Math.random() < 0.3) {
+      if (this.renderManager && this.renderManager.particleSystem) {
+        this.renderManager.particleSystem.emit(
+          screen.x, 
+          screen.y, 
+          Math.PI, 
+          80 * screen.scale, 
+          2, 
+          'rgba(255,255,255,0.8)'
         );
       }
+    }
+  }
+
+  // New: dust trail while moving
+  renderTrailEffects(screen) {
+    if (!this.renderManager?.particleSystem) return;
+    if (Math.random() < 0.12) {
+      this.renderManager.particleSystem.emit(
+        screen.x - 8 * screen.scale,
+        screen.y + 3 * screen.scale,
+        Math.PI,
+        30 * screen.scale,
+        1,
+        'rgba(120,100,80,0.45)',
+        { spread: 0.6, forwardBoost: 0.2 }
+      );
     }
   }
 

@@ -4,7 +4,7 @@
 export class ParticleSystem {
   constructor() {
     this.particles = [];
-    this.maxParticles = 100;
+    this.maxParticles = 400;
   }
 
   createParticle(x, y, vx, vy, color, life) {
