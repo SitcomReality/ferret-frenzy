@@ -189,11 +189,8 @@ export class RenderManager {
     const worldPixelWidth = dims.width * 4;
     const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
     const laneHeight = this.worldTransform.laneHeight;
-    const totalHeight = laneHeight * this.renderProps.numberOfLanes;
+    const totalHeight = laneHeight * (this.renderProps?.numberOfLanes || 10);
     const trackCenterY = totalHeight / 2;
-
-    const yPos = 0; // This will be calculated per racer in worldTransform
-    const cameraPixelY = yPos / 100 * totalHeight;
 
     this.ctx.translate(-cameraPixelX, -trackCenterY);
   }
@@ -306,6 +303,7 @@ export class RenderManager {
    */
   updateCameraTarget() {
     if (!this.currentRace || !this.currentRace.racers || this.currentRace.racers.length === 0) return;
+    
     const { desiredX, desiredZoom } = this.camera.calculateDesiredState(this.currentRace, this.gameState);
     const dims = this.canvasAdapter.getDimensions();
     const lanes = this.renderProps?.numberOfLanes || this.gameState.settings.trackProperties.numberOfLanes || 10;
@@ -315,6 +313,7 @@ export class RenderManager {
     const zMax = this.gameState.settings?.render?.camera?.zoomMax || 3.0;
     const targetZoom = Math.max(zMin, Math.min(Math.min(verticalFitZoom * 0.98, zMax), desiredZoom));
     const targetX = Math.max(0, Math.min(100, desiredX));
+    
     this.camera.target.x += (targetX - this.camera.target.x) * this.camera.damping;
     this.camera.zoom += (targetZoom - this.camera.zoom) * this.camera.damping;
   }

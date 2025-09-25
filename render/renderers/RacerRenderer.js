@@ -13,19 +13,37 @@ export class RacerRenderer {
   render(ctx, race, worldTransform, time) {
     this.screenPositions = [];
 
+    // Get dimensions and calculate world scale
+    const dims = this.renderManager.canvasAdapter.getDimensions();
+    const worldPixelWidth = dims.width * 4;
+    const laneHeight = worldTransform.laneHeight;
+    const totalHeight = laneHeight * race.racers.length;
+
     for (let idx = 0; idx < race.racers.length; idx++) {
       const rid = race.racers[idx];
       const racer = this.renderManager?.gameState?.racers.find(r => r.id === rid);
       const worldX = race.liveLocations[rid] || 0;
-      const screen = worldTransform.worldToScreen(worldX, idx, this.renderManager.camera, this.renderManager.canvas.width, this.renderManager.canvas.height, race.racers.length, this.renderManager.gameState);
-
-      this.screenPositions.push({ rid, x: screen.x, y: screen.y, r: 25 * screen.scale });
+      
+      // Convert world position to pixels (0-100% becomes 0 to worldPixelWidth)
+      const pixelX = (worldX / 100) * worldPixelWidth;
+      
+      // Calculate lane Y position
+      const laneY = idx * laneHeight + laneHeight / 2 - totalHeight / 2;
+      
+      // These coordinates are in the world space, and the context is already camera-transformed
+      const screenX = pixelX;
+      const screenY = laneY;
+      
+      // Store screen positions for hit testing (convert back to screen space for UI)
+      const uiScreenX = screenX * this.renderManager.camera.zoom + dims.width / 2;
+      const uiScreenY = screenY * this.renderManager.camera.zoom + dims.height / 2;
+      this.screenPositions.push({ rid, x: uiScreenX, y: uiScreenY, r: 25 * this.renderManager.camera.zoom });
 
       // Render ferret using the dedicated renderer
-      this.ferretRenderer.render(ctx, screen.x, screen.y, racer, time, screen.scale);
+      this.ferretRenderer.render(ctx, screenX, screenY, racer, time, this.renderManager.camera.zoom);
 
       // Handle boost particles
-      this.renderBoostEffects(ctx, racer, screen, idx, worldTransform);
+      this.renderBoostEffects(ctx, racer, { x: screenX, y: screenY, scale: this.renderManager.camera.zoom }, idx, worldTransform);
     }
 
     this.updateLeaderboard(race);
@@ -33,21 +51,12 @@ export class RacerRenderer {
 
   renderBoostEffects(ctx, racer, screen, laneIndex, worldTransform) {
     if (racer?.isBoosting && Math.random() < 0.3) {
-      const scr = worldTransform.worldToScreen(
-        racer.liveLocations || 0,
-        laneIndex,
-        this.renderManager ? this.renderManager.camera : null,
-        this.renderManager ? this.renderManager.canvas.width : 800,
-        this.renderManager ? this.renderManager.canvas.height : 520,
-        this.renderManager && this.renderManager.renderProps ? this.renderManager.renderProps.numberOfLanes : 10
-      );
-
       if (this.renderManager && this.renderManager.particleSystem) {
         this.renderManager.particleSystem.emit(
-          scr.x, 
-          scr.y, 
+          screen.x, 
+          screen.y, 
           Math.PI, 
-          80 * scr.scale, 
+          80 * screen.scale, 
           2, 
           'rgba(255,255,255,0.8)'
         );
