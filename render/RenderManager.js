@@ -49,7 +49,7 @@ export class RenderManager {
 
     // Initialize camera
     this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.15;
-    this.camera.setMode('fitAll');
+    this.camera.setMode('directed');
   }
 
   /**

@@ -7,7 +7,6 @@ class Camera {
     this.zoom = 1;
     this.damping = 0.15;
     this.director = new RaceDirector();
-    this.debug = true; // Enable debug logging
   }
 
   setMode(mode, opts = {}) {
@@ -20,16 +19,9 @@ class Camera {
     if (!race || !race.racers || race.racers.length === 0 || !gameState) {
       return { desiredX: this.target.x, desiredZoom: this.zoom };
     }
-    
+
     if (this.mode === 'directed') {
       const shot = this.director.getShot(race, gameState, canvasDimensions);
-      if (this.director.debug || this.debug) {
-        console.log('[Camera:calculateDesiredState]', shot.name, { 
-          racers: shot.racers, 
-          target: shot.target, 
-          zoom: shot.zoom 
-        });
-      }
       return {
         desiredX: shot.target.x,
         desiredZoom: shot.zoom
@@ -54,3 +46,4 @@ class Camera {
 }
 
 export { Camera };
+

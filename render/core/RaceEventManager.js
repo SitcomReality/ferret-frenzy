@@ -6,7 +6,6 @@ export class RaceEventManager {
     this.events = [];
     this.eventListeners = new Map();
     this.raceAnalysis = null;
-    this.debug = true; // Enable debug logging
   }
 
   /**
@@ -56,14 +55,6 @@ export class RaceEventManager {
         newLeader: currentLeader,
         position: race.liveLocations[currentLeader] || 0
       });
-      
-      if (this.debug) {
-        console.log('[RaceEventManager] Lead change detected:', {
-          oldLeader: lastLeader,
-          newLeader: currentLeader,
-          position: race.liveLocations[currentLeader] || 0
-        });
-      }
     }
     
     this.raceAnalysis.lastLeader = currentLeader;
@@ -86,14 +77,6 @@ export class RaceEventManager {
           gap: gap,
           position: positions[i].pos
         });
-        
-        if (this.debug) {
-          console.log('[RaceEventManager] Close racing detected:', {
-            racers: [positions[i].rid, positions[i + 1].rid],
-            gap: gap,
-            position: positions[i].pos
-          });
-        }
       }
     }
   }
@@ -122,13 +105,6 @@ export class RaceEventManager {
             racerId: rid,
             position: race.liveLocations[rid] || 0
           });
-          
-          if (this.debug) {
-            console.log('[RaceEventManager] Stumble detected:', {
-              racerId: rid,
-              position: race.liveLocations[rid] || 0
-            });
-          }
         }
       }
     });
@@ -145,10 +121,6 @@ export class RaceEventManager {
       data,
       time: performance.now()
     };
-    
-    if (this.debug) {
-      console.log('[RaceEventManager] Event emitted:', type, data);
-    }
     
     this.events.push(event);
     
