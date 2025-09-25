@@ -1,5 +1,3 @@
-
-```
 /**
  * CameraDirector - Analyzes the race and selects cinematic shots.
  */
