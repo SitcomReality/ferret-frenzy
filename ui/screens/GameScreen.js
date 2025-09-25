@@ -201,7 +201,7 @@ export class GameScreen {
     // Highlight the current race in the race week panel
     this.highlightCurrentRace(this.gameState.currentRaceIndex);
     // Initial render of the track and racers at starting line
-    this.renderManager.tick(performance.now());
+    this.renderManager.renderOnce();
   }
 
   onRaceStart(data) {

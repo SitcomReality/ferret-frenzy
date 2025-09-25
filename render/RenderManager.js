@@ -100,6 +100,15 @@ export class RenderManager {
   }
 
   /**
+   * Render a single frame (useful for setup screens)
+   */
+  renderOnce(time = performance.now()) {
+    const deltaTime = (time - this.lastTime) / 1000;
+    this.lastTime = time;
+    this.renderPipeline.execute(time, deltaTime);
+  }
+
+  /**
    * Clear the canvas
    */
   clear() {
