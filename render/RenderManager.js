@@ -10,6 +10,7 @@ import { RenderPipeline } from './systems/RenderPipeline.js';
 import { CanvasAdapter } from './core/CanvasAdapter.js';
 import { InteractionController } from './systems/InteractionController.js';
 import { OverlayRenderer } from './renderers/OverlayRenderer.js';
+import { BannerSystem } from './core/BannerSystem.js';
 
 /**
  * RenderManager - Centralized rendering coordinator
@@ -38,6 +39,7 @@ export class RenderManager {
     // Additional systems
     this.interactionController = new InteractionController(this);
     this.overlayRenderer = new OverlayRenderer(this);
+    this.bannerSystem = new BannerSystem();
     this.renderPipeline = new RenderPipeline(this);
 
     // Render state
@@ -127,6 +129,13 @@ export class RenderManager {
   update(time, deltaTime) {
     this.updateCameraTarget(deltaTime);
     this.particleSystem.update(deltaTime);
+    // Forward hover lane banners into BannerSystem with short duration to keep alive while hovered
+    const hoverBanners = this.interactionController?.banners;
+    if (hoverBanners && this.currentRace) {
+      hoverBanners.forEach((b, laneIndex) => {
+        if (b?.active) this.bannerSystem.createBanner('name', laneIndex, b.text, 0.6);
+      });
+    }
   }
 
   /**
@@ -139,6 +148,12 @@ export class RenderManager {
     this.applyCameraTransform();
 
     this.trackRenderer.render(this.ctx, this.currentRace, this.renderProps, this.camera);
+    // Draw informative banners behind racers (between track and ferrets)
+    const origWTS = this.worldTransform.worldToScreen.bind(this.worldTransform);
+    this.worldTransform.worldToScreen = (wx, li, cam) =>
+      origWTS(wx, li, cam, this.canvas.width, this.canvas.height, this.renderProps?.numberOfLanes, this.gameState);
+    this.bannerSystem.render(this.ctx, this.camera, this.worldTransform);
+    this.worldTransform.worldToScreen = origWTS;
     this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time / 1000);
 
     this.ctx.restore();
