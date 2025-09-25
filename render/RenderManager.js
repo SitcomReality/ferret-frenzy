@@ -50,6 +50,15 @@ export class RenderManager {
     // Initialize camera
     this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.015;
     this.camera.setMode('directed');
+
+    // Configure particle system from settings (ensure particles are available after refactor)
+    const pSettings = this.gameState?.settings?.render?.particles;
+    if (pSettings) {
+      this.particleSystem.maxParticles = pSettings.maxParticles || this.particleSystem.maxParticles;
+      this.particleSystem.enabled = !!pSettings.enabled;
+    } else {
+      this.particleSystem.enabled = true;
+    }
   }
 
   /**
