@@ -24,7 +24,7 @@ export class CameraCalculator {
     // Ensure all lanes are visible vertically
     const maxZoomForVerticalFit = height / (totalTrackHeight + 40); // +40 for padding
     
-    // Calculate horizontal requirements
+    // Calculate horizontal requirements based on racers to frame
     const positions = racers.map(rid => race.liveLocations[rid] || 0);
     const minPos = Math.min(...positions);
     const maxPos = Math.max(...positions);
@@ -43,37 +43,45 @@ export class CameraCalculator {
   }
 
   /**
-   * Calculate optimal camera target position
+   * Calculate optimal camera target position - focuses on actual racers, not empty space
    */
   calculateOptimalTarget(racers, race, shotDef) {
     if (racers.length === 0) {
-      // If no racers to frame (e.g., between shots), find the leader of the whole race
-      const sorted = [...race.racers].sort((a,b) => (race.liveLocations[b]||0) - (race.liveLocations[a]||0));
-      if (sorted.length > 0) {
+      // If no racers to frame, find and focus on the race leader
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      if (activeRacers.length > 0) {
+        const sorted = [...activeRacers].sort((a,b) => (race.liveLocations[b]||0) - (race.liveLocations[a]||0));
         return { x: race.liveLocations[sorted[0]] || 50, y: 0 };
       }
       return { x: 50, y: 0 };
     }
-    const positions = racers.map(rid => race.liveLocations[rid] || 0).sort((a,b) => b - a);
-    const leaderPos = positions[0] || 0;
-    const runnerUp = positions[1] ?? leaderPos;
-    const spread = Math.max(...positions) - Math.min(...positions);
+
+    // Get positions of racers we should be tracking
+    const positions = racers.map(rid => race.liveLocations[rid] || 0);
     
-    // Bias towards the front of the pack. 0.5 is center, 1.0 is leader.
-    // A higher bias keeps the camera focused on the frontrunners.
-    const bias = shotDef.priority === 'wide' ? 0.75 : 0.9;
-    let targetX = minPos + (maxPos - minPos) * bias;
-
-    // Apply lookahead to keep the leader from being at the edge of the screen
-    if (shotDef.lookahead) {
-      targetX += shotDef.lookahead;
+    // Instead of averaging all positions, weight heavily towards the frontrunners
+    const sortedPositions = [...positions].sort((a, b) => b - a); // Sort front to back
+    
+    let targetX;
+    
+    if (sortedPositions.length === 1) {
+      // Single racer focus - center on them with lookahead
+      targetX = sortedPositions[0] + (shotDef.lookahead || 0);
+    } else {
+      // Multiple racers - weighted average favoring the leaders
+      const weights = sortedPositions.map((_, i) => Math.pow(0.6, i)); // Exponential decay
+      const weightedSum = sortedPositions.reduce((sum, pos, i) => sum + pos * weights[i], 0);
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+      
+      targetX = weightedSum / totalWeight + (shotDef.lookahead || 0);
     }
 
-    // Special case for finish line shots, frame the finish line itself
+    // Special handling for finish line shots
     if (shotDef === shotDefinitions.finish_approach || shotDef === shotDefinitions.finish_focus) {
-        targetX = Math.max(targetX, 98); // Ensure finish line is in view
+      targetX = Math.max(targetX, 98); // Ensure finish line is in view
     }
 
+    // Ensure target stays within track bounds
     return { x: Math.max(0, Math.min(100, targetX)), y: 0 };
   }
 }

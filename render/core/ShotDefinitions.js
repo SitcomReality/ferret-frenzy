@@ -3,7 +3,11 @@
  */
 export const shotDefinitions = {
   starting_lineup: {
-    updateRacers: (race, gameState) => race.racers.filter(rid => !(race.results || []).includes(rid)),
+    updateRacers: (race, gameState) => {
+      // Show all active racers at start
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      return activeRacers.length > 0 ? activeRacers : race.racers;
+    },
     margin: 15,
     minSpan: 40,
     lookahead: 0,
@@ -13,9 +17,8 @@ export const shotDefinitions = {
   
   leader_focus: {
     updateRacers: (race, gameState) => {
-      const sorted = race.racers
-        .filter(rid => !(race.results || []).includes(rid))
-        .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.length > 0 ? [sorted[0]] : [];
     },
     margin: 20,
@@ -27,9 +30,9 @@ export const shotDefinitions = {
   
   pack_focus: {
     updateRacers: (race, gameState) => {
-      const sorted = race.racers
-        .filter(rid => !(race.results || []).includes(rid))
-        .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      // Focus on top 5 racers, ensuring we always have someone to track
       return sorted.slice(0, Math.min(5, sorted.length));
     },
     margin: 15,
@@ -41,10 +44,9 @@ export const shotDefinitions = {
   
   close_finish: {
     updateRacers: (race, gameState) => {
-      const sorted = race.racers
-        .filter(rid => !(race.results || []).includes(rid))
-        .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      return sorted.slice(0, 3);
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      return sorted.slice(0, Math.min(3, sorted.length));
     },
     margin: 8,
     minSpan: 15,
@@ -60,13 +62,14 @@ export const shotDefinitions = {
         .pop();
       
       if (recentLeadChange) {
-        return [recentLeadChange.oldLeader, recentLeadChange.newLeader];
+        return [recentLeadChange.oldLeader, recentLeadChange.newLeader].filter(rid => 
+          !(race.results || []).includes(rid)
+        );
       }
       
-      const sorted = race.racers
-        .filter(rid => !(race.results || []).includes(rid))
-        .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      return sorted.slice(0, 3);
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      return sorted.slice(0, Math.min(3, sorted.length));
     },
     margin: 12,
     minSpan: 20,
@@ -83,10 +86,12 @@ export const shotDefinitions = {
       
       if (recentStumble) {
         const stumblerPos = race.liveLocations[recentStumble.racerId] || 0;
-        return race.racers.filter(rid => {
+        const nearbyRacers = race.racers.filter(rid => {
+          if ((race.results || []).includes(rid)) return false;
           const pos = race.liveLocations[rid] || 0;
           return Math.abs(pos - stumblerPos) < 15;
         });
+        return nearbyRacers.length > 0 ? nearbyRacers : [recentStumble.racerId];
       }
       
       return shotDefinitions.pack_focus.updateRacers(race, gameState);
@@ -100,10 +105,9 @@ export const shotDefinitions = {
   
   finish_approach: {
     updateRacers: (race, gameState) => {
-      const sorted = race.racers
-        .filter(rid => !(race.results || []).includes(rid))
-        .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      return sorted.slice(0, 4);
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      return sorted.slice(0, Math.min(4, sorted.length));
     },
     margin: 10,
     minSpan: 20,
@@ -114,14 +118,14 @@ export const shotDefinitions = {
   
   finish_focus: {
     updateRacers: (race, gameState) => {
-      // Show the finishers, prioritizing the most recent one.
+      // Show the most recent finishers
       if (race.results && race.results.length > 0) {
         return race.results.slice(-3);
       }
-      // If no one has finished yet, show the lead pack.
-      const sorted = race.racers.filter(rid => !(race.results || []).includes(rid))
-          .sort((a,b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      return sorted.slice(0,1);
+      // If no one has finished yet, show the leader who's about to finish
+      const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
+      const sorted = [...activeRacers].sort((a,b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+      return sorted.slice(0, 1);
     },
     margin: 15,
     minSpan: 25,
