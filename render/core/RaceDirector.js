@@ -12,6 +12,7 @@ export class RaceDirector {
     this.currentShot = 'starting_lineup';
     this.lastShotChangeTime = 0;
     this.minShotDuration = 3000; // 3 seconds minimum between shot changes
+    this.debug = true;
     
     // Initialize subsystems
     this.eventManager = new RaceEventManager();
@@ -42,6 +43,8 @@ export class RaceDirector {
     // The racers to frame are determined by the shot definition
     const racersToFrame = shotDef.updateRacers(race, gameState, this.raceAnalysis);
     
+    if (this.debug) console.debug('[Director:getShot]', this.currentShot, { racersToFrame });
+    
     return {
       name: this.currentShot,
       racers: racersToFrame,
@@ -58,6 +61,8 @@ export class RaceDirector {
       const previousShot = this.currentShot;
       this.currentShot = shotName;
       this.lastShotChangeTime = time;
+      
+      if (this.debug) console.log('[Director:shotChange]', { from: previousShot, to: shotName, time });
       
       this.eventManager.emitEvent('shotChange', {
         from: previousShot,

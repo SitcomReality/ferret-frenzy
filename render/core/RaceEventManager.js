@@ -121,7 +121,7 @@ export class RaceEventManager {
       data,
       time: performance.now()
     };
-    
+    if (console && console.debug) console.debug('[RaceEvent]', type, data);
     this.events.push(event);
     
     const listeners = this.eventListeners.get(type) || [];

@@ -12,11 +12,13 @@ export class ShotSelector {
   updateShot(race, gameState, raceAnalysis) {
     const now = performance.now();
     if (now - this.director.lastShotChangeTime < this.director.minShotDuration) {
+      if (this.director.debug) console.debug('[ShotSelector] Throttled shot change');
       return; // Don't change shots too frequently
     }
 
     const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
     if (activeRacers.length === 0) {
+      if (this.director.debug) console.debug('[ShotSelector] No active racers -> finish_focus');
       this.director.setShot('finish_focus', now);
       return;
     }
@@ -31,11 +33,13 @@ export class ShotSelector {
     // 1. ABSOLUTE PRIORITY: Finish Line Sequence
     // If anyone has finished, lock focus on the finishers.
     if (race.results && race.results.length > 0) {
+        if (this.director.debug) console.debug('[ShotSelector] Winner finished -> finish_focus', race.results[0]);
         this.director.setShot('finish_focus', now);
         return;
     }
     // As the leader approaches the finish, lock into the finish approach shot.
     if (leaderPos >= 95) {
+        if (this.director.debug) console.debug('[ShotSelector] Leader near finish -> finish_approach', { leaderPos });
         this.director.setShot('finish_approach', now);
         return;
     }
@@ -45,6 +49,7 @@ export class ShotSelector {
     if (leaderPos > 85 && sortedRacers.length > 1) {
       const secondPos = race.liveLocations[sortedRacers[1]] || 0;
       if (leaderPos - secondPos < 5) { // Tight gap near the end
+        if (this.director.debug) console.debug('[ShotSelector] Close finish -> close_finish', { leaderPos, secondPos });
         this.director.setShot('close_finish', now);
         return;
       }
@@ -56,10 +61,12 @@ export class ShotSelector {
     const hasRecentLeadChange = recentEvents.some(e => e.type === 'leadChange');
 
     if (hasRecentStumble && leaderPos > 15) {
+      if (this.director.debug) console.debug('[ShotSelector] Recent stumble -> incident_focus');
       this.director.setShot('incident_focus', now);
       return;
     }
     if (hasRecentLeadChange && leaderPos > 20 && leaderPos < 80) {
+      if (this.director.debug) console.debug('[ShotSelector] Lead change -> battle_focus');
       this.director.setShot('battle_focus', now);
       return;
     }
@@ -67,6 +74,7 @@ export class ShotSelector {
     // 3. STANDARD PRIORITY: Race Stage & Dynamics
     // Start of the race
     if (leaderPos < 15) {
+      if (this.director.debug) console.debug('[ShotSelector] Early race -> starting_lineup', { leaderPos });
       this.director.setShot('starting_lineup', now);
       return;
     }
@@ -80,12 +88,13 @@ export class ShotSelector {
         const leaderGap = positions[0] - positions[1];
         // If leader has a significant breakaway, focus on them.
         if (leaderGap > 12) {
+            if (this.director.debug) console.debug('[ShotSelector] Leader breakaway -> leader_focus', { leaderGap });
             this.director.setShot('leader_focus', now);
             return;
         }
     }
     
-    // Default to showing the front pack
+    if (this.director.debug) console.debug('[ShotSelector] Default -> pack_focus');
     this.director.setShot('pack_focus', now);
   }
 }
