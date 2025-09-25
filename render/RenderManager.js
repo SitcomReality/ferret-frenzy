@@ -1,5 +1,3 @@
-
-```javascript
 import { Camera } from './core/Camera.js';
 import { WorldTransform } from './core/WorldTransform.js';
 import { HitTestIndex } from './core/HitTestIndex.js';
@@ -163,11 +161,11 @@ export class RenderManager {
     this.ctx.fillRect(10, 10, 200, 100);
     this.ctx.fillStyle = '#0f0';
     this.ctx.font = '12px monospace';
-    this.ctx.fillText(`FPS: ${fps.toFixed(1)}`, 20, 30);
-    this.ctx.fillText(`Camera X: ${this.camera.target.x.toFixed(2)}`, 20, 45);
-    this.ctx.fillText(`Camera Zoom: ${this.camera.zoom.toFixed(2)}`, 20, 60);
-    this.ctx.fillText(`Particles: ${this.particleSystem.particles.length}`, 20, 75);
-    this.ctx.fillText(`Hovered Lane: ${this.interactionController.hoveredLane}`, 20, 90);
+    this.ctx.fillText(`FPS: ${fps.toFixed(1)}`, 20,30);
+    this.ctx.fillText(`Camera X: ${this.camera.target.x.toFixed(2)}`, 20,45);
+    this.ctx.fillText(`Camera Zoom: ${this.camera.zoom.toFixed(2)}`, 20,60);
+    this.ctx.fillText(`Particles: ${this.particleSystem.particles.length}`, 20,75);
+    this.ctx.fillText(`Hovered Lane: ${this.interactionController.hoveredLane}`, 20,90);
   }
 
   /**
@@ -184,6 +182,9 @@ export class RenderManager {
     const laneHeight = this.worldTransform.laneHeight;
     const totalHeight = laneHeight * this.renderProps.numberOfLanes;
     const trackCenterY = totalHeight / 2;
+
+    const yPos = 0; // This will be calculated per racer in worldTransform
+    const cameraPixelY = yPos / 100 * totalHeight;
 
     this.ctx.translate(-cameraPixelX, -trackCenterY);
   }
