@@ -7,46 +7,68 @@ export class CameraCalculator {
   }
 
   /**
-   * Calculate optimal zoom that considers actual screen dimensions
+   * Calculate optimal zoom that considers actual screen dimensions with track height as baseline
    */
   calculateOptimalZoom(racers, race, canvasDimensions, shotDef) {
     if (!canvasDimensions || racers.length === 0) {
-      return 1.2;
+      return this.getTrackBasedZoom(canvasDimensions, race);
     }
 
     const { width, height } = canvasDimensions;
-    const laneHeight = 40; // From WorldTransform
     
-    // Calculate how much vertical space we need for racers being tracked
-    const racerLanes = racers.length;
-    const trackHeight = Math.max(racerLanes * laneHeight, 200); // Minimum reasonable height
-    
-    // More aggressive vertical zoom - don't need to show ALL lanes if we're tracking specific racers
-    const maxZoomForVerticalFit = height / (trackHeight + 80); // Less padding for tighter shots
+    // Get the baseline zoom that fits the entire track height
+    const baselineZoom = this.getTrackBasedZoom(canvasDimensions, race);
     
     // Calculate horizontal requirements based on racers to frame
     const positions = racers.map(rid => race.liveLocations[rid] || 0);
     const minPos = Math.min(...positions);
     const maxPos = Math.max(...positions);
     const span = Math.max(shotDef.minSpan || 20, maxPos - minPos);
-    const targetSpan = span + (shotDef.margin || 15); // Reduced margin for tighter shots
+    const targetSpan = span + (shotDef.margin || 15);
     
     // Calculate zoom needed for horizontal fit
     const worldPixelWidth = width * 4; // From rendering system
     const maxZoomForHorizontalFit = (width * 0.85) / (worldPixelWidth * targetSpan / 100);
     
-    // Use the more restrictive zoom but prefer closer shots
-    let optimalZoom = Math.min(maxZoomForVerticalFit, maxZoomForHorizontalFit);
+    // Use baseline as starting point, only zoom out if horizontal fit requires it
+    let optimalZoom = Math.min(baselineZoom, maxZoomForHorizontalFit);
     
     // Apply shot-specific zoom modifiers for more dynamic camera work
     if (shotDef.priority === 'tight') {
-      optimalZoom *= 1.3; // Zoom in more for tight shots
+      optimalZoom = Math.min(optimalZoom * 1.4, baselineZoom * 1.2); // Allow tighter than baseline for tight shots
     } else if (shotDef.priority === 'medium') {
-      optimalZoom *= 1.1; // Slight zoom in for medium shots
+      optimalZoom = Math.min(optimalZoom * 1.2, baselineZoom * 1.1);
     }
+    // Wide shots use the calculated zoom as-is
     
-    // More reasonable bounds - allow closer zoom
-    return Math.max(0.6, Math.min(2.5, optimalZoom));
+    // Reasonable bounds - baseline zoom sets the upper limit
+    return Math.max(0.3, Math.min(baselineZoom * 1.5, optimalZoom));
+  }
+
+  /**
+   * Calculate the baseline zoom that fits the track height perfectly
+   */
+  getTrackBasedZoom(canvasDimensions, race) {
+    if (!canvasDimensions) {
+      return 1.0;
+    }
+
+    const { height } = canvasDimensions;
+    const laneHeight = 40; // From WorldTransform
+    
+    // Get number of lanes from game state or race data
+    // Default to 10 lanes if not available
+    const numberOfLanes = race?.numberOfLanes || 10;
+    
+    // Calculate total track height including small padding
+    const trackHeight = numberOfLanes * laneHeight;
+    const padding = 20; // Small padding above and below track
+    const totalHeight = trackHeight + padding;
+    
+    // Calculate zoom that fits the track height exactly
+    const trackFitZoom = height / totalHeight;
+    
+    return Math.max(0.5, Math.min(2.0, trackFitZoom));
   }
 
   /**

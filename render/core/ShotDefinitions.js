@@ -8,8 +8,8 @@ export const shotDefinitions = {
       const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
       return activeRacers.length > 0 ? activeRacers : race.racers;
     },
-    margin: 12,
-    minSpan: 25,
+    margin: 15,
+    minSpan: 30,
     lookahead: 0,
     priority: 'wide',
     description: 'Wide shot showing all racers at the start'
@@ -21,10 +21,10 @@ export const shotDefinitions = {
       const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.length > 0 ? [sorted[0]] : [];
     },
-    margin: 15,
-    minSpan: 18,
-    lookahead: 2,
-    priority: 'medium',
+    margin: 8,
+    minSpan: 12,
+    lookahead: 1.5,
+    priority: 'tight',
     description: 'Focus on the race leader'
   },
   
@@ -36,9 +36,9 @@ export const shotDefinitions = {
       return sorted.slice(0, Math.min(4, sorted.length));
     },
     margin: 12,
-    minSpan: 25,
-    lookahead: 2,
-    priority: 'wide',
+    minSpan: 20,
+    lookahead: 1,
+    priority: 'medium',
     description: 'Focus on the racing pack'
   },
   
