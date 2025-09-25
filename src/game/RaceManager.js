@@ -186,6 +186,28 @@ export class RaceManager {
         if (!pers || pers.shouldActivateBoost(0, currentPosition, nearby)) racer.activateBoost();
       }
       if (racer.isBoosting && perf) { perf.reduceRemainingBoost(deltaTime * 60); if (perf.remainingBoost <= 0) racer.deactivateBoost(); }
+      
+      // Check for stumbling
+      const stumbleChance = stats?.getStat('stumbleChance') || 0.002;
+      if (Math.random() < stumbleChance * deltaTime * 60) { // Convert to per-second chance
+        racer.ferret.isStumbling = true;
+        racer.remainingStumble = stats?.getStat('stumbleDuration') || 120;
+        // Emit stumble event for camera system
+        this.eventBus.emit('race:racerStumbled', {
+          racerId: racerId,
+          position: currentPosition
+        });
+      }
+      
+      // Handle stumble recovery
+      if (racer.ferret.isStumbling && racer.remainingStumble > 0) {
+        racer.remainingStumble -= deltaTime * 60;
+        if (racer.remainingStumble <= 0) {
+          racer.ferret.isStumbling = false;
+          racer.ferret.crashPhase = 0;
+        }
+      }
+      
       const speed = racer.calculateSpeed(
         racer.formThisWeek,
         currentPosition,
@@ -193,8 +215,14 @@ export class RaceManager {
         this.currentRace.weather
       );
 
+      // Apply stumble speed penalty
+      let finalSpeed = speed;
+      if (racer.ferret.isStumbling) {
+        finalSpeed *= 0.6; // 40% speed reduction while stumbling
+      }
+
       // Update position based on deltaTime for smooth movement
-      const distanceToTravel = speed * deltaTime;
+      const distanceToTravel = finalSpeed * deltaTime;
       this.currentRace.liveLocations[racerId] = Math.min(100, currentPosition + distanceToTravel);
     });
   }
