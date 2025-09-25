@@ -35,9 +35,7 @@ export class GameState {
         winningCalculationModifier: 1.5,
       },
       trackProperties: {
-        numberOfSegments: 21,
         minConsecutiveSegmentsOfSameType: 1,
-        sequentialSegments: 3,
         numberOfLanes: 10,
         segmentsPerSection: 3,
         minSectionsPerTrack: 3,
@@ -81,6 +79,7 @@ export class GameState {
         totalPoolSize: 36,
       },
       render: {
+        debug: false,
         textures: {
           enabled: true,
           quality: 'medium',
@@ -102,7 +101,8 @@ export class GameState {
         camera: {
           smoothing: 0.15,
           zoomMin: 0.5,
-          zoomMax: 3.0
+          zoomMax: 3.0,
+          fitAllMargin: 15,
         }
       },
       worldProperties: {
