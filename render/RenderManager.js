@@ -299,7 +299,7 @@ export class RenderManager {
   }
 
   /**
-   * Update camera target
+   * Update camera target to follow the leader
    */
   updateCameraTarget() {
     if (!this.currentRace || !this.currentRace.racers || this.currentRace.racers.length === 0) return;
@@ -311,7 +311,9 @@ export class RenderManager {
     const verticalFitZoom = Math.max(0.1, (dims.height / totalHeight)); // fit all lanes
     const zMin = this.gameState.settings?.render?.camera?.zoomMin || 0.5;
     const zMax = this.gameState.settings?.render?.camera?.zoomMax || 3.0;
-    const targetZoom = Math.max(zMin, Math.min(Math.min(verticalFitZoom * 0.98, zMax), desiredZoom));
+    
+    // For leader tracking, we want to be more zoomed in to focus on the action
+    const targetZoom = Math.max(zMin, Math.min(zMax, Math.max(verticalFitZoom * 0.7, desiredZoom)));
     const targetX = Math.max(0, Math.min(100, desiredX));
     
     this.camera.target.x += (targetX - this.camera.target.x) * this.camera.damping;
