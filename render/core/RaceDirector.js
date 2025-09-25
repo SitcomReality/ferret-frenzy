@@ -68,7 +68,7 @@ export class RaceDirector {
       const urgency = urgentShots.has(shotName) ? 'urgent' : 'smooth';
       this.currentTransition = {
         urgency,
-        suggestedDamping: urgency === 'urgent' ? { pan: 0.22, zoom: 0.22 } : { pan: 0.08, zoom: 0.08 }
+        suggestedDamping: urgency === 'urgent' ? { pan: 0.12, zoom: 0.12 } : { pan: 0.04, zoom: 0.04 }
       };
 
       this.eventManager.emitEvent('shotChange', {

@@ -109,22 +109,22 @@ export class CameraCalculator {
     let targetX;
     
     if (sortedPositions.length === 1) {
-      // Single racer focus - center on them with modest lookahead
-      const lead = Math.min(shotDef.lookahead || 0, 0.8);
-      targetX = sortedPositions[0] + lead * 0.15; // Reduced from 0.35
+      // Single racer focus - center on them with minimal lookahead
+      const lead = Math.min(shotDef.lookahead || 0, 0.5);
+      targetX = sortedPositions[0] + lead * 0.08; // Much more reduced lookahead
     } else {
       // Multiple racers - more balanced weighting
       const weights = sortedPositions.map((_, i) => Math.pow(0.85, i)); // Less aggressive front-weighting
       const weightedSum = sortedPositions.reduce((sum, pos, i) => sum + pos * weights[i], 0);
       const totalWeight = weights.reduce((sum, w) => sum + w, 0);
       
-      const lead = Math.min(shotDef.lookahead || 0, 0.8);
-      targetX = weightedSum / totalWeight + lead * 0.15; // Reduced from 0.3
+      const lead = Math.min(shotDef.lookahead || 0, 0.5);
+      targetX = weightedSum / totalWeight + lead * 0.08; // Much more reduced lookahead
     }
 
-    // Special handling for finish line shots
+    // Special handling for finish line shots - much less aggressive
     if (shotDef === shotDefinitions.finish_approach || shotDef === shotDefinitions.finish_focus) {
-      targetX = Math.max(targetX, 92); // Reduced from 95, less aggressive finish line positioning
+      targetX = Math.max(targetX, 88); // Reduced from 92, less finish line leading
     }
 
     // Ensure target stays within track bounds

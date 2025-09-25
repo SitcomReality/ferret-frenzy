@@ -23,7 +23,7 @@ export const shotDefinitions = {
     },
     margin: 8,
     minSpan: 12,
-    lookahead: 0.3,
+    lookahead: 0.15,
     priority: 'tight',
     description: 'Focus on the race leader'
   },
@@ -37,7 +37,7 @@ export const shotDefinitions = {
     },
     margin: 12,
     minSpan: 20,
-    lookahead: 0.2,
+    lookahead: 0.1,
     priority: 'medium',
     description: 'Focus on the racing pack'
   },
@@ -50,7 +50,7 @@ export const shotDefinitions = {
     },
     margin: 6,
     minSpan: 12,
-    lookahead: 0.2,
+    lookahead: 0.1,
     priority: 'tight',
     description: 'Tight focus on close finish'
   },
@@ -73,7 +73,7 @@ export const shotDefinitions = {
     },
     margin: 10,
     minSpan: 16,
-    lookahead: 0.2,
+    lookahead: 0.1,
     priority: 'medium',
     description: 'Focus on racing battles'
   },
@@ -109,10 +109,10 @@ export const shotDefinitions = {
       const sorted = [...activeRacers].sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.slice(0, Math.min(3, sorted.length));
     },
-    margin: 8,
-    minSpan: 15,
-    lookahead: 0.1,
-    priority: 'medium',
+    margin: 6,
+    minSpan: 12,
+    lookahead: 0.05,
+    priority: 'tight',
     description: 'Focus on finish approach'
   },
   
@@ -127,10 +127,10 @@ export const shotDefinitions = {
       const sorted = [...activeRacers].sort((a,b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       return sorted.slice(0, 1);
     },
-    margin: 10,
-    minSpan: 18,
+    margin: 8,
+    minSpan: 15,
     lookahead: 0,
-    priority: 'medium',
+    priority: 'tight',
     description: 'Focus on finishers'
   }
 };

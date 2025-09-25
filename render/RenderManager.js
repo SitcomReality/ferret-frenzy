@@ -48,7 +48,7 @@ export class RenderManager {
     this.raceEndCountdown = null;
 
     // Initialize camera
-    this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.15;
+    this.camera.damping = (this.gameState?.settings?.render?.camera?.smoothing) || 0.04;
     this.camera.setMode('directed');
   }
 
@@ -317,11 +317,11 @@ export class RenderManager {
     const targetZoom = Math.max(zMin, Math.min(zMax, desiredZoom));
     const targetX = Math.max(0, Math.min(100, desiredX));
 
-    // Dynamic damping: slower for smooth transitions
+    // Dynamic damping: much slower for smooth transitions
     const panD = suggestedDamping?.pan ?? this.camera.damping;
     const zoomD = suggestedDamping?.zoom ?? this.camera.damping;
 
-    // Leader-on-screen guard: if leader drifts near edges, temporarily speed up pan
+    // Leader-on-screen guard: if leader drifts near edges, temporarily speed up pan but still slower than before
     const activeRacers = this.currentRace.racers.filter(rid => !(this.currentRace.results || []).includes(rid));
     if (activeRacers.length) {
       const leader = activeRacers.sort((a,b)=> (this.currentRace.liveLocations[b]||0)-(this.currentRace.liveLocations[a]||0))[0];
@@ -330,8 +330,8 @@ export class RenderManager {
       const uiLeaderX = (leaderX - this.camera.target.x / 100 * worldPixelWidth) * this.camera.zoom + dims.width / 2;
       const margin = dims.width * 0.08;
       if (uiLeaderX < margin || uiLeaderX > (dims.width - margin)) {
-        // Override to quicker pan to keep leader in frame
-        const fastPan = Math.max(panD, 0.25);
+        // Override to quicker pan to keep leader in frame, but still slower than before
+        const fastPan = Math.max(panD, 0.15);
         this.camera.target.x += (targetX - this.camera.target.x) * fastPan;
       } else {
         this.camera.target.x += (targetX - this.camera.target.x) * panD;
