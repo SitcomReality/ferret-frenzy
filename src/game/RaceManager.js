@@ -74,25 +74,36 @@ export class RaceManager {
     race.initializeSegments(this.gameState.settings.trackProperties.segmentsPerSection);
     race.startTime = Date.now();
     this.currentRace = {
-      id: race.id,
-      racers: race.racers,
-      track: race.track,
-      weather: race.weather,
-      segments: race.segments,
-      results: [],
-      liveLocations: {},
-      livePositions: [],
-      startTime: race.startTime
+        id: race.id,
+        racers: race.racers,
+        track: race.track,
+        weather: race.weather,
+        segments: race.segments,
+        results: [],
+        winner: null,
+        liveLocations: {},
+        livePositions: [],
+        startTime: race.startTime
     };
 
     // Initialize racer positions
     this.currentRace.racers.forEach(racerId => {
-      this.currentRace.liveLocations[racerId] = 0;
-      const racer = this.gameState.racers.find(r => r.id === racerId);
-      if (racer) {
-        racer.reset();
-        racer.formThisWeek = this.calculateRacerForm(racer);
-      }
+        this.currentRace.liveLocations[racerId] = 0;
+        const racer = this.gameState.racers.find(r => r.id === racerId);
+        if (racer) {
+            // Ensure components are properly initialized
+            if (!racer.components) {
+                console.warn(`Racer ${racerId} missing components, reinitializing...`);
+                // Reinitialize racer components if missing
+                const { racerComponents } = await import('./entities/racer/RacerComponents.js');
+                racer.components = racerComponents.createComponents(racer, this.gameState.settings);
+            }
+            
+            racer.reset();
+            racer.formThisWeek = this.calculateRacerForm(racer);
+        } else {
+            console.error(`Racer with ID ${racerId} not found in gameState.racers`);
+        }
     });
 
     this.gameState.currentRace = this.currentRace;
