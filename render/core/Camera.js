@@ -5,7 +5,7 @@ class Camera {
     this.mode = 'directed'; // Use the new director-based mode
     this.target = { x: 0, y: 0 };
     this.zoom = 1;
-    this.damping = 0.15;
+    this.damping = 0.08; // Slower, smoother camera movement
     this.director = new RaceDirector();
   }
 
@@ -46,4 +46,3 @@ class Camera {
 }
 
 export { Camera };
-

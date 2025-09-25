@@ -14,45 +14,49 @@ export class CameraCalculator {
       return 1.0;
     }
 
+    // The baseline zoom fits the track height perfectly in the viewport.
     const baselineZoom = this.getTrackBasedZoom(canvasDimensions, race);
 
     if (racers.length === 0) {
       return baselineZoom;
     }
 
-    const { width, height } = canvasDimensions;
+    const { width } = canvasDimensions;
     
-    // Get the baseline zoom that fits the entire track height
-
-    // Calculate horizontal requirements based on racers to frame
     const positions = racers.map(rid => race.liveLocations[rid] || 0);
     const minPos = Math.min(...positions);
     const maxPos = Math.max(...positions);
-    const span = Math.max(shotDef.minSpan || 20, maxPos - minPos);
+    
+    // Prevent zooming on empty space if racers are too spread out.
+    // If the gap is huge, we might frame a smaller group.
+    let racersToFrame = [...racers];
+    const maxSpreadThreshold = 50; // Don't try to frame racers more than 50% of track apart in pack shots
+    if ((maxPos - minPos) > maxSpreadThreshold && shotDef.priority !== 'wide') {
+        const leaderPos = Math.max(...positions);
+        // Filter out racers that are too far behind the leader for this shot
+        racersToFrame = racers.filter(rid => (leaderPos - (race.liveLocations[rid] || 0)) < maxSpreadThreshold);
+    }
+    
+    const framedPositions = racersToFrame.map(rid => race.liveLocations[rid] || 0);
+    const framedMinPos = Math.min(...framedPositions);
+    const framedMaxPos = Math.max(...framedPositions);
+    
+    const span = Math.max(shotDef.minSpan || 20, framedMaxPos - framedMinPos);
     const targetSpan = span + (shotDef.margin || 15);
     
     // Calculate zoom needed for horizontal fit
     const worldPixelWidth = width * 4; // From rendering system
-    const maxZoomForHorizontalFit = (width * 0.85) / (worldPixelWidth * targetSpan / 100);
+    const maxZoomForHorizontalFit = (width * 0.90) / (worldPixelWidth * targetSpan / 100);
 
-    // Use baseline as starting point; for pack/battle restrict zoom-out unless truly needed
-    const isPackOrBattle = (shotDef === shotDefinitions.pack_focus || shotDef === shotDefinitions.battle_focus);
-    const minZoomForPackBattle = baselineZoom * 0.9; // keep close to track-fit
-    const needsWideFit = (targetSpan > 45 || racers.length >= 6);
+    // Start with the horizontal fit, but don't zoom in closer than the baseline allows (prevents clipping top/bottom)
     let optimalZoom = Math.min(baselineZoom, maxZoomForHorizontalFit);
-    if (isPackOrBattle && !needsWideFit && optimalZoom < minZoomForPackBattle) {
-      optimalZoom = minZoomForPackBattle;
-    }
 
     // Apply shot-specific zoom modifiers for more dynamic camera work
     if (shotDef.priority === 'tight') {
-      optimalZoom = Math.min(optimalZoom * 1.4, baselineZoom * 1.2); // Allow tighter than baseline for tight shots
-    } else if (shotDef.priority === 'medium') {
-      optimalZoom = Math.min(optimalZoom * 1.2, baselineZoom * 1.1);
+      optimalZoom *= 1.2; // Push in a bit for tight shots
     }
-    // Wide shots use the calculated zoom as-is
 
-    // Reasonable bounds - baseline zoom sets the upper limit
+    // Reasonable bounds - baseline zoom sets an effective upper limit for most shots.
     return Math.max(0.3, Math.min(baselineZoom * 1.5, optimalZoom));
   }
 

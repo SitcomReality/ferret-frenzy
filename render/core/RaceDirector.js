@@ -11,7 +11,8 @@ export class RaceDirector {
   constructor() {
     this.currentShot = 'starting_lineup';
     this.lastShotChangeTime = 0;
-    this.minShotDuration = 2500; // Slightly more responsive shot changes
+    this.minShotDuration = 3500; // Increased for less frequent changes
+    this.lastShotChangeSection = -1; // For section-based pacing
 
     // Initialize subsystems
     this.eventManager = new RaceEventManager();
@@ -53,11 +54,12 @@ export class RaceDirector {
   /**
    * Set the current shot
    */
-  setShot(shotName, time) {
+  setShot(shotName, time, section) {
     if (this.currentShot !== shotName) {
       const previousShot = this.currentShot;
       this.currentShot = shotName;
       this.lastShotChangeTime = time;
+      this.lastShotChangeSection = section;
 
       this.eventManager.emitEvent('shotChange', {
         from: previousShot,

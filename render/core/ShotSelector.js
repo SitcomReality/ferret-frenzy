@@ -5,6 +5,21 @@ export class ShotSelector {
   constructor(director) {
     this.director = director;
   }
+  
+  /**
+   * Tries to set a new shot, respecting section-based pacing.
+   * High priority events can override the section lock.
+   */
+  trySetShot(shotName, now, currentSection, isSameSection, highPriorityEvent) {
+    // Allow shot change if it's a new section or a high-priority event happened.
+    // Also allow changes near the start/end of the race for better framing.
+    const isNearStart = currentSection === 0;
+    const isNearFinish = (this.director.raceAnalysis?.leaderPos || 0) > 90;
+
+    if (!isSameSection || highPriorityEvent || isNearStart || isNearFinish) {
+      this.director.setShot(shotName, now, currentSection);
+    }
+  }
 
   /**
    * Update the current shot based on race analysis
@@ -17,7 +32,7 @@ export class ShotSelector {
 
     const activeRacers = race.racers.filter(rid => !(race.results || []).includes(rid));
     if (activeRacers.length === 0) {
-      this.director.setShot('finish_focus', now);
+      this.director.setShot('finish_focus', now, -1); // Use -1 for section as race is over
       return;
     }
 
@@ -25,90 +40,84 @@ export class ShotSelector {
       (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0)
     );
     const leaderPos = race.liveLocations[sortedRacers[0]] || 0;
+    raceAnalysis.leaderPos = leaderPos; // Store for other modules
 
-    // --- DYNAMIC SHOT SELECTION ---
+    // --- CALCULATE CURRENT SECTION FOR PACING ---
+    const segmentsPerSection = gameState.settings.trackProperties.segmentsPerSection;
+    const totalSegments = race.segments.length > 1 ? race.segments.length -1 : 1;
+    const currentSegment = Math.floor((leaderPos / 100) * totalSegments);
+    const currentSection = Math.floor(currentSegment / segmentsPerSection);
+    const isSameSection = currentSection === this.director.lastShotChangeSection;
 
-    // 1. FINISH LINE PRIORITY (but more flexible)
-    // If some racers have finished, but not all, we need to decide what to do.
-    // If the race leader is near the end, we use finish shots.
-    // Otherwise, we focus on the remaining racers.
-    if (race.results && race.results.length > 0 && race.results.length < race.racers.length) {
-      if (leaderPos >= 96) {
-        this.director.setShot('finish_approach', now);
-        return;
+    // --- SHOT SELECTION LOGIC ---
+    const recentEvents = this.director.eventManager.getRecentEvents(4000);
+    const highPriorityEvent = recentEvents.some(e => e.type === 'stumble' || e.type === 'leadChange');
+
+    // 1. FINISH LINE SEQUENCE
+    if (race.results && race.results.length > 0) {
+      // If some have finished but others are still racing far from the end, focus on them.
+      if (leaderPos < 90) {
+         this.trySetShot('pack_focus', now, currentSection, isSameSection, highPriorityEvent);
+      } else {
+         this.trySetShot('finish_focus', now, currentSection, isSameSection, true); // Finishing is high priority
       }
-       // Fall through to focus on the pack of remaining racers
-    } else if (race.results && race.results.length > 0) {
-      this.director.setShot('finish_focus', now);
       return;
     }
-    
-    if (leaderPos >= 96) { // Closer to finish line before locking
-        this.director.setShot('finish_approach', now);
-        return;
+    if (leaderPos >= 92) {
+      this.trySetShot('finish_approach', now, currentSection, isSameSection, true);
+      return;
     }
 
-    // 2. RECENT EVENTS (with reduced rigidity)
-    const recentEvents = this.director.eventManager.getRecentEvents(4000); // Shorter window
-    const hasRecentStumble = recentEvents.some(e => e.type === 'stumble');
-    const hasRecentLeadChange = recentEvents.some(e => e.type === 'leadChange');
+    // 2. START OF RACE
+    if (leaderPos < 15) {
+      this.trySetShot('starting_lineup', now, currentSection, isSameSection, false);
+      return;
+    }
 
-    // 3. DYNAMIC RACING CONDITIONS
+    // 3. MID-RACE DYNAMICS
     const positions = sortedRacers.map(rid => race.liveLocations[rid] || 0);
     const pack = positions.slice(0, Math.min(positions.length, 5));
-    const packSpread = Math.max(...pack) - Math.min(...pack);
+    const packSpread = pack.length > 1 ? Math.max(...pack) - Math.min(...pack) : 0;
     
-    // Close finish detection (more nuanced)
-    if (leaderPos > 88 && sortedRacers.length > 1) {
+    // Close finish potential
+    if (leaderPos > 85 && sortedRacers.length > 1) {
       const secondPos = race.liveLocations[sortedRacers[1]] || 0;
-      if (leaderPos - secondPos < 6) {
-        this.director.setShot('close_finish', now);
+      if (leaderPos - secondPos < 8) {
+        this.trySetShot('close_finish', now, currentSection, isSameSection, highPriorityEvent);
         return;
       }
     }
 
-    // Incident focus (less sticky)
-    if (hasRecentStumble && leaderPos > 20 && Math.random() < 0.7) { // Add some randomness
-      this.director.setShot('incident_focus', now);
+    // Incidents
+    if (highPriorityEvent && recentEvents.some(e => e.type === 'stumble')) {
+      this.trySetShot('incident_focus', now, currentSection, isSameSection, true);
       return;
     }
 
-    // Battle focus (more flexible conditions)
-    if (hasRecentLeadChange && leaderPos > 25 && leaderPos < 85) {
-      this.director.setShot('battle_focus', now);
-      return;
-    }
-
-    // 4. CONTEXTUAL SHOTS
-    // Start of the race (shorter duration)
-    if (leaderPos < 12) {
-      this.director.setShot('starting_lineup', now);
+    // Battles & Lead Changes
+    if (highPriorityEvent && recentEvents.some(e => e.type === 'leadChange')) {
+      this.trySetShot('battle_focus', now, currentSection, isSameSection, true);
       return;
     }
     
-    // Dynamic mid-race decisions
+    // Pack analysis
     if (sortedRacers.length > 1) {
         const leaderGap = positions[0] - positions[1];
         
-        // Leader breakaway (higher threshold)
-        if (leaderGap > 15 && Math.random() < 0.6) { // Add variety
-            this.director.setShot('leader_focus', now);
+        // Leader breakaway
+        if (leaderGap > 12) {
+            this.trySetShot('leader_focus', now, currentSection, isSameSection, false);
             return;
         }
         
         // Tight pack racing
-        if (packSpread < 8 && positions.length > 2) {
-            this.director.setShot('battle_focus', now);
+        if (packSpread < 10 && positions.length > 2) {
+            this.trySetShot('battle_focus', now, currentSection, isSameSection, false);
             return;
         }
     }
     
-    // Default to pack focus with occasional variation
-    if (Math.random() < 0.85) {
-        this.director.setShot('pack_focus', now);
-    } else {
-        // Occasional leader focus for variety
-        this.director.setShot('leader_focus', now);
-    }
+    // 4. DEFAULT SHOT
+    this.trySetShot('pack_focus', now, currentSection, isSameSection, false);
   }
 }
