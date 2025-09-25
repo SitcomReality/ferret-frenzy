@@ -130,6 +130,7 @@ export class RenderManager {
     this.updateCameraTarget(deltaTime);
     this.particleSystem.update(deltaTime);
     // Forward hover lane banners into BannerSystem with short duration to keep alive while hovered
+    this.interactionController.update();
     const hoverBanners = this.interactionController?.banners;
     if (hoverBanners && this.currentRace) {
       hoverBanners.forEach((b, laneIndex) => {
