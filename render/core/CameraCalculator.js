@@ -1,3 +1,5 @@
+
+```javascript
 /**
  * CameraCalculator - Handles camera calculations
  */
@@ -23,7 +25,7 @@ export class CameraCalculator {
     const { width, height } = canvasDimensions;
     
     // Get the baseline zoom that fits the entire track height
-    
+
     // Calculate horizontal requirements based on racers to frame
     const positions = racers.map(rid => race.liveLocations[rid] || 0);
     const minPos = Math.min(...positions);
@@ -34,10 +36,16 @@ export class CameraCalculator {
     // Calculate zoom needed for horizontal fit
     const worldPixelWidth = width * 4; // From rendering system
     const maxZoomForHorizontalFit = (width * 0.85) / (worldPixelWidth * targetSpan / 100);
-    
-    // Use baseline as starting point, only zoom out if horizontal fit requires it
+
+    // Use baseline as starting point; for pack/battle restrict zoom-out unless truly needed
+    const isPackOrBattle = (shotDef === shotDefinitions.pack_focus || shotDef === shotDefinitions.battle_focus);
+    const minZoomForPackBattle = baselineZoom * 0.9; // keep close to track-fit
+    const needsWideFit = (targetSpan > 45 || racers.length >= 6);
     let optimalZoom = Math.min(baselineZoom, maxZoomForHorizontalFit);
-    
+    if (isPackOrBattle && !needsWideFit && optimalZoom < minZoomForPackBattle) {
+      optimalZoom = minZoomForPackBattle;
+    }
+
     // Apply shot-specific zoom modifiers for more dynamic camera work
     if (shotDef.priority === 'tight') {
       optimalZoom = Math.min(optimalZoom * 1.4, baselineZoom * 1.2); // Allow tighter than baseline for tight shots
@@ -45,7 +53,7 @@ export class CameraCalculator {
       optimalZoom = Math.min(optimalZoom * 1.2, baselineZoom * 1.1);
     }
     // Wide shots use the calculated zoom as-is
-    
+
     // Reasonable bounds - baseline zoom sets the upper limit
     return Math.max(0.3, Math.min(baselineZoom * 1.5, optimalZoom));
   }
