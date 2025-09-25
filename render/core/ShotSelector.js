@@ -29,9 +29,18 @@ export class ShotSelector {
     // --- DYNAMIC SHOT SELECTION ---
 
     // 1. FINISH LINE PRIORITY (but more flexible)
-    if (race.results && race.results.length > 0) {
-        this.director.setShot('finish_focus', now);
+    // If some racers have finished, but not all, we need to decide what to do.
+    // If the race leader is near the end, we use finish shots.
+    // Otherwise, we focus on the remaining racers.
+    if (race.results && race.results.length > 0 && race.results.length < race.racers.length) {
+      if (leaderPos >= 96) {
+        this.director.setShot('finish_approach', now);
         return;
+      }
+       // Fall through to focus on the pack of remaining racers
+    } else if (race.results && race.results.length > 0) {
+      this.director.setShot('finish_focus', now);
+      return;
     }
     
     if (leaderPos >= 96) { // Closer to finish line before locking

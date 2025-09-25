@@ -9,7 +9,7 @@ export const shotDefinitions = {
       return activeRacers.length > 0 ? activeRacers : race.racers;
     },
     margin: 15,
-    minSpan: 30,
+    minSpan: 5,
     lookahead: 0,
     priority: 'wide',
     description: 'Wide shot showing all racers at the start'

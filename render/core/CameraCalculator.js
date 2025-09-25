@@ -10,14 +10,19 @@ export class CameraCalculator {
    * Calculate optimal zoom that considers actual screen dimensions with track height as baseline
    */
   calculateOptimalZoom(racers, race, canvasDimensions, shotDef) {
-    if (!canvasDimensions || racers.length === 0) {
-      return this.getTrackBasedZoom(canvasDimensions, race);
+    if (!canvasDimensions) {
+      return 1.0;
+    }
+
+    const baselineZoom = this.getTrackBasedZoom(canvasDimensions, race);
+
+    if (racers.length === 0) {
+      return baselineZoom;
     }
 
     const { width, height } = canvasDimensions;
     
     // Get the baseline zoom that fits the entire track height
-    const baselineZoom = this.getTrackBasedZoom(canvasDimensions, race);
     
     // Calculate horizontal requirements based on racers to frame
     const positions = racers.map(rid => race.liveLocations[rid] || 0);
