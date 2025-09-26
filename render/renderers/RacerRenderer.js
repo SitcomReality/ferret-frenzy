@@ -54,6 +54,9 @@ export class RacerRenderer {
 
   renderBoostEffects(ctx, racer, screen, laneIndex, worldTransform) {
     if (racer?.isBoosting && Math.random() < 0.3) {
+      // Don't emit particles if racer has finished
+      if (racer.visual?.finished) return;
+      
       if (this.renderManager && this.renderManager.particleSystem) {
         // Emit from feet position - feet are below the center
         const feetY = screen.y + 15 * screen.scale; // Move down from center to feet
@@ -72,6 +75,23 @@ export class RacerRenderer {
   // New: dust trail while moving
   renderTrailEffects({ x, y, scale }) {
     if (!this.renderManager?.particleSystem) return;
+    
+    // Don't emit particles if racer has finished - need to find the racer for this position
+    const racers = this.renderManager.currentRace?.racers || [];
+    const gameState = this.renderManager.gameState;
+    
+    // Find which racer corresponds to this screen position
+    // This is approximate but should work for the trail effect
+    const screenPositions = this.screenPositions;
+    const currentPosition = screenPositions.find(pos => 
+      Math.abs(pos.x - x) < 50 && Math.abs(pos.y - y) < 30
+    );
+    
+    if (currentPosition) {
+      const racer = gameState?.racers.find(r => r.id === currentPosition.rid);
+      if (racer?.visual?.finished) return;
+    }
+    
     if (Math.random() < 0.12) {
       // Emit from feet position - feet are below the center
       const feetY = y + 15 * scale;

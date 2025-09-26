@@ -8,8 +8,8 @@ export class FerretAnimationSystem {
     // Animation state will be managed per ferret instance
   }
 
-  update(ferret, racer, time, raceState) {
-    const liveX = (raceState?.liveLocations?.[racer.id]) || 0;
+  update(ferret, racer, time, currentRace) {
+    const liveX = (currentRace?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
     const dtSeconds = Math.max(0.0001, dt / 1000);
 
@@ -17,7 +17,7 @@ export class FerretAnimationSystem {
     const currentSpeed = racer.getAverageSpeed();
 
     // Check if the racer has finished or is not moving (stopped)
-    const isRacing = raceState?.racers?.includes(racer.id) && !racer.visual.finished && !raceState.results.includes(racer.id);
+    const isRacing = currentRace?.racers?.includes(racer.id) && !racer.visual.finished && !currentRace.results.includes(racer.id);
 
     // Use actual forward progress to drive animation speed
     const deltaX = liveX - (ferret._lastX ?? liveX);
@@ -86,6 +86,13 @@ export class FerretAnimationSystem {
       ferret.gait.cyclePhase = 0;
     }
 
+    // Don't update particles if racer has finished
+    if (racer.visual?.finished) {
+      ferret._lastX = liveX;
+      ferret._lastTime = time;
+      return;
+    }
+
     ferret._lastX = liveX;
     ferret._lastTime = time;
 
@@ -146,7 +153,7 @@ export class FerretAnimationSystem {
     }
 
     // Update eye tracking
-    this.updateEyeTracking(ferret, racer, time, raceState);
+    this.updateEyeTracking(ferret, racer, time, currentRace);
   }
 
   updateBodyChain(ferret, racer, dt, velocity) {
