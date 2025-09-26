@@ -1,6 +1,6 @@
-/** 
+/**
  * FerretTailRenderer - Renders ferret tail with physics-based animation
- */ 
+ */
 export class FerretTailRenderer {
   constructor() {
     // Tail rendering state managed per ferret instance
@@ -20,8 +20,10 @@ export class FerretTailRenderer {
     const tailFluffiness = ferret.tail.fluffiness;
 
     // Much slower, more grounded tail movement
-    const { FerretAnimationUtils } = await import('./FerretAnimationUtils.js');
-    const tailSway = FerretAnimationUtils.calculateTailSway(ferret, performance.now());
+    const tailSway = Math.sin(
+      ferret.gait.cyclePhase * 0.5 + 
+      ferret.seed % 1000 * 0.1
+    ) * (1 + ferret.gait.stride * 0.5);
 
     // Tail should drag along the ground with gentle sway
     const groundMargin = 8; // How close tail stays to ground
@@ -74,21 +76,52 @@ export class FerretTailRenderer {
 
     // Tail follows the last few nodes of the body chain
     const tailNodes = chain.nodes.slice(-3); // Use last 3 nodes for tail
-    const { SplineUtils } = await import('./SplineUtils.js');
-    const pts = SplineUtils.samplePolyline(tailNodes, 16);
-
+    
+    // Simple polyline sampling for tail
+    const pts = [];
+    for (let i = 0; i < tailNodes.length; i++) {
+      pts.push(tailNodes[i]);
+    }
+    
     // Calculate tail width based on fluffiness and current state
     const baseWidth = 4 * ferret.tail.fluffiness;
     const tipWidth = 2 * ferret.tail.fluffiness;
 
     // Render as a thick spline
-    SplineUtils.renderThickSpline(ctx, pts, baseWidth, tipWidth, colors[2]);
+    if (pts.length >= 2) {
+      // Simple quadratic curve for tail
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      
+      if (pts.length === 2) {
+        ctx.lineTo(pts[1].x, pts[1].y);
+      } else {
+        // Use quadratic curve for smoother tail
+        ctx.quadraticCurveTo(pts[1].x, pts[1].y, pts[pts.length - 1].x, pts[pts.length - 1].y);
+      }
+      
+      ctx.lineWidth = baseWidth;
+      ctx.strokeStyle = colors[2];
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
 
     // Add subtle ground contact shadow
     if (!ferret.isStumbling) {
       ctx.globalAlpha = 0.3;
       const shadowPts = pts.map(p => ({ x: p.x + 1, y: p.y + 2 }));
-      SplineUtils.renderThickSpline(ctx, shadowPts, baseWidth * 0.8, tipWidth * 0.8, 'rgba(0,0,0,0.2)');
+      if (shadowPts.length >= 2) {
+        ctx.beginPath();
+        ctx.moveTo(shadowPts[0].x, shadowPts[0].y);
+        if (shadowPts.length === 2) {
+          ctx.lineTo(shadowPts[1].x, shadowPts[1].y);
+        } else {
+          ctx.quadraticCurveTo(shadowPts[1].x, shadowPts[1].y, shadowPts[shadowPts.length - 1].x, shadowPts[shadowPts.length - 1].y);
+        }
+        ctx.lineWidth = baseWidth * 0.8;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.stroke();
+      }
       ctx.globalAlpha = 1;
     }
   }
