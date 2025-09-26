@@ -11,6 +11,7 @@ export class FerretAnimationSystem {
   update(ferret, racer, time, raceState) {
     const liveX = (raceState?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
+    const dtSecs = Math.max(0.0001, dt); // Define dtSecs before using it
     const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
 
     if (velocity > 0.00005) {
@@ -27,7 +28,6 @@ export class FerretAnimationSystem {
 
     // Initialize ear state
     ferret.ear = ferret.ear || { value: 0, anim: null, reverse: false };
-    const dtSecs = Math.max(0.0001, dt);
 
     // Trigger flap once per half-cycle (phase 0 and π)
     const phase = ferret.gait.cyclePhase;
