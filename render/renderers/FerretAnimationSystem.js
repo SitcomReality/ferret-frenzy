@@ -11,20 +11,29 @@ export class FerretAnimationSystem {
   update(ferret, racer, time, raceState) {
     const liveX = (raceState?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
-    const dtSecs = Math.max(0.0001, dt); // Define dtSecs before using it
-    const velocity = Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt; // world units/sec
-
-    if (velocity > 0.00005) {
-      const k = 0.22; // maps world velocity to gait speed
+    const dtSecs = Math.max(0.0001, dt);
+    
+    // Calculate velocity more reliably - use the racer's current speed
+    const racerObj = raceState?.racers?.find(r => r.id === racer.id);
+    const currentSpeed = racerObj ? racerObj.getAverageSpeed() : 0;
+    
+    // If we have a valid speed from the racer, use it; otherwise estimate from position change
+    let velocity = currentSpeed > 0 ? currentSpeed : Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt;
+    
+    // Ensure minimum animation even when velocity is very low
+    if (velocity > 0.00005 || currentSpeed > 0) {
+      const k = 0.22;
       ferret.gait.cyclePhase += velocity * k;
       ferret.gait.stride = Math.min(1.3, 0.6 + velocity * 0.12);
     } else {
-      // keep subtle leg animation even when nearly stationary
+      // Subtle animation when nearly stationary
       ferret.gait.cyclePhase += dtSecs * 1.2;
       ferret.gait.stride = Math.max(0.15, ferret.gait.stride * 0.95);
     }
+    
     if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
-    ferret._lastX = liveX; ferret._lastTime = time;
+    ferret._lastX = liveX;
+    ferret._lastTime = time;
 
     // Initialize ear state
     ferret.ear = ferret.ear || { value: 0, anim: null, reverse: false };
