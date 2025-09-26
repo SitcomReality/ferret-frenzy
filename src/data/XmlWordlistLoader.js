@@ -26,8 +26,8 @@ export class XmlWordlistLoader {
       const prefixResponse = await fetch('wordlist/racerNamePrefixes.xml');
       const prefixXmlText = await prefixResponse.text();
       const prefixParser = new DOMParser();
-      const prefixXml = prefixParser.parseFromString(prefixXmlText, \"text/xml\");
-
+      const prefixXml = prefixParser.parseFromString(prefixXmlText, "text/xml");
+      
       window.racerNamePrefixes = [];
       const prefixItems = prefixXml.getElementsByTagName('item');
       for (let item of prefixItems) {
@@ -42,8 +42,8 @@ export class XmlWordlistLoader {
       const suffixResponse = await fetch('wordlist/racerNameSuffixes.xml');
       const suffixXmlText = await suffixResponse.text();
       const suffixParser = new DOMParser();
-      const suffixXml = suffixParser.parseFromString(suffixXmlText, \"text/xml\");
-
+      const suffixXml = suffixParser.parseFromString(suffixXmlText, "text/xml");
+      
       window.racerNameSuffixes = [];
       const suffixItems = suffixXml.getElementsByTagName('item');
       for (let item of suffixItems) {
