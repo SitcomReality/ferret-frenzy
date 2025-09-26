@@ -177,8 +177,10 @@ export class RenderManager {
     this.cameraSystem.applyTransform(this.ctx);
 
     this.trackRenderer.render(this.ctx, this.currentRace, this.renderProps, this.camera);
-    // Render banners in world-space using race positions
-    // this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
+    
+    // Render banners in world space before racers so they appear behind
+    this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
+    
     this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time);
 
     this.ctx.restore();
@@ -199,8 +201,9 @@ export class RenderManager {
    * Render overlays and UI elements
    */
   renderOverlays() {
-    // Render banners in screen-space - moved here so they render behind ferrets
-    this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
+    // Banners are now rendered in renderScene() to appear behind racers
+    // Only render UI overlays here that should appear on top of everything
+    
     if (this.raceEndCountdown && this.raceEndCountdown.active) {
       this.overlayRenderer.renderCountdown(this.ctx);
     }
