@@ -23,8 +23,10 @@ export class FerretRenderer {
     // Update animation state
     this.animationSystem.update(ferret, racer, time, raceState);
 
-    // Resolve color indices to hex strings
-    const colors = racer.colors.map(c => (typeof c === 'string' ? c : window.racerColors?.[c] || '#000'));
+    // Resolve racer colors robustly with a local fallback palette
+    const fallback = ["#6C8EAD", "#A23E48", "#FF8C42", "#171219"];
+    const palette = (window && window.racerColors && Array.isArray(window.racerColors)) ? window.racerColors : fallback;
+    const colors = (racer.colors || fallback).map(c => (typeof c === 'string' ? c : (palette[c] ?? fallback[c % fallback.length])));
 
     // Render ferret components
     // Use the bodyRenderer's main render method which coordinates all components
