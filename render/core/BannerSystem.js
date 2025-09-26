@@ -144,6 +144,10 @@ export class BannerSystem {
     ctx.closePath();
     ctx.fill();
 
+    // Type accent: slim top bar to distinguish event type
+    ctx.fillStyle = this.getBannerColor(banner.type);
+    ctx.fillRect(startX, bannerY, Math.max(4, totalNameBarWidth), Math.max(2, bannerHeight * 0.06));
+
     // --- Draw Number Circle ---
     ctx.beginPath();
     ctx.arc(startX, laneY, numberCircleRadius, Math.PI * 1.5, Math.PI * 0.5);

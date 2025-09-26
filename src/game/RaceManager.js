@@ -205,6 +205,7 @@ export class RaceManager {
         if (racer.remainingStumble <= 0) {
           racer.ferret.isStumbling = false;
           racer.ferret.crashPhase = 0;
+          this.eventBus.emit('race:racerRecovered', { racerId });
         }
       }
       

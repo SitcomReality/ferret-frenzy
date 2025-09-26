@@ -78,6 +78,27 @@ export class RenderManager {
     raceDirector.on('shotChange', (event) => {
       console.log(`Camera shot changed: ${event.data.from} -> ${event.data.to}`);
     });
+    // New: director events -> informative banners
+    raceDirector.on('stumble', (evt) => {
+      const rid = evt.data?.racerId;
+      if (!rid || !this.currentRace) return;
+      const lane = this.currentRace.racers.indexOf(rid);
+      if (lane >= 0) this.bannerSystem.showBanner('stumble', lane, 'STUMBLING', rid);
+    });
+    // New: app race events -> finish/recovery banners
+    window.app?.eventBus?.on('race:racerFinished', ({ racerId, position }) => {
+      if (!this.currentRace) return;
+      const lane = this.currentRace.racers.indexOf(racerId);
+      if (lane >= 0) this.bannerSystem.showBanner('finish', lane, `P${position}`, racerId);
+    });
+    window.app?.eventBus?.on('race:racerRecovered', ({ racerId }) => {
+      if (!this.currentRace) return;
+      const lane = this.currentRace.racers.indexOf(racerId);
+      if (lane >= 0) this.bannerSystem.hideBanner(lane);
+    });
+    window.app?.eventBus?.on('race:finish', () => {
+      this.bannerSystem.activeBanners.clear();
+    });
   }
 
   /**

@@ -88,10 +88,10 @@ export class ShotSelector {
     }
 
     // Incidents
-    if (highPriorityEvent && recentEvents.some(e => e.type === 'stumble')) {
-      this.trySetShot('incident_focus', now, currentSection, isSameSection, true);
-      return;
-    }
+    // if (highPriorityEvent && recentEvents.some(e => e.type === 'stumble')) {
+    //   this.trySetShot('incident_focus', now, currentSection, isSameSection, true);
+    //   return;
+    // }
 
     // Battles & Lead Changes
     if (highPriorityEvent && recentEvents.some(e => e.type === 'leadChange')) {
