@@ -1,3 +1,5 @@
+import { VerletChain } from "../systems/VerletChain.js";
+
 /**
  * FerretAnimationSystem - Handles ferret animation and movement
  */
