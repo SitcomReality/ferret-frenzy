@@ -1,1 +1,79 @@
-/**\n * FerretHeadRenderer - Renders ferret head components\n */\n\nexport class FerretHeadRenderer {\n  constructor() {\n    this.earRenderer = new FerretEarRenderer();\n    this.noseRenderer = new FerretNoseRenderer();\n  }\n\n  render(ctx, ferret, colors, time, racer) {\n    // New: Position head based on the front of the particle chain\n    if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length > 0) {\n      const headNode = ferret.bodyChain.nodes[0];\n      const nextNode = ferret.bodyChain.nodes[1];\n      const tangentX = headNode.x - nextNode.x;\n      const tangentY = headNode.y - nextNode.y;\n      const angle = Math.atan2(tangentY, tangentX);\n      \n      ctx.save();\n      ctx.translate(headNode.x, headNode.y);\n      ctx.rotate(angle);\n      \n      const base = 12 * (ferret.head.size || 1);\n      const round = ferret.head.roundness ?? 0.3;\n      const rx = base * (1 + round * 0.8), ry = base * (1 - round * 0.4);\n      const headX = 0, headY = 0;\n\n      ctx.beginPath(); \n      ctx.ellipse(headX, headY, rx, ry, 0, 0, Math.PI * 2);\n      ctx.fillStyle = colors[0];\n      ctx.fill();\n      ctx.stroke();\n\n      // Render features relative to the new transformed head position\n      this.earRenderer.render(ctx, ferret, colors, headX, headY, rx);\n      this.noseRenderer.render(ctx, ferret, colors, headX + rx, headY, time, racer);\n      this.renderUnderbite(ctx, ferret, headX, headY, rx);\n      \n      ctx.restore();\n      return;\n    }\n\n    const bodyLength = ferret.body.length * 30;\n    const attachX = -5 + bodyLength / 2;\n    const base = 12 * (ferret.head.size || 1);\n    const round = ferret.head.roundness ?? 0.3;\n    const rx = base * (1 + round * 0.8), ry = base * (1 - round * 0.4);\n    const headX = attachX + rx, headY = 0;\n\n    ctx.beginPath(); \n    ctx.ellipse(headX, headY, rx, ry, 0, 0, Math.PI * 2);\n    ctx.fillStyle = colors[0];\n    ctx.fill();\n    ctx.stroke();\n\n    // Ears (biased left)\n    this.earRenderer.render(ctx, ferret, colors, headX, headY, rx);\n\n    // Nose (at right-most point)\n    this.noseRenderer.render(ctx, ferret, colors, headX + rx, headY, time, racer);\n\n    // Underbite aligned with ellipse\n    this.renderUnderbite(ctx, ferret, headX, headY, rx);\n  }\n\n  renderUnderbite(ctx, ferret, headX, headY, headSize) {\n    if (ferret.head.underbiteDepth > 0.02) {\n      const d = ferret.head.underbiteDepth * 6;\n      ctx.fillStyle = 'rgba(0,0,0,0.3)';\n      ctx.beginPath(); \n      ctx.moveTo(headX + headSize*0.4, headY + headSize*0.25);\n      ctx.lineTo(headX + headSize*0.2 + d, headY + headSize*0.38 + d*0.4);\n      ctx.lineTo(headX, headY + headSize*0.25); \n      ctx.closePath(); \n      ctx.fill();\n    }\n  }\n}\n```\n\n```
+/**
+ * FerretHeadRenderer - Renders ferret head components
+ */
+
+export class FerretHeadRenderer {
+  constructor() {
+    this.earRenderer = new FerretEarRenderer();
+    this.noseRenderer = new FerretNoseRenderer();
+  }
+
+  render(ctx, ferret, colors, time, racer) {
+    // New: Position head based on the front of the particle chain
+    if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length > 0) {
+      const headNode = ferret.bodyChain.nodes[0];
+      const nextNode = ferret.bodyChain.nodes[1];
+      const tangentX = headNode.x - nextNode.x;
+      const tangentY = headNode.y - nextNode.y;
+      const angle = Math.atan2(tangentY, tangentX);
+      
+      ctx.save();
+      ctx.translate(headNode.x, headNode.y);
+      ctx.rotate(angle);
+      
+      const base = 12 * (ferret.head.size || 1);
+      const round = ferret.head.roundness ?? 0.3;
+      const rx = base * (1 + round * 0.8), ry = base * (1 - round * 0.4);
+      const headX = 0, headY = 0;
+
+      ctx.beginPath(); 
+      ctx.ellipse(headX, headY, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = colors[0];
+      ctx.fill();
+      ctx.stroke();
+
+      // Render features relative to the new transformed head position
+      this.earRenderer.render(ctx, ferret, colors, headX, headY, rx);
+      this.noseRenderer.render(ctx, ferret, colors, headX + rx, headY, time, racer);
+      this.renderUnderbite(ctx, ferret, headX, headY, rx);
+      
+      ctx.restore();
+      return;
+    }
+
+    const bodyLength = ferret.body.length * 30;
+    const attachX = -5 + bodyLength / 2;
+    const base = 12 * (ferret.head.size || 1);
+    const round = ferret.head.roundness ?? 0.3;
+    const rx = base * (1 + round * 0.8), ry = base * (1 - round * 0.4);
+    const headX = attachX + rx, headY = 0;
+
+    ctx.beginPath(); 
+    ctx.ellipse(headX, headY, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = colors[0];
+    ctx.fill();
+    ctx.stroke();
+
+    // Ears (biased left)
+    this.earRenderer.render(ctx, ferret, colors, headX, headY, rx);
+
+    // Nose (at right-most point)
+    this.noseRenderer.render(ctx, ferret, colors, headX + rx, headY, time, racer);
+
+    // Underbite aligned with ellipse
+    this.renderUnderbite(ctx, ferret, headX, headY, rx);
+  }
+
+  renderUnderbite(ctx, ferret, headX, headY, headSize) {
+    if (ferret.head.underbiteDepth > 0.02) {
+      const d = ferret.head.underbiteDepth * 6;
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath(); 
+      ctx.moveTo(headX + headSize*0.4, headY + headSize*0.25);
+      ctx.lineTo(headX + headSize*0.2 + d, headY + headSize*0.38 + d*0.4);
+      ctx.lineTo(headX, headY + headSize*0.25); 
+      ctx.closePath(); 
+      ctx.fill();
+    }
+  }
+}
