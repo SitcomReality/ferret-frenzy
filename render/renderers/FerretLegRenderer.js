@@ -173,7 +173,7 @@ export class FerretLegRenderer {
     ctx.lineJoin = 'round';
     ctx.stroke();
 
-    const pawSize = 3;
+    const pawSize = ferret.isStumbling ? 2 : 3;
     ctx.fillStyle = 'rgba(0,0,0,0.4)';
     ctx.beginPath();
     ctx.arc(foot.x, foot.y, pawSize, 0, Math.PI * 2);
