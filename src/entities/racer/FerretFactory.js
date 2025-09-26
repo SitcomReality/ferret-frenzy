@@ -29,7 +29,8 @@ export class FerretFactory {
       thickness: pick(0.8, 1.2)
     };
     const tail = {
-      length: pick(0.7, 1.5),
+      // Increase tail length by 1.5x - 3x (was 0.7-1.5, now 1.05-4.5)
+      length: pick(1.05, 4.5),
       fluffiness: pick(0.8, 1.3),
       followFactor: pick(0.2, 0.5) // New: how closely tail follows body chain
     };
