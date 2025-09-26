@@ -105,7 +105,7 @@ export class FerretFactory {
     });
 
     return {
-      enabled: false, // Feature flag - disabled until Phase 2
+      enabled: true, // Feature flag - enabled for Phase 1 body rendering
       nodes: chain.nodes,
       prevNodes: chain.prevNodes,
       restLengths: chain.restLengths,

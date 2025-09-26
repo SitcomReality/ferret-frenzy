@@ -3,6 +3,15 @@
  */
 export class FerretBodyRenderer {
   renderBody(ctx, ferret, colors) {
+    if (ferret.bodyChain?.enabled && ferret.bodyChain?.nodes?.length >= 2) {
+      const pts = SplineUtils.samplePolyline(ferret.bodyChain.nodes, 24);
+      const startW = (ferret.bodyChain.params?.thicknessStart || 12) * (ferret.body?.stockiness || 1);
+      const endW = (ferret.bodyChain.params?.thicknessEnd || 6) * (ferret.body?.stockiness || 1);
+      SplineUtils.renderThickSpline(ctx, pts, startW, endW, colors[0]);
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1.5; ctx.stroke();
+      return;
+    }
+
     const bodyLength = ferret.body.length * 30;
     let bodyHeight = ferret.body.height * 20;
     bodyHeight *= ferret.body.stockiness;
