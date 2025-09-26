@@ -21,7 +21,8 @@ export class FerretFactory {
         // Standardize all ferrets to similar lengths - reduce variation significantly
         length: pick(2.6, 2.9), // Much tighter range (was 2.4-2.8)
         height: pick(0.9 * 1.5, 1.2 * 2.0), // taller overall
-        stockiness: pick(1.0, 1.3) // Reduced max stockiness variation for more consistent body thickness
+        stockiness: pick(1.0, 1.2) // Reduced max stockiness variation for more consistent body thickness
+                                // Was 1.3, now 1.2 to reduce taper
     };
     const legs = {
       length: pick(0.8, 1.2),
@@ -99,8 +100,9 @@ export class FerretFactory {
     const damping = pick(0.85, 0.92); // Reduced from pick(0.95, 0.995) for more jiggle
     
     // Thicker chain rendering for beefier bodies
-    const thicknessStart = pick(14, 26); // Increased from pick(12, 24)
-    const thicknessEnd = pick(7, 13); // Increased from pick(6, 12)
+    // *** REDUCED VARIATION: Thickness range is now much tighter ***
+    const thicknessStart = pick(16, 24); // Reduced range from pick(14, 26) to pick(16, 24)
+    const thicknessEnd = pick(10, 12);   // Reduced range from pick(7, 13) to pick(10, 12)
 
     // Initial chain setup (will be positioned properly during animation)
     const chain = VerletChain.createChain({
@@ -119,6 +121,7 @@ export class FerretFactory {
             stiffness,
             damping,
             iterations,
+            // *** REDUCED VARIATION: Tighter thickness ranges applied here ***
             thicknessStart,
             thicknessEnd
         },
