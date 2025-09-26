@@ -1,5 +1,5 @@
 # Ferret Graphics Integration Guide
-# Objective: Provide a concise overview of how ferrets are constructed and animated in the Racing Game, and outline the essential interface/features a new “fancy ferret” system must support to be compatible.
+# Objective: Provide a concise overview of how ferrets are constructed and animated in the Racing Game, and outline the essential interface/features a new "fancy ferret" system must support to be compatible.
 
 ## 1) How ferrets are constructed today
 - Entity source
@@ -36,7 +36,7 @@
     - Eye tracking: looks to adjacent lanes if nearby; smooth pupil movement; blink timing.
   - `FerretBodyRenderer` draws parts:
     - Far-side legs first (behind body), then body, head, tail, near-side legs (front), then eyes.
-    - Leg kinematics compute hip/knee/foot positions with lift during forward swing.
+    - Leg kinematics use a simple procedural approach driven by the gait `cyclePhase`. The foot's horizontal position relative to the hip is calculated using `sin(cyclePhase)`, creating a forward-and-backward motion. The foot's vertical "lift" is calculated using `cos(cyclePhase)`, causing the foot to raise only during its forward swing. A simple IK approximation determines the knee's position to create a natural bend. See `docs/FerretLegAnimation.md` for a detailed breakdown.
     - Nose twitching disabled when stumbling; underbite optional; coat band.
   - `FerretEyeRenderer` clips eye whites, draws pupil, eyelids based on blink/lid offsets.
 - Particles and effects
@@ -81,7 +81,7 @@
   - Respect provided `scale` and position `x,y` in camera space.
   - No additional global transforms; keep drawing local to provided origin.
 
-## 4) Integration guidelines for “fancy ferrets”
+## 4) Integration guidelines for "fancy ferrets"
 - Replace renderer via composition
   - Create `FancyFerretRenderer` implementing the same render signature.
   - Swap in `RacerRenderer` by replacing `this.ferretRenderer = new FancyFerretRenderer();`
