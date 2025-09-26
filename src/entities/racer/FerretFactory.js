@@ -18,10 +18,10 @@ export class FerretFactory {
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
     const body = {
-      // Make bodies much longer - increase minimum length significantly
-      length: pick(2.2, 2.8), // Much higher minimum (was 1.5), slightly higher maximum
+      // Make bodies much longer - increase minimum length significantly and reduce variation
+      length: pick(2.4, 2.8), // Much higher minimum (was 1.5), reduced range for more consistent lengths
       height: pick(0.9 * 1.5, 1.2 * 2.0), // taller overall
-      stockiness: pick(1.0, 1.6) // thicker bodies
+      stockiness: pick(1.0, 1.3) // Reduced max stockiness variation for more consistent body thickness
     };
     const legs = {
       length: pick(0.8, 1.2),
