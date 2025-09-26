@@ -33,21 +33,28 @@ export class BannerSystem {
     }
   }
 
-  render(ctx, camera, worldTransform) {
-    // Render all active banners
-    // Apply camera transformations
-    // Ensure proper z-ordering
+  render(ctx, camera, worldTransform, race, renderProps) {
+    // Render all active banners in world-space (camera already applied via ctx)
+    const dpr = (window.devicePixelRatio || 1);
+    const w = ctx.canvas.width / dpr;
+    const laneHeight = worldTransform.laneHeight;
+    const totalHeight = laneHeight * (renderProps?.numberOfLanes || 10);
+    const worldPixelWidth = w * 4;
+
     for (const [laneIndex, banner] of this.activeBanners.entries()) {
       const { type, text, startTime, duration } = banner;
-      const laneX = worldTransform.worldToScreen(0, laneIndex, camera).x;
-      const laneY = worldTransform.worldToScreen(0, laneIndex, camera).y;
-      const bannerX = laneX - 100;
-      const bannerY = laneY - 20;
+      const rid = race?.racers?.[laneIndex];
+      const locPct = race?.liveLocations?.[rid] ?? 0;
+
       const bannerWidth = 200;
       const bannerHeight = 30;
+      const bannerX = (locPct / 100) * worldPixelWidth - (bannerWidth * 0.5); // center-ish near racer
+      const laneTopY = laneIndex * laneHeight;
+      const bannerY = laneTopY + (laneHeight * 0.15); // stay within lane
+
       const bannerColor = this.getBannerColor(type);
       const textColor = this.getBannerTextColor(type);
-      const isFinished = Date.now() - startTime > duration * 1000;
+      const isFinished = typeof duration === 'number' && (Date.now() - startTime > duration * 1000);
 
       ctx.save();
       ctx.fillStyle = bannerColor;

@@ -156,14 +156,8 @@ export class RenderManager {
     this.cameraSystem.applyTransform(this.ctx);
 
     this.trackRenderer.render(this.ctx, this.currentRace, this.renderProps, this.camera);
-    
-    // Draw informative banners behind racers (between track and ferrets)
-    const origWTS = this.worldTransform.worldToScreen.bind(this.worldTransform);
-    this.worldTransform.worldToScreen = (wx, li, cam) =>
-      origWTS(wx, li, cam, this.canvas.width, this.canvas.height, this.renderProps?.numberOfLanes, this.gameState);
-    this.bannerSystem.render(this.ctx, this.camera, this.worldTransform);
-    this.worldTransform.worldToScreen = origWTS;
-    
+    // Render banners in world-space using race positions
+    this.bannerSystem.render(this.ctx, this.camera, this.worldTransform, this.currentRace, this.renderProps);
     this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time);
 
     this.ctx.restore();
