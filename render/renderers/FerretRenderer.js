@@ -32,7 +32,16 @@ export class FerretRenderer {
     
     // Map the racer's color indices to actual hex colors
     const colors = (racer.colors || [0, 1, 2]).map(index => {
-      const colorIndex = typeof index === 'number' ? index : 0;
+      // Handle both number indices and string indices
+      let colorIndex;
+      if (typeof index === 'number') {
+        colorIndex = index;
+      } else if (typeof index === 'string' && !isNaN(parseInt(index))) {
+        colorIndex = parseInt(index);
+      } else {
+        // Fallback for invalid indices
+        colorIndex = 0;
+      }
       return palette[colorIndex] || palette[0];
     });
 
