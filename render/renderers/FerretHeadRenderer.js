@@ -1,3 +1,6 @@
+import { FerretEarRenderer } from './FerretEarRenderer.js';
+import { FerretNoseRenderer } from './FerretNoseRenderer.js';
+
 /**
  * FerretHeadRenderer - Renders ferret head components
  */
