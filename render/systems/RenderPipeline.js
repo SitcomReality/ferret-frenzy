@@ -1,6 +1,6 @@
-/** 
+/**
  * RenderPipeline - Manages the render pipeline phases
- */ 
+ */
 export class RenderPipeline {
   constructor(renderManager) {
     this.renderManager = renderManager;

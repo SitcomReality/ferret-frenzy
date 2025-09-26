@@ -11,6 +11,9 @@ import { CanvasAdapter } from './core/CanvasAdapter.js';
 import { InteractionController } from './systems/InteractionController.js';
 import { OverlayRenderer } from './renderers/OverlayRenderer.js';
 import { BannerSystem } from './core/BannerSystem.js';
+import { CameraSystem } from './core/CameraSystem.js';
+import { WeatherRenderer } from './systems/WeatherRenderer.js';
+import { TransformUtils } from './utils/TransformUtils.js';
 
 /**
  * RenderManager - Centralized rendering coordinator
@@ -41,6 +44,11 @@ export class RenderManager {
     this.overlayRenderer = new OverlayRenderer(this);
     this.bannerSystem = new BannerSystem();
     this.renderPipeline = new RenderPipeline(this);
+
+    // New modular systems
+    this.cameraSystem = new CameraSystem(this);
+    this.weatherRenderer = new WeatherRenderer(this);
+    this.transformUtils = new TransformUtils(this);
 
     // Render state
     this.isRendering = false;
@@ -92,8 +100,6 @@ export class RenderManager {
    * Main render loop managed by AnimationLoop
    */
   tick(time) {
-    // if (!this.isRendering) return; // We want to tick even if paused to update UI, but not game logic
-
     const deltaTime = (time - this.lastTime) / 1000;
     this.lastTime = time;
 
@@ -127,8 +133,9 @@ export class RenderManager {
    * Update systems
    */
   update(time, deltaTime) {
-    this.updateCameraTarget(deltaTime);
+    this.cameraSystem.updateTarget(deltaTime);
     this.particleSystem.update(deltaTime);
+    
     // Forward hover lane banners into BannerSystem with short duration to keep alive while hovered
     this.interactionController.update();
     const hoverBanners = this.interactionController?.banners;
@@ -146,26 +153,28 @@ export class RenderManager {
     if (!this.currentRace || !this.renderProps) return;
 
     this.ctx.save();
-    this.applyCameraTransform();
+    this.cameraSystem.applyTransform(this.ctx);
 
     this.trackRenderer.render(this.ctx, this.currentRace, this.renderProps, this.camera);
+    
     // Draw informative banners behind racers (between track and ferrets)
     const origWTS = this.worldTransform.worldToScreen.bind(this.worldTransform);
     this.worldTransform.worldToScreen = (wx, li, cam) =>
       origWTS(wx, li, cam, this.canvas.width, this.canvas.height, this.renderProps?.numberOfLanes, this.gameState);
     this.bannerSystem.render(this.ctx, this.camera, this.worldTransform);
     this.worldTransform.worldToScreen = origWTS;
-    this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time / 1000);
+    
+    this.racerRenderer.render(this.ctx, this.currentRace, this.worldTransform, time);
 
     this.ctx.restore();
 
     this.ctx.save();
-    this.applyCameraTransform();
+    this.cameraSystem.applyTransform(this.ctx);
     this.particleSystem.render(this.ctx);
     this.ctx.restore();
 
     this.ctx.save();
-    this.renderWeatherEffects();
+    this.weatherRenderer.render();
     this.hitIndex.update(this.racerRenderer.getScreenPositions());
     this.nameplate.render(this.ctx, this.gameState);
     this.ctx.restore();
@@ -200,89 +209,10 @@ export class RenderManager {
   }
 
   /**
-   * Apply camera transformation to context
+   * Update camera target to follow the leader
    */
-  applyCameraTransform() {
-    const dims = this.canvasAdapter.getDimensions();
-
-    this.ctx.translate(dims.width / 2, dims.height / 2);
-    this.ctx.scale(this.camera.zoom, this.camera.zoom);
-
-    const worldPixelWidth = dims.width * 4;
-    const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
-    const laneHeight = this.worldTransform.laneHeight;
-    const totalHeight = laneHeight * (this.renderProps?.numberOfLanes || 10);
-    const trackCenterY = totalHeight / 2;
-
-    this.ctx.translate(-cameraPixelX, -trackCenterY);
-  }
-
-  /**
-   * Render weather effects
-   */
-  renderWeatherEffects() {
-    const weather = this.currentRace?.weather;
-    if (!weather) return;
-
-    const dims = this.canvasAdapter.getDimensions();
-    const wLower = weather.toLowerCase();
-
-    this.ctx.save();
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-    if (wLower === 'rainy' || wLower === 'stormy') {
-      this.renderRainEffect(dims);
-    } else if (wLower === 'snowy') {
-      this.renderSnowEffect(dims);
-    } else if (wLower === 'foggy' || wLower === 'cloudy') {
-      this.renderFogEffect(dims);
-    } else if (wLower === 'dusty') {
-      this.renderDustEffect(dims);
-    }
-
-    this.ctx.restore();
-  }
-
-  renderRainEffect(dims) {
-    this.ctx.strokeStyle = 'rgba(180,180,255,0.35)';
-    this.ctx.lineWidth = 1;
-    for (let i = 0; i < 80; i++) {
-      const x = Math.random() * dims.width;
-      const y = Math.random() * dims.height;
-      this.ctx.beginPath();
-      this.ctx.moveTo(x, y);
-      this.ctx.lineTo(x + 10, y + 20);
-      this.ctx.stroke();
-    }
-  }
-
-  renderSnowEffect(dims) {
-    this.ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    for (let i = 0; i < 60; i++) {
-      const x = Math.random() * dims.width;
-      const y = Math.random() * dims.height;
-      const r = 1 + Math.random() * 2;
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, r, 0, Math.PI * 2);
-      this.ctx.fill();
-    }
-  }
-
-  renderFogEffect(dims) {
-    this.ctx.fillStyle = 'rgba(200,200,200,0.12)';
-    this.ctx.fillRect(0, 0, dims.width, dims.height);
-  }
-
-  renderDustEffect(dims) {
-    this.ctx.fillStyle = 'rgba(160,120,80,0.12)';
-    this.ctx.fillRect(0, 0, dims.width, dims.height);
-  }
-
-  /**
-   * Resize canvas to container
-   */
-  resizeToContainer() {
-    this.canvasAdapter.resizeToContainer();
+  updateCameraTarget(deltaTime) {
+    this.cameraSystem.updateTarget(deltaTime);
   }
 
   /**
@@ -321,46 +251,7 @@ export class RenderManager {
   }
 
   /**
-   * Update camera target to follow the leader
-   */
-  updateCameraTarget(deltaTime = 0.016) {
-    if (!this.currentRace || !this.currentRace.racers || this.currentRace.racers.length === 0) return;
-    const dims = this.canvasAdapter.getDimensions();
-    const { desiredX, desiredZoom, suggestedDamping, urgency } = this.camera.calculateDesiredState(this.currentRace, this.gameState, dims);
-
-    const zMin = this.gameState.settings?.render?.camera?.zoomMin || 0.3;
-    const zMax = this.gameState.settings?.render?.camera?.zoomMax || 2.0;
-    const targetZoom = Math.max(zMin, Math.min(zMax, desiredZoom));
-    const targetX = Math.max(0, Math.min(100, desiredX));
-
-    // Dynamic damping: much slower for smooth transitions
-    const panD = suggestedDamping?.pan ?? this.camera.damping;
-    const zoomD = suggestedDamping?.zoom ?? this.camera.damping;
-
-    // Leader-on-screen guard: if leader drifts near edges, temporarily speed up pan but still slower than before
-    const activeRacers = this.currentRace.racers.filter(rid => !(this.currentRace.results || []).includes(rid));
-    if (activeRacers.length) {
-      const leader = activeRacers.sort((a,b)=> (this.currentRace.liveLocations[b]||0)-(this.currentRace.liveLocations[a]||0))[0];
-      const worldPixelWidth = dims.width * 4;
-      const leaderX = (this.currentRace.liveLocations[leader] || 0) / 100 * worldPixelWidth;
-      const cameraPixelX = this.camera.target.x / 100 * worldPixelWidth;
-      const uiLeaderX = (leaderX - cameraPixelX) * this.camera.zoom + dims.width / 2;
-      const margin = dims.width * 0.15;
-      if (uiLeaderX < margin || uiLeaderX > (dims.width - margin)) {
-        // Override to quicker pan to keep leader in frame, but still slow
-        const fastPan = Math.max(panD, 0.06);
-        this.camera.target.x += (targetX - this.camera.target.x) * fastPan;
-      } else {
-        this.camera.target.x += (targetX - this.camera.target.x) * panD;
-      }
-    } else {
-      this.camera.target.x += (targetX - this.camera.target.x) * panD;
-    }
-    this.camera.zoom += (targetZoom - this.camera.zoom) * zoomD;
-  }
-
-  /**
-   * End race early (moved from OverlayRenderer for better cohesion)
+   * End race early
    */
   endRaceEarly() {
     this.gameState.running = false;
@@ -386,6 +277,13 @@ export class RenderManager {
   }
 
   /**
+   * Resize canvas to container
+   */
+  resizeToContainer() {
+    this.canvasAdapter.resizeToContainer();
+  }
+
+  /**
    * Get screen positions for hit testing
    */
   getScreenPositions() {
@@ -396,22 +294,14 @@ export class RenderManager {
    * Convert world coordinates to screen coordinates
    */
   worldToScreen(worldX, laneIndex) {
-    return this.worldTransform.worldToScreen(
-      worldX,
-      laneIndex,
-      this.camera,
-      this.canvas.width,
-      this.canvas.height,
-      this.renderProps?.numberOfLanes,
-      this.gameState
-    );
+    return this.transformUtils.worldToScreen(worldX, laneIndex);
   }
 
   /**
    * Convert screen coordinates to world coordinates
    */
   screenToWorld(screenX, screenY) {
-    return this.worldTransform.screenToWorld(screenX, screenY, this.camera, this.canvas.width, this.canvas.height, this.renderProps?.numberOfLanes);
+    return this.transformUtils.screenToWorld(screenX, screenY);
   }
 
   /**
