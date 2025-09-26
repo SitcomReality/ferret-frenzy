@@ -70,16 +70,16 @@ export class RacerRenderer {
   }
 
   // New: dust trail while moving
-  renderTrailEffects(screen) {
+  renderTrailEffects({ x, y, scale }) {
     if (!this.renderManager?.particleSystem) return;
     if (Math.random() < 0.12) {
       // Emit from feet position - feet are below the center
-      const feetY = screen.y + 15 * screen.scale;
+      const feetY = y + 15 * scale;
       this.renderManager.particleSystem.emit(
-        screen.x - 8 * screen.scale,
+        x - 8 * scale,
         feetY,
         Math.PI,
-        30 * screen.scale,
+        30 * scale,
         1,
         'rgba(120,100,80,0.45)',
         { spread: 0.6, forwardBoost: 0.2 }
