@@ -82,12 +82,31 @@ export class BannerSystem {
   }
 
   renderSingleBanner(ctx, banner, w, h, laneHeight, laneIndex, camera, renderProps) {
-    const racer = banner.racer;
-    if (!racer) return;
+    // Resolve racer reference: banner.racer may be an object, an id, or undefined.
+    let racer = banner.racer;
+    if (typeof racer === 'number' || typeof racer === 'string') {
+      // try to find racer object by id from common global locations
+      const gs = (window.app && window.app.gameState) || window.gameState || (window.app && window.app.gameStateManager);
+      racer = gs?.racers ? gs.racers.find(r => r.id === (typeof racer === 'string' ? parseInt(racer,10) : racer)) : null;
+    } else if (!racer) {
+      const gs = (window.app && window.app.gameState) || window.gameState || (window.app && window.app.gameStateManager);
+      // try to resolve by laneIndex using current race if available
+      const currentRace = gs?.currentRace || (window.app && window.app.currentRace);
+      const rid = currentRace?.racers?.[laneIndex];
+      racer = rid != null ? (gs?.racers ? gs.racers.find(r => r.id === rid) : null) : null;
+    }
+    if (!racer) {
+      // Nothing sensible to draw; skip gracefully
+      return;
+    }
 
-    const color1 = window.racerColors[racer.colors[0]];
-    const color2 = window.racerColors[racer.colors[1]];
-    const color3 = window.racerColors[racer.colors[2]];
+    // Safely read color indices and fall back to defaults
+    const c0 = (Array.isArray(racer.colors) && racer.colors[0] != null) ? racer.colors[0] : 0;
+    const c1 = (Array.isArray(racer.colors) && racer.colors[1] != null) ? racer.colors[1] : 1;
+    const c2 = (Array.isArray(racer.colors) && racer.colors[2] != null) ? racer.colors[2] : 2;
+    const color1 = window.racerColors?.[c0] || '#cccccc';
+    const color2 = window.racerColors?.[c1] || '#999999';
+    const color3 = window.racerColors?.[c2] || '#666666';
 
     // Calculate vertical position based on lane, respecting camera zoom
     const laneY = (laneIndex * laneHeight + laneHeight/2 - (laneHeight * renderProps.numberOfLanes)/2) * camera.zoom + h/2;
