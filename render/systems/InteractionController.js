@@ -1,5 +1,3 @@
-
-```javascript
 /**
  * InteractionController - Handles mouse interactions and hover effects
  */
@@ -51,8 +49,6 @@ export class InteractionController {
   }
 
   createHoverBanner(racer, laneIndex, w) {
-    const startX = w + 100;
-
     if (!this.banners.has(laneIndex)) {
       this.banners.set(laneIndex, {
         lane: laneIndex,
@@ -62,7 +58,7 @@ export class InteractionController {
     } else {
       const banner = this.banners.get(laneIndex);
       banner.active = true;
-      banner.text = this.getRacerNameString(racer); // Update in case of changes
+      banner.text = this.getRacerNameString(racer);
     }
   }
 
