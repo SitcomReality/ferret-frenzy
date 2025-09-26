@@ -8,7 +8,7 @@ export class FerretTailRenderer {
 
   render(ctx, ferret, colors) {
     // New: Tail follows the particle chain if enabled
-    if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length > 0) {
+    if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length >= 2) {
       this.renderChainedTail(ctx, ferret, colors);
       return;
     }

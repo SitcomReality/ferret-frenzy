@@ -11,25 +11,39 @@ export class FerretAnimationSystem {
   update(ferret, racer, time, raceState) {
     const liveX = (raceState?.liveLocations?.[racer.id]) || 0;
     const dt = Math.max(0.0001, time - (ferret._lastTime ?? time));
-    const dtSecs = Math.max(0.0001, dt);
+    const dtSecs = dt; // dt is in milliseconds, dtSecs should be in seconds if used outside this block
+    const dtSeconds = Math.max(0.0001, dt / 1000);
     
     // Calculate velocity more reliably - use the racer's current speed
-    const racerObj = raceState?.racers?.find(r => r.id === racer.id);
-    const currentSpeed = racerObj ? racerObj.getAverageSpeed() : 0;
+    const currentSpeed = racer.getAverageSpeed();
     
-    // If we have a valid speed from the racer, use it; otherwise estimate from position change
-    let velocity = currentSpeed > 0 ? currentSpeed : Math.max(0, liveX - (ferret._lastX ?? liveX)) / dt;
+    // Check if the racer has finished or is not moving (stopped)
+    const isRacing = raceState?.racers?.includes(racer.id) && !racer.visual.finished && !raceState.results.includes(racer.id);
     
-    // Ensure minimum animation even when velocity is very low
-    if (velocity > 0.00005 || currentSpeed > 0) {
+    let velocity;
+    if (isRacing) {
+      // Use the actual calculated speed to drive animation
+      velocity = currentSpeed > 0 ? currentSpeed : 0.001; // Ensure a tiny speed for stationary animation if race is active
+    } else {
+      // Racer is finished or race is paused, animation should stop.
+      velocity = 0;
+    }
+
+    if (velocity > 0.00005) {
       const k = 0.22;
-      ferret.gait.cyclePhase += velocity * k;
+      ferret.gait.cyclePhase += velocity * k * dtSeconds;
       ferret.gait.stride = Math.min(1.3, 0.6 + velocity * 0.12);
     } else {
-      // Subtle animation when nearly stationary
-      ferret.gait.cyclePhase += dtSecs * 1.2;
+      // Subtle animation when nearly stationary or finished/paused
+      ferret.gait.cyclePhase += dtSeconds * 1.2;
       ferret.gait.stride = Math.max(0.15, ferret.gait.stride * 0.95);
     }
+    
+    // If finished, force stride to zero to stop movement visualization
+    if (racer.visual.finished) {
+      ferret.gait.stride = 0;
+    }
+
     
     if (ferret.gait.cyclePhase > Math.PI * 2) ferret.gait.cyclePhase -= Math.PI * 2;
     ferret._lastX = liveX;
@@ -56,13 +70,13 @@ export class FerretAnimationSystem {
       const anim = ferret.ear.anim;
 
       if (anim.phase === 'up') {
-        anim.t += dtSecs;
+        anim.t += dtSeconds;
         const u = Math.min(1, anim.t / anim.upDur);
         ferret.ear.value = easeOutCubic(u);
         ferret.ear.reverse = true;
         if (u >= 1) { anim.phase = 'down'; anim.t = 0; }
       } else { // down
-        anim.t += dtSecs;
+        anim.t += dtSeconds;
         const u = Math.min(1, anim.t / anim.downDur);
         ferret.ear.value = 1 - easeInCubic(u);
         ferret.ear.reverse = false;
@@ -70,7 +84,7 @@ export class FerretAnimationSystem {
       }
     } else {
       // default gently towards down if no animation
-      ferret.ear.value += (0 - ferret.ear.value) * Math.min(1, dtSecs * 4);
+      ferret.ear.value += (0 - ferret.ear.value) * Math.min(1, dtSeconds * 4);
     }
 
     ferret._prevPhase = phase;
@@ -88,7 +102,7 @@ export class FerretAnimationSystem {
 
     // New: Update particle chain physics
     if (ferret.bodyChain?.enabled) {
-      this.updateBodyChain(ferret, racer, dtSecs, velocity);
+      this.updateBodyChain(ferret, racer, dtSeconds, velocity);
     }
 
     // Update eye tracking
@@ -198,18 +212,18 @@ export class FerretAnimationSystem {
       ferret.eye.blinkPhase = 0;
     }
     if (ferret.eye.isBlinking) {
-      ferret.eye.blinkPhase += (dt || 0.016) * 18; // quick blink
+      ferret.eye.blinkPhase += (dt || 0.016) * 0.018; // quick blink (0.016 is a placeholder for dt in ms)
       if (ferret.eye.blinkPhase >= Math.PI) {
         ferret.eye.isBlinking = false;
         // next blink between 2-6s
         const nextBlink = 2 + (ferret.seed % 4000) / 1000; // deterministic-ish per ferret
-        ferret.eye.blinkTimer = nextBlink;
+        ferret.eye.blinkTimer = nextBlink * 1000; // Store in ms
         ferret.eye.blinkPhase = 0;
       }
     }
 
     // Update eyelid expressions
-    const moodTimer = time * 0.5 + racer.id;
+    const moodTimer = time * 0.0005 + racer.id; // time is now in milliseconds
     ferret.eye.upperLid = 0.1 + Math.sin(moodTimer) * 0.05;
     ferret.eye.lowerLid = 0.05 + Math.cos(moodTimer * 0.7) * 0.02;
   }

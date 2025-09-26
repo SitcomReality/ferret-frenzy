@@ -422,6 +422,10 @@ export class Racer {
     if (this.ferret) {
       this.ferret.isStumbling = false;
       this.ferret.crashPhase = 0;
+      // Reset animation state variables to prevent carry-over bugs
+      this.ferret._lastTime = null;
+      this.ferret._lastX = null;
+      this.ferret.eye.blinkTimer = (this.ferret.eye.blinkTimer / 1000) * 1000; // Reset timer to initial value (in ms)
     }
   }
 

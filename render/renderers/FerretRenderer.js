@@ -21,6 +21,7 @@ export class FerretRenderer {
     ctx.scale(scale, scale);
 
     // Update animation state
+    // Pass time in milliseconds (as provided by RenderManager.tick)
     this.animationSystem.update(ferret, racer, time, raceState);
 
     // Resolve racer colors robustly with a local fallback palette

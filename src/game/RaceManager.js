@@ -225,6 +225,9 @@ export class RaceManager {
       // Update position based on deltaTime for smooth movement
       const distanceToTravel = finalSpeed * deltaTime;
       this.currentRace.liveLocations[racerId] = Math.min(100, currentPosition + distanceToTravel);
+      
+      // Update the racer entity itself, especially its components
+      racer.update(deltaTime, { race: this.currentRace, currentPosition });
     });
   }
 
