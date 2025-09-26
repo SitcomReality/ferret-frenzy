@@ -29,16 +29,16 @@ export class FerretTailRenderer {
     const groundMargin = 8; // How close tail stays to ground
     const tailEndY = tailStartY + groundMargin + (ferret.isStumbling ? 0 : 2);
 
-    // Create a gentle curve that drags along the ground
-    const controlPointX = tailStartX - tailLength * 0.4;
-    const controlPointY = tailStartY + groundMargin + (Math.abs(tailSway) * 0.3);
+    // Create a gentle curve that extends outward to the left
+    const controlPointX = tailStartX - tailLength * 0.6; // Extend further left
+    const controlPointY = tailStartY + groundMargin + (Math.abs(tailSway) * 0.2);
 
     ctx.beginPath();
     ctx.moveTo(tailStartX, tailStartY);
     ctx.quadraticCurveTo(
       controlPointX, 
       controlPointY, 
-      tailStartX - tailLength, 
+      tailStartX - tailLength, // Extend fully to the left
       tailEndY
     );
 
