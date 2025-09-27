@@ -1,2 +1,27 @@
-/* ...existing styles... */\n 
-body[data-theme=\"memphis\"] .btn {\n    border-radius: 10px;\n    border: 3px solid var(--border-color);\n    box-shadow: 6px 6px 0 #141414;\n    background: #fff;\n    color: var(--text-primary);\n    transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;\n}\n\nbody[data-theme=\"memphis\"] .btn:hover:not(:disabled) {\n    transform: translate(-2px, -2px);\n    box-shadow: 8px 8px 0 #141414;\n}\n\nbody[data-theme=\"memphis\"] .btn-primary {\n    background: var(--accent-color);\n    color: #fff;\n    border-color: #141414;\n}\n\nbody[data-theme=\"memphis\"] .btn-outline {\n    background: #fff;\n    color: var(--accent-color);\n    border-color: var(--accent-color);\n}\n\n/* ...existing styles...*/\n\n\n```\n\nThe updated code for styles/components/memphis/buttons.css is:\n\n\n```\nstyles/components/memphis/buttons.css\n/* ...existing styles ... */\n\nbody[data-theme=\"memphis\"] .btn {\n    border-radius: 10px;\n    border: 3px solid var(--border-color);\n    box-shadow: 6px 6px 0 #141414;\n    background: #fff;\n    color: var(--text-primary);\n    transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;\n}\n\nbody[data-theme=\"memphis\"] .btn:hover:not(:disabled) {\n    transform: translate(-2px, -2px);\n    box-shadow: 8px 8px 0 #141414;\n}\n\nbody[data-theme=\"memphis\"] .btn-primary {\n    background: var(--accent-color);\n    color: #fff;\n    border-color: #141414;\n}\n\nbody[data-theme=\"memphis\"] .btn-outline {\n    background: #fff;\n    color: var(--accent-color);\n    border-color: var(--accent-color);\n}\n\n/* ...existing styles ... */\n\n\n```\n\nThe updated code maintains the current aesthetic and layout while introducing new design elements and visual effects to enhance the user experience. The .btn class is updated with a bold, Memphis-inspired design, featuring a 10px border-radius, 3px solid border, and a box-shadow effect. The .btn-primary class is updated with an accent color background, and the .btn-outline class is updated with a white background and accent color border and color. The hover state for non-disabled buttons is updated with a transform effect and an increased box-shadow size. The existing styles are preserved and enhanced with the new design elements, providing a visually appealing and modern interface.
+/* Memphis Design button styles */
+body[data-theme="memphis"] .btn {
+    border-radius: 10px;
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0 #141414;
+    background: #fff;
+    color: var(--text-primary);
+    transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+body[data-theme="memphis"] .btn:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 #141414;
+}
+
+body[data-theme="memphis"] .btn-primary {
+    background: var(--accent-color);
+    color: #fff;
+    border-color: #141414;
+}
+
+body[data-theme="memphis"] .btn-outline {
+    background: #fff;
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
