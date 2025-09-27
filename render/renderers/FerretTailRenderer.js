@@ -27,10 +27,10 @@ export class FerretTailRenderer {
 
   createTailChain(ferret) {
     const tailLength = ferret.tail.length * 25;
-    const nodeCount = Math.max(3, Math.floor(tailLength / 8)); // More nodes for flexibility
+    const nodeCount = Math.max(4, Math.floor(tailLength / 6)); // More nodes for flexibility
     const restDistance = tailLength / (nodeCount - 1);
     
-    // Create chain with low stiffness for floppy movement
+    // Create chain with very low stiffness for floppy movement
     const chain = VerletChain.createChain({
       count: nodeCount,
       start: { x: 0, y: 0 },
@@ -43,14 +43,14 @@ export class FerretTailRenderer {
       prevNodes: chain.prevNodes,
       restLengths: chain.restLengths,
       params: {
-        stiffness: 0.2, // Very low stiffness for floppy movement
-        damping: 0.92,  // Reduced damping for more wobble
-        iterations: 2,  // Fewer iterations for softer constraints
-        thicknessStart: 6 * ferret.tail.fluffiness,
+        stiffness: 0.12, // Very low stiffness for floppy movement
+        damping: 0.78,  // Reduced damping for more wobble
+        iterations: 1,  // Fewer iterations for softer constraints
+        thicknessStart: 5 * ferret.tail.fluffiness,
         thicknessEnd: 2 * ferret.tail.fluffiness
       },
       anchors: {
-        base: { x: 0, y: 0, weight: 0.9 } // Strong attachment to body
+        base: { x: 0, y: 0, weight: 0.8 } // Strong attachment to body
       }
     };
   }

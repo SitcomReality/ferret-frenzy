@@ -96,9 +96,9 @@ export class FerretFactory {
     
     // Increase spacing between body nodes to reflect longer bodies
     const restDistance = pick(18, 28); // Increased from pick(12, 20)
-    const stiffness = pick(0.2, 0.4); // Reduced from pick(0.6, 0.9) for more wobble
+    const stiffness = pick(0.15, 0.25); // Reduced from pick(0.6, 0.9) for more wobble
     const iterations = Math.round(pick(1, 2)); // Reduced from Math.round(pick(2, 3))
-    const damping = pick(0.85, 0.92); // Reduced from pick(0.95, 0.995) for more jiggle
+    const damping = pick(0.82, 0.88); // Reduced from pick(0.95, 0.995) for more jiggle
     
     // Thicker chain rendering for beefier bodies
     // *** REDUCED VARIATION: Thickness range is now much tighter ***
@@ -127,8 +127,8 @@ export class FerretFactory {
             thicknessEnd
         },
         anchors: {
-            head: { x: 0, y: 0, offsetY: 0, weight: 0.6 }, // Reduced from 0.8 for more jiggle
-            hip: { x: 0, y: 0, offsetY: 0, weight: 0.4 } // Reduced from 0.6 for more jiggle
+            head: { x: 0, y: 0, offsetY: 0, weight: 0.5 }, // Reduced from 0.8 for more jiggle
+            hip: { x: 0, y: 0, offsetY: 0, weight: 0.3 } // Reduced from 0.6 for more jiggle
         }
     };
   }
