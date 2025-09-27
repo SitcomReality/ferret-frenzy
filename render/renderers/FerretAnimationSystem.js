@@ -32,6 +32,12 @@ export class FerretAnimationSystem {
     // --- 3. Update eye tracking and expressions ---
     FerretLookSystem.update(ferret, racer, time, currentRace);
     this.updateFootContacts(ferret);
+
+    // Stumble state sync and timing
+    const prev = !!ferret.isStumbling;
+    if (racer?.visual?.stumbling) ferret.isStumbling = true;
+    if (ferret.isStumbling && !prev) { ferret._stumbleEntered = true; ferret._stumbleTimer = ferret._stumbleTimer ?? 1.1; }
+    if (ferret.isStumbling) { ferret._stumbleTimer = Math.max(0, (ferret._stumbleTimer ?? 1.1) - dtSeconds); if (ferret._stumbleTimer === 0) ferret.isStumbling = false; }
   }
 
   updateFootContacts(ferret) {

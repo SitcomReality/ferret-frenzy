@@ -20,8 +20,8 @@ export class VerletBodySystem {
     chain.anchors.hip.y = chain.anchors.hip.offsetY;
 
     if (ferret.isStumbling) {
-      chain.anchors.head.weight = 0.1;
-      chain.anchors.hip.weight = 0.1;
+      chain.anchors.head.y = 14; chain.anchors.hip.y = 10;
+      chain.anchors.head.weight = 0.05; chain.anchors.hip.weight = 0.05;
     } else {
       chain.anchors.head.weight = 0.8;
       chain.anchors.hip.weight = 0.6;
@@ -34,9 +34,9 @@ export class VerletBodySystem {
 
     const { nodes, prevNodes, restLengths, params, anchors } = chain;
     VerletChain.integrate(nodes, prevNodes, dt, params.damping);
+    if (ferret.isStumbling) { VerletChain.applyGravity(nodes, 35); VerletChain.applyGroundConstraint(nodes, prevNodes, 15, 0.85, dt); }
     VerletChain.updateAnchors(nodes, anchors.hip, anchors.head);
     VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);
     VerletChain.smoothCurvature(nodes, 0.1);
   }
 }
-

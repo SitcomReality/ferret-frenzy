@@ -12,9 +12,9 @@ export class VerletTailSystem {
     tail.anchors.base.y = hipNode.y;
 
     VerletChain.integrate(tail.nodes, tail.prevNodes, dt, tail.params.damping);
-    VerletChain.applyGravity(tail.nodes, 9.8);
+    VerletChain.applyGravity(tail.nodes, ferret.isStumbling ? 30 : 9.8);
     const GROUND_Y = 15;
-    const friction = 0.6;
+    const friction = ferret.isStumbling ? 0.9 : 0.6;
     VerletChain.applyGroundConstraint(tail.nodes, tail.prevNodes, GROUND_Y, friction, dt);
 
     VerletChain.updateAnchors(tail.nodes, tail.anchors.base, null);
@@ -42,12 +42,12 @@ export class VerletTailSystem {
       const DirTy = targetTailDy / targetDirLength;
       const targetX1 = tailP0.x + DirTx * tailRestLength;
       const targetY1 = tailP0.y + DirTy * tailRestLength;
-      const orientationStiffness = 0.9;
+      const orientationStiffness = ferret.isStumbling ? 0.5 : 0.9;
       tailP1.x += (targetX1 - tailP1.x) * orientationStiffness;
       tailP1.y += (targetY1 - tailP1.y) * orientationStiffness;
     }
 
     VerletChain.satisfyConstraints(tail.nodes, tail.restLengths, tail.params.iterations, tail.params.stiffness);
-    VerletChain.smoothCurvature(tail.nodes, 0.1);
+    VerletChain.smoothCurvature(tail.nodes, ferret.isStumbling ? 0.02 : 0.1);
   }
 }

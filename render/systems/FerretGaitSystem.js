@@ -98,6 +98,8 @@ export class FerretGaitSystem {
         ferret.isStumbling = false;
         ferret.crashPhase = 0;
       }
+    } else if (racer?.visual?.stumbling) {
+      ferret.isStumbling = true; ferret.crashPhase = 0;
     }
   }
 }

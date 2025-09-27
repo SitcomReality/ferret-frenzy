@@ -136,5 +136,16 @@ export class RacerRenderer {
     // Front feet should emit forward of the body so move offsets to positive values
     tryEmit('FL', 7);
     tryEmit('FR', 5);
+
+    // Stumble calamity: big burst on enter, gritty puffs while active
+    if (ferret._stumbleEntered) {
+      ps.emit(screen.x + 10 * screen.scale, y, Math.PI, 120 * screen.scale, 28, dustColor, { spread: 2.2, forwardBoost: 0.05 });
+      ps.emit(screen.x - 18 * screen.scale, y, Math.PI, 100 * screen.scale, 22, dustColor, { spread: 2.0, forwardBoost: 0.05 });
+      ferret._stumbleEntered = false;
+    }
+    if (ferret.isStumbling) {
+      ps.emit(screen.x + 8 * screen.scale, y, Math.PI, 65 * screen.scale, 6, dustColor, { spread: 1.6, forwardBoost: 0.05 });
+      ps.emit(screen.x - 16 * screen.scale, y, Math.PI, 55 * screen.scale, 5, dustColor, { spread: 1.4, forwardBoost: 0.05 });
+    }
   }
 }
