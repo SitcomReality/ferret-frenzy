@@ -32,14 +32,14 @@ export class FerretTailRenderer {
       
       // 4. Define virtual control points for the tail spline (P1 is start/base)
       const P1 = tailBase;
-      // Mid-tail point, offset by sway and gravity
+      // Mid-tail point, offset by sway and gravity. Sway is amplified towards the tip.
       const P2 = {
-        x: P1.x + (dx / L) * extensionLength * 0.3 + sway, 
-        y: P1.y + (dy / L) * extensionLength * 0.3 + gravityOffset * 0.5
+        x: P1.x + (dx / L) * extensionLength * 0.5 + sway * 0.75,
+        y: P1.y + (dy / L) * extensionLength * 0.5 + gravityOffset * 0.5
       };
-      // Tip point, full extension, max gravity
+      // Tip point, full extension, max gravity and sway
       const P3 = { 
-        x: P1.x + (dx / L) * extensionLength + sway * 0.5, 
+        x: P1.x + (dx / L) * extensionLength + sway * 1.5,
         y: P1.y + (dy / L) * extensionLength + gravityOffset
       };
 
