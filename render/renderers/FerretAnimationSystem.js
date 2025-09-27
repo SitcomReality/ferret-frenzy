@@ -213,8 +213,17 @@ export class FerretAnimationSystem {
 
     // 1. Anchor tail base (P0) to the hip node of the body (node 0)
     const hipNode = body.nodes[0];
-    tail.anchors.base.x = hipNode.x;
-    tail.anchors.base.y = hipNode.y;
+    // Compute body tangent and its outward normal, then offset the tail base
+    const b0 = body.nodes[0], b1 = body.nodes[1];
+    let bx = b1.x - b0.x, by = b1.y - b0.y;
+    const bl = Math.sqrt(bx*bx + by*by) || 1;
+    const tx = bx / bl, ty = by / bl;
+    // outward normal (points "left" of the tangent); choose direction so tail projects backward-left
+    const nx = -ty, ny = tx;
+    // Offset amount: half the body's end-thickness so tail sits flush against body's edge
+    const bodyEdgeOffset = (body.params?.thicknessEnd || 10) * 0.5;
+    tail.anchors.base.x = hipNode.x + nx * bodyEdgeOffset;
+    tail.anchors.base.y = hipNode.y + ny * bodyEdgeOffset;
 
     // --- 2. Solve Verlet Chain for the tail ---
     VerletChain.integrate(tail.nodes, tail.prevNodes, dt, tail.params.damping);
