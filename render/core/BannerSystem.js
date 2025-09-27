@@ -72,7 +72,7 @@ export class BannerSystem {
       // Animate position and opacity
       banner.x += (banner.targetX - banner.x) * 0.18;
       const targetOpacity = banner.active ? 1 : 0;
-      banner.opacity += (targetOpacity - banner.opacity) * 0.15);
+      banner.opacity += (targetOpacity - banner.opacity) * 0.15;
 
       // Garbage collect banners that are fully faded out and off-screen
       if (!banner.active && banner.opacity < 0.02 && Math.abs(banner.x - banner.targetX) < 2) {
