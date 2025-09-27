@@ -86,20 +86,19 @@ export class BannerSystem {
       }
       
       if (banner.canvas) {
-        // Calculate banner position maintaining aspect ratio regardless of zoom
-        const laneY = (laneIndex * laneHeight + laneHeight/2 - (laneHeight * renderProps.numberOfLanes)/2) + h/2;
-        
-        // Fix: Use consistent banner height that doesn't scale with camera zoom
-        // This maintains the banner's visual size regardless of zoom level
-        const bannerHeight = Math.max(20, Math.min(60, laneHeight * 0.8));
-        
-        // Calculate width to maintain aspect ratio based on the pre-rendered canvas
-        const aspectRatio = banner.canvas.width / banner.canvas.height;
-        const bannerWidth = bannerHeight * aspectRatio;
-        
+        const laneY = (laneIndex * laneHeight + laneHeight/2 - (laneHeight * renderProps.numberOfLanes)/2) * camera.zoom + h/2;
+        const bannerHeight = laneHeight * camera.zoom;
+        const bannerY = laneY - bannerHeight/2;
+
         ctx.save();
         ctx.globalAlpha = Math.max(0, Math.min(1, banner.opacity));
-        ctx.drawImage(banner.canvas, banner.x, laneY - bannerHeight/2, bannerWidth, bannerHeight);
+        // Preserve the pre-rendered canvas aspect ratio when scaling to the lane height.
+        // banner.canvas is in device pixels (scaled by dpr), but the ctx is already scaled by dpr,
+        // so compute aspect using canvas pixel dimensions and scale width to match the target height.
+        const canvasAspect = banner.canvas.width / banner.canvas.height;
+        const drawHeight = bannerHeight;
+        const drawWidth = drawHeight * canvasAspect;
+        ctx.drawImage(banner.canvas, banner.x, bannerY, drawWidth, drawHeight);
         ctx.restore();
       }
     }
