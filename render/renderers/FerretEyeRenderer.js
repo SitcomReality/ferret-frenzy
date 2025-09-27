@@ -8,8 +8,10 @@ export class FerretEyeRenderer {
 
   render(ctx, ferret, colors) {
     if (ferret.bodyChain?.enabled && ferret.bodyChain.nodes.length > 0) {
-      const headNode = ferret.bodyChain.nodes[0];
-      const headX = headNode.x + 8;
+      // Head is the last node in the chain (node N-1). Use that for eye placement.
+      const headNode = ferret.bodyChain.nodes[ferret.bodyChain.nodes.length - 1];
+      // Slight forward offset so eyes sit on the front of the head
+      const headX = headNode.x + (ferret.head?.size || 1) * 4;
       const headY = headNode.y;
       this.renderEye(ctx, headX, headY, ferret, colors);
       return;
