@@ -1,1 +1,42 @@
-```\nimport { VerletChain } from \"verlet-chain\";\n\n/**\n * VerletBodySystem - Manages the physics simulation and anchoring for the ferret body chain.\n */\nexport class VerletBodySystem {\n  /**\n   * Updates the body chain state based on race conditions.\n   * @param {Object} ferret - The ferret animation data object.\n   * @param {Object} racer - The racer entity.\n   * @param {number} dt - Delta time in seconds.\n   */\n  static update(ferret, racer, dt) {\n    const chain = ferret.bodyChain;\n    if (!chain || !chain.nodes || !chain.enabled) return;\n\n    // --- 1. Update Gait and Anchors ---\n    const bounceHeight = ferret.gait.bounceHeight || 3;\n    const strideAmp = ferret.gait.strideAmplitude || 1;\n    const gaitPhase = ferret.gait.cyclePhase;\n\n    // Bounding gait: front and back anchors move vertically in opposition\n    chain.anchors.head.offsetY = -Math.sin(gaitPhase) * bounceHeight * strideAmp;\n    chain.anchors.hip.offsetY = Math.sin(gaitPhase) * bounceHeight * strideAmp;\n\n    // Set anchor X positions based on body length\n    const bodyPixelLength = (chain.nodes.length - 1) * (chain.restLengths[0] || 8);\n    // Note: Node 0 is hip/tail anchor, Node N-1 is head anchor\n    chain.anchors.head.x = bodyPixelLength / 2; \n    chain.anchors.hip.x = -bodyPixelLength / 2;\n\n    // Update Y positions with offset\n    chain.anchors.head.y = chain.anchors.head.offsetY;\n    chain.anchors.hip.y = chain.anchors.hip.offsetY;\n\n    // Stumbling makes the body go limp\n    if (ferret.isStumbling) {\n      chain.anchors.head.weight = 0.1;\n      chain.anchors.hip.weight = 0.1;\n    } else {\n      chain.anchors.head.weight = 0.8;\n      chain.anchors.hip.weight = 0.6;\n    }\n\n    // --- 2. Update Leg Animation State (for leg renderer consumption) ---\n    const contactDuty = ferret.gait.contact.dutyCycle || 0.6;\n    const isFrontContact = Math.sin(gaitPhase) < (contactDuty * 2 - 1);\n    ferret.gait.contact.frontInContact = isFrontContact;\n    ferret.gait.contact.backInContact = !isFrontContact;\n\n    // --- 3. Solve Verlet Chain ---\n    const { nodes, prevNodes, restLengths, params, anchors } = chain;\n    VerletChain.integrate(nodes, prevNodes, dt, params.damping);\n    // Apply anchors: front anchor (index 0) is hip, back anchor (index N-1) is head\n    VerletChain.updateAnchors(nodes, anchors.hip, anchors.head);\n    VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);\n    VerletChain.smoothCurvature(nodes, 0.1);\n  }\n}\n\n\n```\n\nrender/systems/VerletBodySystem.js\n```\n\n```
+import { VerletChain } from "verlet-chain";
+
+export class VerletBodySystem {
+  static update(ferret, racer, dt) {
+    const chain = ferret.bodyChain;
+    if (!chain || !chain.nodes || !chain.enabled) return;
+
+    const bounceHeight = ferret.gait.bounceHeight || 3;
+    const strideAmp = ferret.gait.strideAmplitude || 1;
+    const gaitPhase = ferret.gait.cyclePhase;
+
+    chain.anchors.head.offsetY = -Math.sin(gaitPhase) * bounceHeight * strideAmp;
+    chain.anchors.hip.offsetY = Math.sin(gaitPhase) * bounceHeight * strideAmp;
+
+    const bodyPixelLength = (chain.nodes.length - 1) * (chain.restLengths[0] || 8);
+    chain.anchors.head.x = bodyPixelLength / 2;
+    chain.anchors.hip.x = -bodyPixelLength / 2;
+
+    chain.anchors.head.y = chain.anchors.head.offsetY;
+    chain.anchors.hip.y = chain.anchors.hip.offsetY;
+
+    if (ferret.isStumbling) {
+      chain.anchors.head.weight = 0.1;
+      chain.anchors.hip.weight = 0.1;
+    } else {
+      chain.anchors.head.weight = 0.8;
+      chain.anchors.hip.weight = 0.6;
+    }
+
+    const contactDuty = ferret.gait.contact.dutyCycle || 0.6;
+    const isFrontContact = Math.sin(gaitPhase) < (contactDuty * 2 - 1);
+    ferret.gait.contact.frontInContact = isFrontContact;
+    ferret.gait.contact.backInContact = !isFrontContact;
+
+    const { nodes, prevNodes, restLengths, params, anchors } = chain;
+    VerletChain.integrate(nodes, prevNodes, dt, params.damping);
+    VerletChain.updateAnchors(nodes, anchors.hip, anchors.head);
+    VerletChain.satisfyConstraints(nodes, restLengths, params.iterations, params.stiffness);
+    VerletChain.smoothCurvature(nodes, 0.1);
+  }
+}
+
