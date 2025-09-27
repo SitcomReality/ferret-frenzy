@@ -38,15 +38,15 @@ export class RaceEventManager {
   detectFinishEvents(race, now) {
     if (!race.results || !race.finishedAt) return;
     
-    // Check if any new finishers since last check
+    // Check if any new finishers since last check using Date.now() for finishedAt epoch times
     const recentFinishes = race.results.filter(rid => {
       const finishTime = race.finishedAt[rid];
-      return finishTime && (now - finishTime) < 1000; // Within last second
+      return finishTime && (Date.now() - finishTime) < 1000;
     });
     
     if (recentFinishes.length > 0) {
-      // Update last finish time to current time for camera tracking
-      this.raceAnalysis.lastFinishTime = now;
+      // Update last finish time using performance timeline for selector logic
+      this.raceAnalysis.lastFinishTime = performance.now();
       
       recentFinishes.forEach(rid => {
         this.emitEvent('racerFinished', {

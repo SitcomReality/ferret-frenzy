@@ -66,6 +66,12 @@ export class ShotSelector {
     const timeSinceLastFinish = now - (raceAnalysis.lastFinishTime || 0);
     const isRecentFinishDrama = timeSinceLastFinish < 4000; // Extended to 4 seconds
 
+    // Force finish focus during recent finish drama, regardless of current leader position
+    if (isRecentFinishDrama) {
+      this.trySetShot('finish_focus', now, -1, false, true);
+      return;
+    }
+
     // 1. FINISH LINE SEQUENCE - ABSOLUTE TOP PRIORITY
     // Be much more aggressive about staying on finish shots
     if (leaderPos >= 88 || (isRecentFinishDrama && leaderPos >= 80)) {
