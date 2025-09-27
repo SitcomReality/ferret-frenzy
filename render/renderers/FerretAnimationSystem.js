@@ -208,18 +208,15 @@ export class FerretAnimationSystem {
   updateTailChain(ferret, racer, dt, velocity) {
     const tail = ferret.tailChain;
     const body = ferret.bodyChain;
-    if (!tail?.nodes || !body?.nodes || body.nodes.length === 0) return;
+    // Need at least body node 0 and 1 to define orientation. Tail needs at least 2 nodes (0 and 1).
+    if (!tail?.nodes || tail.nodes.length < 2 || !body?.nodes || body.nodes.length < 2) return; 
 
-    // 1. Anchor tail base to the hip node of the body (node 0)
+    // 1. Anchor tail base (P0) to the hip node of the body (node 0)
     const hipNode = body.nodes[0];
     tail.anchors.base.x = hipNode.x;
     tail.anchors.base.y = hipNode.y;
 
-    // Apply tail sway movement, primarily lateral, derived from gait
-    // Rely solely on the hip node's solved position (which includes gait bounce) 
-    // to prevent unwanted vertical sliding at the attachment point.
-
-    // 2. Solve Verlet Chain for the tail
+    // --- 2. Solve Verlet Chain for the tail ---
     VerletChain.integrate(tail.nodes, tail.prevNodes, dt, tail.params.damping);
     
     // Apply gravity
@@ -230,8 +227,57 @@ export class FerretAnimationSystem {
     const friction = 0.6; // Moderate drag
     VerletChain.applyGroundConstraint(tail.nodes, tail.prevNodes, GROUND_Y, friction, dt);
 
-    // Pin the base of the tail to its anchor
+    // 3. Pin the base of the tail (nodes[0]) to its anchor
+    // We update P0 here, so we use the result to calculate P1's position constraint target.
     VerletChain.updateAnchors(tail.nodes, tail.anchors.base, null); // Only front anchor
+
+    // 4. Apply Rigid Orientation Constraint to segment 0-1 (post-anchor pin)
+    
+    const tailP0 = tail.nodes[0];
+    const tailP1 = tail.nodes[1];
+
+    // Calculate body segment 0-1 vector (pointing towards head/forward)
+    const bodyP0 = body.nodes[0];
+    const bodyP1 = body.nodes[1];
+    
+    let Vx = bodyP1.x - bodyP0.x;
+    let Vy = bodyP1.y - bodyP0.y;
+    let L = Math.sqrt(Vx*Vx + Vy*Vy);
+    
+    if (L > 0.001) {
+      // Normalized tangent of body segment (forward direction)
+      const Tx = Vx / L;
+      const Ty = Vy / L;
+      
+      const tailRestLength = tail.restLengths[0];
+      
+      // Normalized vector perpendicular to body tangent (Down relative to body cross section)
+      // If T is (1, 0), N is (0, 1) (downwards, assuming canvas Y is down).
+      const Nx = -Ty; 
+      const Ny = Tx;
+      
+      // Target tail direction: mostly backward (-Tx, -Ty), slightly rotated downwards relative to body frame
+      // This ensures the tail base is perpendicular to the body spine, fixing the rotation issue.
+      const downwardBiasFactor = 0.5; // Controls initial droop relative to body plane
+      const targetTailDx = -Tx + Nx * downwardBiasFactor;
+      const targetTailDy = -Ty + Ny * downwardBiasFactor;
+      
+      const targetDirLength = Math.sqrt(targetTailDx*targetTailDx + targetTailDy*targetTailDy);
+      const DirTx = targetTailDx / targetDirLength;
+      const DirTy = targetTailDy / targetDirLength;
+      
+      const targetX1 = tailP0.x + DirTx * tailRestLength;
+      const targetY1 = tailP0.y + DirTy * tailRestLength;
+      
+      // Apply position constraint to tail.nodes[1] (strong correction towards desired orientation)
+      const orientationStiffness = 0.9; 
+      
+      // P_new = P_current + (P_target - P_current) * stiffness
+      tailP1.x += (targetX1 - tailP1.x) * orientationStiffness;
+      tailP1.y += (targetY1 - tailP1.y) * orientationStiffness;
+    }
+
+    // 5. Satisfy constraints (distance)
     VerletChain.satisfyConstraints(tail.nodes, tail.restLengths, tail.params.iterations, tail.params.stiffness);
     VerletChain.smoothCurvature(tail.nodes, 0.1);
   }
