@@ -133,7 +133,8 @@ export class RacerRenderer {
     // Rear feet slightly further back, front a bit closer to center
     tryEmit('BL', -12);
     tryEmit('BR', -10);
-    tryEmit('FL', -7);
-    tryEmit('FR', -5);
+    // Front feet should emit forward of the body so move offsets to positive values
+    tryEmit('FL', 7);
+    tryEmit('FR', 5);
   }
 }
