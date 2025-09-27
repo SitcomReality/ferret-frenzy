@@ -72,7 +72,7 @@ export class BannerSystem {
       // Animate position and opacity
       banner.x += (banner.targetX - banner.x) * 0.18;
       const targetOpacity = banner.active ? 1 : 0;
-      banner.opacity += (targetOpacity - banner.opacity) * 0.15;
+      banner.opacity += (targetOpacity - banner.opacity) * 0.15);
 
       // Garbage collect banners that are fully faded out and off-screen
       if (!banner.active && banner.opacity < 0.02 && Math.abs(banner.x - banner.targetX) < 2) {
@@ -86,13 +86,20 @@ export class BannerSystem {
       }
       
       if (banner.canvas) {
-        const laneY = (laneIndex * laneHeight + laneHeight/2 - (laneHeight * renderProps.numberOfLanes)/2) * camera.zoom + h/2;
-        const bannerHeight = laneHeight * camera.zoom;
-        const bannerY = laneY - bannerHeight/2;
-
+        // Calculate banner position maintaining aspect ratio regardless of zoom
+        const laneY = (laneIndex * laneHeight + laneHeight/2 - (laneHeight * renderProps.numberOfLanes)/2) + h/2;
+        
+        // Fix: Use consistent banner height that doesn't scale with camera zoom
+        // This maintains the banner's visual size regardless of zoom level
+        const bannerHeight = Math.max(20, Math.min(60, laneHeight * 0.8));
+        
+        // Calculate width to maintain aspect ratio based on the pre-rendered canvas
+        const aspectRatio = banner.canvas.width / banner.canvas.height;
+        const bannerWidth = bannerHeight * aspectRatio;
+        
         ctx.save();
         ctx.globalAlpha = Math.max(0, Math.min(1, banner.opacity));
-        ctx.drawImage(banner.canvas, banner.x, bannerY, banner.canvas.width / dpr, bannerHeight);
+        ctx.drawImage(banner.canvas, banner.x, laneY - bannerHeight/2, bannerWidth, bannerHeight);
         ctx.restore();
       }
     }
