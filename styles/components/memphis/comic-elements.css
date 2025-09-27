@@ -1,0 +1,206 @@
+/* Memphis-styled comic and UI elements */
+.comic-burst-memphis {
+    position: relative;
+    display: inline-block;
+    background: var(--accent-3);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    font-family: 'Space Mono', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 3px solid var(--border-color);
+    clip-path: polygon(
+        0% 15%, 15% 0%, 85% 0%, 100% 15%,
+        100% 85%, 85% 100%, 15% 100%, 0% 85%
+    );
+    box-shadow: 4px 4px 0 var(--border-color);
+    animation: comic-wobble 3s ease-in-out infinite;
+}
+
+.comic-burst-memphis.winner {
+    background: var(--accent-color);
+    color: white;
+    animation: winner-burst 1s ease-out infinite;
+}
+
+.comic-burst-memphis.explosion {
+    background: var(--accent-2);
+    color: white;
+    clip-path: polygon(
+        50% 0%, 60% 35%, 98% 35%, 68% 57%,
+        79% 91%, 50% 70%, 21% 91%, 32% 57%,
+        2% 35%, 40% 35%
+    );
+}
+
+@keyframes comic-wobble {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(1deg) scale(1.02); }
+    75% { transform: rotate(-1deg) scale(0.98); }
+}
+
+@keyframes winner-burst {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.speech-bubble-memphis {
+    position: relative;
+    background: var(--bg-primary);
+    border: 3px solid var(--border-color);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin: 12px;
+    box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.speech-bubble-memphis::before {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid var(--bg-primary);
+    filter: drop-shadow(3px 3px 0 var(--border-color));
+}
+
+.action-lines-memphis {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.action-lines-memphis::before,
+.action-lines-memphis::after {
+    content: '';
+    position: absolute;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        var(--accent-color) 2px,
+        var(--accent-color) 4px
+    );
+    opacity: 0.3;
+}
+
+.action-lines-memphis::before {
+    top: -50%;
+    left: -10%;
+    width: 20%;
+    height: 200%;
+    animation: speed-lines 2s linear infinite;
+}
+
+.action-lines-memphis::after {
+    top: -50%;
+    right: -10%;
+    width: 20%;
+    height: 200%;
+    animation: speed-lines 2s linear infinite reverse;
+}
+
+@keyframes speed-lines {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+.comic-panel-memphis {
+    background: var(--bg-primary);
+    border: 4px solid var(--border-color);
+    border-radius: 8px;
+    margin: 16px;
+    padding: 20px;
+    position: relative;
+    box-shadow: 6px 6px 0 var(--border-color);
+}
+
+.comic-panel-memphis::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border: 2px dashed var(--accent-2);
+    border-radius: 4px;
+    opacity: 0.5;
+}
+
+.notification-badge-memphis {
+    background: var(--accent-color);
+    color: white;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    box-shadow: 2px 2px 0 var(--border-color);
+    animation: badge-bounce 2s ease-in-out infinite;
+}
+
+@keyframes badge-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.progress-bar-memphis {
+    background: var(--bg-secondary);
+    border: 3px solid var(--border-color);
+    border-radius: 20px;
+    height: 24px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill-memphis {
+    background: linear-gradient(
+        90deg,
+        var(--accent-color) 0%,
+        var(--accent-2) 50%,
+        var(--accent-3) 100%
+    );
+    height: 100%;
+    border-radius: 17px;
+    transition: width 0.5s ease-out;
+    position: relative;
+}
+
+.progress-fill-memphis::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 8px,
+        rgba(255,255,255,0.2) 8px,
+        rgba(255,255,255,0.2) 16px
+    );
+    animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+    0% { transform: translateX(-16px); }
+    100% { transform: translateX(0); }
+}
+
