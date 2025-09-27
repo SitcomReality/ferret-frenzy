@@ -1,6 +1,7 @@
 import { FerretAnimationSystem } from "./FerretAnimationSystem.js";
 import { FerretBodyRenderer } from "./FerretBodyRenderer.js";
 import { FerretEyeRenderer } from "./FerretEyeRenderer.js";
+import { FerretColorUtils } from './FerretColorUtils.js';
 
 /**
  * FerretRenderer - Renders individual ferret racers
@@ -31,20 +32,13 @@ export class FerretRenderer {
     ];
     
     // Map the racer's color indices to actual hex colors
-    const colors = (racer.colors || [0, 1, 2]).map(index => {
-      // Handle both number indices and string indices
-      let colorIndex;
-      if (typeof index === 'number') {
-        colorIndex = index;
-      } else if (typeof index === 'string' && !isNaN(parseInt(index))) {
-        colorIndex = parseInt(index);
-      } else {
-        // Fallback for invalid indices
-        colorIndex = 0;
-      }
-      return palette[colorIndex] || palette[0];
-    });
-
+    // Ensure we produce exactly three resolved color strings for body/stripe/accents
+    const colors = [
+      FerretColorUtils.getColor(racer, 0),
+      FerretColorUtils.getColor(racer, 1),
+      FerretColorUtils.getColor(racer, 2)
+    ];
+    
     // Render ferret components
     // Use the bodyRenderer's main render method which coordinates all components
     this.bodyRenderer.render(ctx, ferret, colors, time, racer);
