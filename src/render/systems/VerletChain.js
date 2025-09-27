@@ -64,6 +64,57 @@ export class VerletChain {
   }
 
   /** 
+   * Apply a simple gravity force
+   * @param {Array} nodes - Node positions
+   * @param {number} strength - Gravity strength
+   */
+  static applyGravity(nodes, strength = 9.8) {
+    for (let i = 0; i < nodes.length; i++) {
+        // A small constant gravity pull downwards
+        nodes[i].y += strength * 0.05;
+    }
+  }
+
+  /**
+   * Apply constraint to keep nodes above a ground plane and apply drag/friction.
+   * @param {Array} nodes - Node positions
+   * @param {Array} prevNodes - Previous positions (for velocity calculation/friction)
+   * @param {number} groundY - The Y coordinate of the ground plane
+   * @param {number} friction - Friction coefficient (0=none, 1=max drag)
+   * @param {number} dt - Delta time
+   */
+  static applyGroundConstraint(nodes, prevNodes, groundY, friction = 0.5, dt) {
+      if (nodes.length === 0) return;
+      
+      const frictionRate = friction * dt * 60; // Convert friction coefficient to per-frame rate
+
+      for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+          const prev = prevNodes[i];
+
+          // 1. Ground Collision/Constraint (Repulsion)
+          if (node.y >= groundY) {
+              
+              // Push the node back to the surface
+              node.y = groundY;
+              
+              // Update previous position to simulate an inelastic collision/stop vertical velocity
+              const velY = node.y - prev.y; 
+              // Reduce vertical velocity significantly (0.2 retains a slight upward spring/bounce reduction)
+              prev.y = node.y - velY * 0.2; 
+
+              // 2. Horizontal Friction/Drag
+              const velX = node.x - prev.x;
+              
+              // Apply drag: reduces horizontal speed when touching the ground.
+              const dragMultiplier = 1.0 - frictionRate;
+              
+              prev.x = node.x - velX * dragMultiplier;
+          }
+      }
+  }
+
+  /** 
    * Satisfy distance constraints between connected nodes 
    * @param {Array} nodes - Node positions to modify 
    * @param {Array} restLengths - Rest distances between adjacent nodes 

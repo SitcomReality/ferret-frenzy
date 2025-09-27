@@ -1,4 +1,4 @@
-import { VerletChain } from "../systems/VerletChain.js";
+import { VerletChain } from "verlet-chain";
 
 /**
  * FerretAnimationSystem - Handles ferret animation and movement
@@ -215,10 +215,22 @@ export class FerretAnimationSystem {
     tail.anchors.base.x = hipNode.x;
     tail.anchors.base.y = hipNode.y;
 
+    // Apply tail sway movement, primarily lateral, derived from gait
+    const sway = Math.sin(ferret.gait.cyclePhase * 0.8 + racer.id) * 3 * ferret.gait.stride;
+    tail.anchors.base.x += 0; // No major X movement here, anchor is rigid to body
+    tail.anchors.base.y += sway; 
+
     // 2. Solve Verlet Chain for the tail
     VerletChain.integrate(tail.nodes, tail.prevNodes, dt, tail.params.damping);
+    
     // Apply gravity
     VerletChain.applyGravity(tail.nodes, 9.8);
+    
+    // Apply ground constraint (Y=15 is floor level for ferret body/feet based on LegRenderer)
+    const GROUND_Y = 15;
+    const friction = 0.6; // Moderate drag
+    VerletChain.applyGroundConstraint(tail.nodes, tail.prevNodes, GROUND_Y, friction, dt);
+
     // Pin the base of the tail to its anchor
     VerletChain.updateAnchors(tail.nodes, tail.anchors.base, null); // Only front anchor
     VerletChain.satisfyConstraints(tail.nodes, tail.restLengths, tail.params.iterations, tail.params.stiffness);
