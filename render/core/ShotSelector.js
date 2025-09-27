@@ -36,8 +36,10 @@ export class ShotSelector {
 
     const activeRacers = race.racers.filter(rid => {
       const t = race.finishedAt?.[rid];
-      return !t || (Date.now() - t) < 2500; // Extended grace period
-    }).filter(rid => !(race.results || []).includes(rid));
+      // A racer is "active" if they haven't finished OR they finished less than 2.5 seconds ago.
+      // This prevents the camera from flicking away immediately after a finish.
+      return !t || (Date.now() - t) < 2500;
+    });
     
     // If no active racers remain, force finish focus on the last position.
     if (activeRacers.length === 0) {
