@@ -10,6 +10,11 @@ import { GameScreen } from '../../ui/screens/GameScreen.js';
 import { LoadingManager } from './LoadingManager.js';
 import { XmlWordlistLoader } from '../data/XmlWordlistLoader.js';
 import { EventListeners } from './EventListeners.js';
+import { WeekPreviewScreen } from '../../ui/screens/WeekPreviewScreen.js';
+import { PreRaceScreen } from '../../ui/screens/PreRaceScreen.js';
+import { RaceResultsScreen } from '../../ui/screens/RaceResultsScreen.js';
+import { WeekSummaryScreen } from '../../ui/screens/WeekSummaryScreen.js';
+import { PhaseManager } from './PhaseManager.js';
 
 /**
  * Application - Main application coordinator
@@ -135,7 +140,17 @@ export class Application {
 
     // Register screens and initialize UI
     this.uiManager.registerScreen('intro', new IntroScreen());
-    this.uiManager.registerScreen('game', new GameScreen(this.gameStateManager));
+    this.uiManager.registerScreen('week_preview', new WeekPreviewScreen());
+    this.uiManager.registerScreen('pre_race', new PreRaceScreen());
+    this.uiManager.registerScreen('race', new GameScreen(this.gameStateManager));
+    this.uiManager.registerScreen('results', new RaceResultsScreen());
+    this.uiManager.registerScreen('week_summary', new WeekSummaryScreen());
+    this.uiManager.setPhaseMapping({
+      intro:'intro', week_preview:'week_preview', pre_race:'pre_race',
+      race:'race', results:'results', week_summary:'week_summary'
+    });
+    this.phaseManager = new PhaseManager(this.eventBus, this.gameStateManager);
+    this.eventBus.on('phase:changed', ({ phase }) => this.uiManager.showPhase(phase, { gameState: this.gameStateManager }));
     this.uiManager.initialize();
     this.uiManager.showScreen('intro', { gameState: this.gameStateManager });
 

@@ -9,6 +9,7 @@ export class UIManager {
     this.activeScreen = null;
     this.isInitialized = false;
     this.root = document.getElementById('app') || null;
+    this.phaseToScreen = {};
   }
 
   /** 
@@ -131,5 +132,11 @@ export class UIManager {
     this.screens.clear();
     this.activeScreen = null;
     this.isInitialized = false;
+  }
+
+  setPhaseMapping(map) { this.phaseToScreen = map; }
+  showPhase(phase, data = {}) {
+    const screenName = this.phaseToScreen?.[phase];
+    if (screenName) this.showScreen(screenName, data);
   }
 }
