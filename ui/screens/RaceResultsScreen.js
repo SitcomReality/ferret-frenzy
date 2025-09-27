@@ -1,5 +1,4 @@
 ui/screens/RaceResultsScreen.js
-import { SettingsPanel } from '../components/settingsPanel.js';
 import { RacerCardComponent } from '../components/RacerCardComponent.js';
 
 /**
@@ -8,8 +7,6 @@ import { RacerCardComponent } from '../components/RacerCardComponent.js';
 export class RaceResultsScreen {
   constructor() {
     this.eventBus = null;
-    this.settingsPanel = null;
-    this.loadingIndicator = null;
   }
 
   initialize(eventBus) {
@@ -20,7 +17,16 @@ export class RaceResultsScreen {
   create() {
     this.el = document.createElement('div');
     this.el.id = 'raceResultsScreen';
-    this.el.innerHTML = `<div class="ui gui-container"><h3>Race Results</h3><ol id="resultsList"></ol><div class="d-flex" style="gap:8px"><button id="rrNext" class="btn btn-primary">Next Race</button><button id="rrWeek" class="btn btn-outline">Week Summary</button></div></div>`;
+    this.el.innerHTML = `
+      <div class="ui gui-container">
+        <h3>Race Results</h3>
+        <ol id="resultsList"></ol>
+        <div class="d-flex" style="gap:8px">
+          <button id="rrNext" class="btn btn-primary">Next Race</button>
+          <button id="rrWeek" class="btn btn-outline">Week Summary</button>
+        </div>
+      </div>
+    `;
     this.el.querySelector('#rrNext').addEventListener('click', () => this.eventBus.emit('race:setup'));
     this.el.querySelector('#rrWeek').addEventListener('click', () => this.eventBus.emit('race:weekEnded', {}));
   }
@@ -28,9 +34,27 @@ export class RaceResultsScreen {
   show({ container, gameState }) {
     (container||document.getElementById('app')).appendChild(this.el);
     const cl = this.el.querySelector('#resultsList'); cl.innerHTML = '';
-    const res = gameState?.raceHistory?.[gameState.raceHistory.length-1]?.results || gameState?.currentRace?.results || [];
-    res.forEach((rid, i) => { const r = document.createElement('li'); const racer = gameState.racers.find(x=>x.id===rid); r.textContent = `${i+1}. ${this.getName(racer)}`; cl.appendChild(r); });
+    
+    // Get the most recent race results from history
+    const lastRace = gameState?.raceHistory?.[gameState.raceHistory.length-1];
+    const res = lastRace?.results || [];
+    
+    const maxRacesInWeek = gameState.raceWeek?.races?.length || 0;
+    const currentRaceIndex = gameState?.currentRaceIndex || 0;
+
+    res.forEach((rid, i) => { 
+        const racer = gameState.racers.find(x => x.id === rid);
+        const racerCard = new RacerCardComponent(racer, { index: i, showPlacing: true, compact: false });
+        cl.appendChild(racerCard.createElement());
+    });
+    
+    // Update button visibility based on if this was the last race of the week
+    const isLastRace = currentRaceIndex >= maxRacesInWeek;
+    this.el.querySelector('#rrNext').style.display = isLastRace ? 'none' : 'block';
+    this.el.querySelector('#rrWeek').style.display = isLastRace ? 'block' : 'none';
   }
-  hide() { this.el?.parentNode?.removeChild(this.el); }
-  getName(r){ if(!r?.name)return'Unknown'; const p=window.racerNamePrefixes?.[r.name[0]],s = window.racerNameSuffixes?.[r.name[1]]; return `${typeof p==='function'?(r._evaluatedPrefix||(r._evaluatedPrefix=p())) :p} ${typeof s==='function'?(r._evaluatedSuffix||(r._evaluatedSuffix=s())) :s}`; }
+
+  hide() { 
+    this.el?.parentNode?.removeChild(this.el); 
+  }
 }
