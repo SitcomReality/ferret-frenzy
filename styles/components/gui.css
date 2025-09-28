@@ -62,9 +62,14 @@
 .racers-list {
     margin-top: 8px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 8px;
     padding: 0;
+}
+
+/* Specific styling for the PreRaceScreen racer list to give cards more space */
+.pre-race-racers-list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
 .racers-list .racer-card {

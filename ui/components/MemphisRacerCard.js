@@ -41,9 +41,21 @@ export class MemphisRacerCard extends BaseComponent {
     // Get betting odds from the betting component
     const odds = this.racer.getComponent('betting')?.baseBettingOdds?.toFixed(2) || 'N/A';
 
+    // Get racer colors
+    const color1 = this.getRacerColor(this.racer.colors[0]);
+    const color2 = this.getRacerColor(this.racer.colors[1]);
+    const color3 = this.getRacerColor(this.racer.colors[2]);
+
     this.element.innerHTML = `
       ${this.position ? `<div class="racer-position-memphis">${this.position}</div>` : ''}
-      <div class="racer-name-memphis">${name}</div>
+      <div class="racer-header-memphis">
+        <div class="racer-colors-memphis">
+          <div class="color-swatch-memphis" style="background-color: ${color1};"></div>
+          <div class="color-swatch-memphis" style="background-color: ${color2};"></div>
+          <div class="color-swatch-memphis" style="background-color: ${color3};"></div>
+        </div>
+        <div class="racer-name-memphis">${name}</div>
+      </div>
       <div class="racer-stats-memphis">
         <div class="stat-item-memphis">
           <div class="stat-label-memphis">Speed</div>

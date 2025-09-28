@@ -5,7 +5,7 @@ export class PreRaceScreen {
   create() {
     this.el = document.createElement('div');
     this.el.id = 'preRaceScreen';
-    this.el.innerHTML = `<div class="ui gui-container"><h3>Pre-Race</h3><div id="preRaceInfo"></div><h5>Participants:</h5><div class="racers-list" id="prsRacers"></div><button id="prsStart" class="btn btn-primary">Start Race</button></div>`;
+    this.el.innerHTML = `<div class="ui gui-container"><h3>Pre-Race</h3><div id="preRaceInfo"></div><h5>Participants:</h5><div class="racers-list pre-race-racers-list" id="prsRacers"></div><button id="prsStart" class="btn btn-primary">Start Race</button></div>`;
     this.el.querySelector('#prsStart').addEventListener('click', () => this.eventBus.emit('race:start'));
   }
   show({ container, gameState }) {
