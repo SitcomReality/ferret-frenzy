@@ -39,12 +39,25 @@ export class WeekPreviewScreen {
       racesGrid.appendChild(panel);
     });
     const rosterEl = this.el.querySelector('#wpRoster'); rosterEl.innerHTML = '';
-    const rosterFromWeek = gameState?.raceWeek?.selectedRacers;
-    const roster = Array.isArray(rosterFromWeek) && rosterFromWeek.length
-      ? rosterFromWeek
-      : Array.from(new Set((races.flatMap(r=>r.racers)||[]).map(r=>r.id)))
-          .map(id => (gameState?.racers||[]).find(rr=>rr.id===id))
+    const rosterFromWeekIds = gameState?.raceWeek?.selectedRacers;
+    
+    let roster;
+    // Ensure roster always contains Racer objects, not just IDs
+    if (Array.isArray(rosterFromWeekIds) && rosterFromWeekIds.length) {
+      const allRacers = gameState?.racers || [];
+      roster = rosterFromWeekIds
+          .map(id => allRacers.find(rr => rr.id === id))
           .filter(Boolean);
+    } else {
+      // Fallback: collect unique IDs from all races and map them to objects
+      const rawRacerList = races.flatMap(r=>r.racers)||[];
+      const allRacers = gameState?.racers || [];
+      
+      roster = Array.from(new Set(rawRacerList.map(r => r?.id ?? r)))
+          .map(id => allRacers.find(rr=>rr.id===id))
+          .filter(Boolean);
+    }
+    
     import('../components/MemphisRacerCard.js').then(({ MemphisRacerCard }) => {
       roster.forEach(racer => {
         const card = new MemphisRacerCard(racer, { compact: true });

@@ -47,7 +47,7 @@ export class MemphisRacerCard extends BaseComponent {
     const speed = stats?.speedBase || stats?.speed || 10;
     const endurance = stats?.endurance || 2000;
     const boost = stats?.boostPower || 800;
-    const form = this.racer.formThisWeek || 1.0;
+    const form = this.racer?.formThisWeek || 1.0;
     
     // Get betting odds from the betting component
     let odds = 'N/A';
@@ -58,8 +58,9 @@ export class MemphisRacerCard extends BaseComponent {
       odds = String(Number(this.racer.baseBettingOdds).toFixed(2));
     }
 
-    // Get racer colors
-    const cols = Array.isArray(this.racer?.colors) && this.racer.colors.length ? this.racer.colors : [0,1,2];
+    // Get racer colors - ensure array exists and has at least 3 elements, otherwise use defaults
+    const racerColors = this.racer?.colors;
+    const cols = (Array.isArray(racerColors) && racerColors.length >= 3) ? racerColors : [0, 1, 2];
     const color1 = this.getRacerColor(cols[0]);
     const color2 = this.getRacerColor(cols[1]);
     const color3 = this.getRacerColor(cols[2]);
