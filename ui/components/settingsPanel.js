@@ -43,7 +43,6 @@ export class SettingsPanel extends BaseComponent {
 
         generateCategoryHTML(gameState.settings);
         html += '</div>';
-        document.getElementById('initButtonContainer').style = "display: block";
         return html;
     }
 
