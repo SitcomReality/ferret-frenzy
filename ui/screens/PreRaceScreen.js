@@ -1,3 +1,5 @@
+import { MemphisRacerCard } from '../components/MemphisRacerCard.js';
+
 export class PreRaceScreen {
   initialize(eventBus) { this.eventBus = eventBus; this.create(); }
   create() {
