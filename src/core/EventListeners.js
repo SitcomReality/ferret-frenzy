@@ -51,6 +51,8 @@ export class EventListeners {
     this.app.eventBus.on('game:initialize', () => {
       import('../../init.js').then(({ initGame }) => {
         initGame(this.app.gameStateManager);
+        // After initialization, immediately start the first race week to show Week Preview
+        this.app.eventBus.emit('race:startWeek');
         // Don't show race screen on init anymore. PhaseManager handles it.
         // this.app.uiManager.showScreen('race', { gameState: this.app.gameStateManager });
       }).catch(err => console.error('Failed to load init.js', err));
