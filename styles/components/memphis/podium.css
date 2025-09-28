@@ -173,3 +173,193 @@
     50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
 }
 
+.race-results-container-memphis {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg-primary);
+    min-height: 100vh;
+}
+
+.race-results-header-memphis {
+    text-align: center;
+    margin-bottom: 32px;
+    position: relative;
+}
+
+.race-results-title-memphis {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 4px 4px 0 var(--accent-3);
+    margin: 0;
+}
+
+.race-results-burst-memphis {
+    position: absolute;
+    top: -20px;
+    right: 20px;
+}
+
+.betting-payouts-memphis {
+    background: var(--bg-secondary);
+    border: 4px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: 8px 8px 0 var(--border-color);
+}
+
+.payout-title-memphis {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    margin: 0 0 16px 0;
+    text-align: center;
+}
+
+.payout-summary-memphis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.payout-item-memphis {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.payout-item-memphis.profit {
+    border-width: 3px;
+    font-weight: bold;
+}
+
+.payout-label-memphis {
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+.payout-amount-memphis {
+    font-family: 'Space Mono', monospace;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.payout-amount-memphis.positive {
+    color: var(--accent-color);
+}
+
+.payout-amount-memphis.negative {
+    color: #e74c3c;
+}
+
+.full-results-memphis {
+    margin: 32px 0;
+}
+
+.results-subtitle-memphis {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.results-position-memphis.position-1 {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    animation: winner-glow 2s ease-in-out infinite alternate;
+}
+
+.results-position-memphis.position-2 {
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+}
+
+.results-position-memphis.position-3 {
+    background: linear-gradient(135deg, #cd7f32, #daa520);
+}
+
+@keyframes winner-glow {
+    0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+}
+
+.race-results-actions-memphis {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.race-results-actions-memphis .btn-memphis {
+    min-width: 200px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Comic burst styles */
+.comic-burst-memphis {
+    position: relative;
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: white;
+    font-family: 'Space Mono', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 50%;
+    border: 3px solid var(--border-color);
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    animation: burst-animation 1s ease-out;
+}
+
+.comic-burst-memphis.winner {
+    background: linear-gradient(45deg, var(--accent-color), var(--accent-3));
+    font-size: 16px;
+    animation: winner-burst 2s ease-out;
+}
+
+@keyframes burst-animation {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
+@keyframes winner-burst {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    30% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 1;
+    }
+    60% {
+        transform: scale(0.9) rotate(270deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}

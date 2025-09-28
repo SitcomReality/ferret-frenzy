@@ -50,12 +50,33 @@ export class RaceResultsScreen {
     const results = gameState?.raceHistory?.[gameState.raceHistory.length - 1]?.results ||
                     gameState?.currentRace?.results || [];
     
+    // Check if this is the last race of the week
+    const currentWeek = gameState?.currentWeek || gameState?.raceWeek;
+    const isLastRace = currentWeek && currentWeek.currentRaceIndex >= (currentWeek.races?.length - 1);
+    
+    // Update navigation buttons based on whether there are more races
+    const nextButton = this.el.querySelector('#rrNext');
+    const weekButton = this.el.querySelector('#rrWeek');
+    
+    if (isLastRace) {
+      nextButton.style.display = 'none';
+      weekButton.style.display = 'block';
+      weekButton.textContent = 'WEEK SUMMARY';
+    } else {
+      nextButton.style.display = 'block';
+      weekButton.style.display = 'none';
+      nextButton.textContent = 'NEXT RACE';
+    }
+    
+    // Show betting payouts if player has settled bets
+    this.showBettingPayouts(gameState);
+    
     // Create podium display
     this.podiumDisplay = new PodiumDisplay(this.el.querySelector('#podiumContainer'), {
-      showTop3Only: true
+      showTop3Only: false
     });
     this.podiumDisplay.initialize();
-    
+
     // Format results for podium
     const podiumResults = results.map((racerId, index) => {
       const racer = gameState.racers.find(r => r.id === racerId);
@@ -69,19 +90,28 @@ export class RaceResultsScreen {
     
     this.podiumDisplay.setResults(podiumResults);
     
-    // Add celebration burst
-    const burst = new ComicBurst({
-      text: 'FINISH!',
-      type: 'winner',
-      duration: 2000
-    });
-    
-    const burstContainer = this.el.querySelector('.race-results-burst-memphis');
-    if (burstContainer) {
-      burstContainer.appendChild(burst.createElement ? burst.createElement() : document.createElement('div'));
+    // Add celebration burst for winner
+    if (podiumResults.length > 0) {
+      const burst = new ComicBurst({
+        text: 'WINNER!',
+        type: 'winner',
+        duration: 3000
+      });
+      
+      const burstContainer = this.el.querySelector('.race-results-burst-memphis');
+      if (burstContainer) {
+        const burstElement = document.createElement('div');
+        burstElement.innerHTML = burst.renderToString();
+        burstContainer.appendChild(burstElement);
+      }
     }
     
-    // Populate full results list
+    // Animate podium appearance
+    setTimeout(() => {
+      this.podiumDisplay.animateIn();
+    }, 500);
+    
+    // Populate full results list with placement badges
     const resultsList = this.el.querySelector('#resultsList');
     resultsList.innerHTML = '';
     
@@ -91,8 +121,8 @@ export class RaceResultsScreen {
       listItem.className = 'results-item-memphis';
       
       const position = document.createElement('div');
-      position.className = 'results-position-memphis';
-      position.textContent = index + 1;
+      position.className = `results-position-memphis position-${index + 1}`;
+      position.textContent = this.getPositionBadge(index + 1);
       
       const name = document.createElement('div');
       name.className = 'results-name-memphis';
@@ -108,6 +138,51 @@ export class RaceResultsScreen {
       
       resultsList.appendChild(listItem);
     });
+  }
+
+  showBettingPayouts(gameState) {
+    // Get the most recent betting settlement data
+    const lastRace = gameState?.raceHistory?.[gameState.raceHistory.length - 1];
+    const settledBets = lastRace?.settledBets || [];
+    
+    if (settledBets.length === 0) return;
+    
+    const totalWinnings = settledBets.reduce((sum, bet) => sum + (bet.payout || 0), 0);
+    const totalWagered = settledBets.reduce((sum, bet) => sum + bet.amount, 0);
+    
+    // Create betting payout section
+    const payoutSection = document.createElement('div');
+    payoutSection.className = 'betting-payouts-memphis';
+    payoutSection.innerHTML = `
+      <h3 class="payout-title-memphis">BETTING RESULTS</h3>
+      <div class="payout-summary-memphis">
+        <div class="payout-item-memphis">
+          <span class="payout-label-memphis">Wagered:</span>
+          <span class="payout-amount-memphis">$${totalWagered}</span>
+        </div>
+        <div class="payout-item-memphis">
+          <span class="payout-label-memphis">Winnings:</span>
+          <span class="payout-amount-memphis ${totalWinnings > 0 ? 'positive' : 'negative'}">$${totalWinnings}</span>
+        </div>
+        <div class="payout-item-memphis profit">
+          <span class="payout-label-memphis">Profit:</span>
+          <span class="payout-amount-memphis ${totalWinnings - totalWagered > 0 ? 'positive' : 'negative'}">$${totalWinnings - totalWagered}</span>
+        </div>
+      </div>
+    `;
+    
+    // Insert after podium container
+    const podiumContainer = this.el.querySelector('#podiumContainer');
+    podiumContainer.parentNode.insertBefore(payoutSection, podiumContainer.nextSibling);
+  }
+
+  getPositionBadge(position) {
+    const badges = {
+      1: '🥇',
+      2: '🥈', 
+      3: '🥉'
+    };
+    return badges[position] || position;
   }
 
   hide() {

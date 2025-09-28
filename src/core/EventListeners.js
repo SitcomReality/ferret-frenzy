@@ -49,8 +49,11 @@ export class EventListeners {
 
     // Race finish
     this.app.eventBus.on('race:finish', (raceData) => {
-      this.app.bettingManager.settleBets(raceData.results);
+      const settledBets = this.app.bettingManager.settleBets(raceData.results);
       this.app.checkAchievements('race:finish', raceData);
+      
+      // Store settled bets with race data for results screen
+      raceData.settledBets = settledBets;
       this.app.gameState.raceHistory.push(raceData);
     }); 
 
