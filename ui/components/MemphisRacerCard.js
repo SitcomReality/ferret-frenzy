@@ -32,20 +32,37 @@ export class MemphisRacerCard extends BaseComponent {
 
     const name = this.getRacerNameString(this.racer);
     
-    // Fetch stats from the racer's stats component
-    const stats = this.racer.getComponent('stats')?.stats;
+    // Fetch stats from the racer's stats component (defensive: some racer objects may not expose getComponent)
+    let stats = null;
+    if (this.racer && typeof this.racer.getComponent === 'function') {
+      stats = this.racer.getComponent('stats')?.stats;
+    } else if (this.racer && this.racer.stats) {
+      stats = this.racer.stats;
+    } else if (this.racer && this.racer.components && this.racer.components.get) {
+      const s = this.racer.components.get('stats');
+      stats = s?.stats || null;
+    } else {
+      stats = null;
+    }
     const speed = stats?.speedBase || stats?.speed || 10;
     const endurance = stats?.endurance || 2000;
     const boost = stats?.boostPower || 800;
     const form = this.racer.formThisWeek || 1.0;
     
     // Get betting odds from the betting component
-    const odds = this.racer.getComponent('betting')?.baseBettingOdds?.toFixed(2) || 'N/A';
+    let odds = 'N/A';
+    if (this.racer && typeof this.racer.getComponent === 'function') {
+      const b = this.racer.getComponent('betting');
+      if (b && typeof b.baseBettingOdds !== 'undefined') odds = String(Number(b.baseBettingOdds).toFixed(2));
+    } else if (this.racer && this.racer.baseBettingOdds) {
+      odds = String(Number(this.racer.baseBettingOdds).toFixed(2));
+    }
 
     // Get racer colors
-    const color1 = this.getRacerColor(this.racer.colors[0]);
-    const color2 = this.getRacerColor(this.racer.colors[1]);
-    const color3 = this.getRacerColor(this.racer.colors[2]);
+    const cols = Array.isArray(this.racer?.colors) ? this.racer.colors : [0,1,2];
+    const color1 = this.getRacerColor(cols[0]);
+    const color2 = this.getRacerColor(cols[1]);
+    const color3 = this.getRacerColor(cols[2]);
 
     this.element.innerHTML = `
       ${this.position ? `<div class="racer-position-memphis">${this.position}</div>` : ''}
