@@ -31,6 +31,12 @@ export class EventListeners {
       this.app.raceManager.endRaceNow();
     });
 
+    this.app.eventBus.on('race:initiateStart', () => {
+      const duration = 3000, now = Date.now();
+      this.app.eventBus.emit('race:preCountdownStart', { countdown: { active: true, startTime: now, endTime: now + duration, duration } });
+      setTimeout(() => this.app.eventBus.emit('race:start'), duration);
+    });
+
     // Betting events
     this.app.eventBus.on('bet:placed', (betData) => {
       this.app.uiManager.refreshComponents();

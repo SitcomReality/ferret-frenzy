@@ -14,7 +14,7 @@ export class PreRaceScreen {
         <div class="pre-race-actions"><button id="prsStart" class="btn btn-primary">Start Race</button></div>
       </div>
     </div>`;
-    this.el.querySelector('#prsStart').addEventListener('click', () => this.eventBus.emit('race:start'));
+    this.el.querySelector('#prsStart').addEventListener('click', () => this.eventBus.emit('race:initiateStart'));
   }
   show({ container, gameState }) {
     (container||document.getElementById('app')).appendChild(this.el);
