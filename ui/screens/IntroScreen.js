@@ -15,7 +15,7 @@ export class IntroScreen {
     this.eventBus = eventBus;
     this.createElement();
     this.bindEvents();
-    this.settingsPanel = new SettingsPanel(this.element.querySelector('#introSettings'), {
+    this.settingsPanel = new SettingsPanel(this.element.querySelector('#settingsContent'), {
       eventBus: this.eventBus
     });
   }
@@ -24,16 +24,22 @@ export class IntroScreen {
     this.element = document.createElement('div');
     this.element.id = 'introScreen';
     this.element.innerHTML = `
-      <div id="introSettingsContainer">
-        <div id="introSettings" class="ui-section"></div>
-        <div id="initButtonContainer" class="ui-section">
-          <div class="ui-item">
-            <button id="initGame" class="btn btn-primary">New Game</button>
-            <div id="newGameLoading" class="loading-indicator" style="display: none;">
-              <div class="loading-spinner-small"></div>
-              <span>Initializing...</span>
-            </div>
+      <div class="intro-container">
+        <div class="intro-content">
+          <h1 class="intro-title">FERRET FRENZY</h1>
+          <button id="initGame" class="btn btn-primary btn-memphis btn-start-racing">START RACING!</button>
+          <div id="newGameLoading" class="loading-indicator" style="display: none;">
+            <div class="loading-spinner-small"></div>
+            <span>Building Tracks & Training Ferrets...</span>
           </div>
+          <button id="toggleSettings" class="btn-text">Advanced Settings</button>
+        </div>
+        <div id="advancedSettings" class="advanced-settings-panel collapsed">
+            <div class="panel-header">
+              <h2>Advanced Settings</h2>
+              <button id="closeSettings" class="btn-close">&times;</button>
+            </div>
+            <div id="settingsContent" class="ui-section"></div>
         </div>
       </div>
     `;
@@ -41,6 +47,10 @@ export class IntroScreen {
 
   bindEvents() {
     const initButton = this.element.querySelector('#initGame');
+    const toggleSettingsButton = this.element.querySelector('#toggleSettings');
+    const closeSettingsButton = this.element.querySelector('#closeSettings');
+    const settingsPanel = this.element.querySelector('#advancedSettings');
+
     if (initButton) {
       initButton.addEventListener('click', () => {
         this.showLoadingIndicator();
@@ -49,6 +59,17 @@ export class IntroScreen {
             this.eventBus.emit('game:initialize');
         }, 100);
       });
+    }
+    
+    const togglePanel = () => {
+        settingsPanel.classList.toggle('collapsed');
+    };
+
+    if(toggleSettingsButton) {
+        toggleSettingsButton.addEventListener('click', togglePanel);
+    }
+    if(closeSettingsButton) {
+        closeSettingsButton.addEventListener('click', togglePanel);
     }
 
     this.element.addEventListener('change', (e) => {
@@ -101,7 +122,7 @@ export class IntroScreen {
     (data?.container || document.getElementById('app') || document.body).appendChild(this.element);
     
     // Add Memphis bounce animation
-    this.element.classList.add('memphis-bounce');
+    this.element.querySelector('.intro-content').classList.add('memphis-bounce');
     
     // Initialize settings panel if available
     if (this.settingsPanel) {

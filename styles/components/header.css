@@ -1,0 +1,39 @@
+#header {
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: linear-gradient(180deg, #333 0%, #1a1a1a 100%);
+    border-bottom: 2px solid var(--accent-color);
+}
+
+#header .ui-section {
+    display: flex;
+    align-items: center;
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+.header-left, .header-center, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    color: var(--accent-color);
+    text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
+}
+
+.raceNumbers {
+    position: static;
+    font-size: 1rem;
+    background: rgba(0,0,0,0.2);
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+

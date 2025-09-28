@@ -1,0 +1,112 @@
+#introScreen {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-5);
+    background-image: 
+        url('/memphis_squiggle.png'),
+        url('/memphis_grid.png');
+    background-repeat: repeat, repeat;
+    background-size: 200px, 100px;
+}
+
+.intro-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intro-content {
+    text-align: center;
+    padding: 40px;
+    background: var(--bg-primary);
+    border: 4px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 8px 8px 0 var(--border-color);
+}
+
+.intro-title {
+    font-size: 4rem;
+    color: var(--accent-color);
+    text-shadow: 4px 4px 0 var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.btn-start-racing {
+    font-size: 2.5rem;
+    padding: 20px 40px;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-text:hover {
+    color: var(--accent-color);
+}
+
+.advanced-settings-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100%;
+    background: var(--bg-secondary);
+    border-left: 4px solid var(--border-color);
+    box-shadow: -8px 0 0 var(--border-color);
+    padding: 20px;
+    transform: translateX(0);
+    transition: transform 0.4s ease-out;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+.advanced-settings-panel.collapsed {
+    transform: translateX(100%);
+}
+
+.advanced-settings-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+}
+
+.advanced-settings-panel .panel-header h2 {
+    margin: 0;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+#settingsContent {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: none;
+    background: none;
+    padding: 0;
+}
+
