@@ -38,136 +38,66 @@
     border: 1px solid #ff6000;
 }
 
-#game-container {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 20px;
-    padding: 20px;
-    height: calc(100vh - 200px);
+/* OLD LAYOUT STYLES - REMOVED */
+/* #game-container { ... } */
+/* #left-panel, #right-panel { ... } */
+/* #left-panel { ... } */
+/* #left-panel::-webkit-scrollbar { ... } */
+/* #left-panel::-webkit-scrollbar-track { ... } */
+/* #left-panel::-webkit-scrollbar-thumb { ... } */
+
+
+/* NEW RACE SCREEN STYLES */
+.race-screen-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
     overflow: hidden;
 }
 
-#left-panel, #right-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.race-screen-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
-#left-panel {
-    overflow-y: auto;
-    max-height: 100%;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent-color) #2d2d2d;
+#race-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
-#left-panel::-webkit-scrollbar {
-    width: 8px;
+#race-overlay > * {
+    pointer-events: all;
 }
 
-#left-panel::-webkit-scrollbar-track {
-    background: #2d2d2d;
-    border-radius: 4px;
+#race-overlay #endRaceNow {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
 }
 
-#left-panel::-webkit-scrollbar-thumb {
-    background: var(--accent-color);
-    border-radius: 4px;
+#race-overlay #endRaceNow:hover {
+    opacity: 1;
 }
 
-#right-panel {
-    flex: 1;
-    min-height: 0;
+.race-screen-container .action-lines-memphis {
+    z-index: 0;
 }
 
-.race-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #000;
-  z-index: 1000;
+.race-screen-container #raceCanvas {
+    z-index: 1;
+    position: relative;
 }
 
-.race-canvas-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.race-canvas-container canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.race-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.countdown-display {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  pointer-events: none;
-}
-
-.countdown-number {
-  font-size: 120px;
-  font-weight: bold;
-  color: #ff6b35;
-  text-shadow: 3px 3px 0px #000, -3px -3px 0px #000, 3px -3px 0px #000, -3px 3px 0px #000;
-  animation: countdownPulse 1s ease-in-out;
-}
-
-.countdown-text {
-  font-size: 24px;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 2px 2px 0px #000;
-  letter-spacing: 3px;
-}
-
-@keyframes countdownPulse {
-  0% { transform: scale(0.8); opacity: 0; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.race-controls {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  pointer-events: auto;
-}
-
-.live-leaderboard {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 8px;
-  padding: 15px;
-  min-width: 200px;
-  pointer-events: none;
-}
-
-.race-complete {
-  animation: raceCompleteFlash 0.5s ease-in-out 3;
-}
-
-@keyframes raceCompleteFlash {
-  0%, 100% { background: #000; }
-  50% { background: #004400; }
+.race-screen-container #race-overlay {
+    z-index: 2;
 }
