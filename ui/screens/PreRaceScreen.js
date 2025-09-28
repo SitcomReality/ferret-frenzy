@@ -7,7 +7,7 @@ export class PreRaceScreen {
     this.el = document.createElement('div');
     this.el.id = 'preRaceScreen';
     this.el.innerHTML = `<div class="ui gui-container pre-race-grid">
-      <div class="pre-race-track" id="preRaceTrack"></div>
+      <div class="pre-race-track" id="preRaceTrack" style="grid-column: 1 / -1;"></div>
       <div class="pre-race-participants">
         <h3>Participants & Betting</h3>
         <div class="racers-list pre-race-racers-list" id="prsRacers"></div>
