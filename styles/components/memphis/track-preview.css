@@ -159,6 +159,13 @@
     border: 2px solid var(--border-color);
 }
 
+.weather-badge-memphis {
+  position: absolute; top: 16px; left: 16px;
+  background: var(--accent-2); color:#fff; padding:6px 12px;
+  border-radius: 8px; font-weight: 700; border:3px solid var(--border-color);
+  box-shadow: 3px 3px 0 var(--border-color);
+}
+
 .week-preview .week-title {
   font-family: 'Space Mono', monospace;
   font-size: 42px;

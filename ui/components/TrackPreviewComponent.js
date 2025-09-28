@@ -15,8 +15,7 @@ export class TrackPreviewComponent extends BaseComponent {
 
     setTrackData(track, raceData = {}) {
         this.track = track;
-        // Merge raceIndex from options and new data
-        this.raceData = { ...this.raceData, ...raceData };
+        this.raceData = { ...this.raceData, ...raceData, showWeather: this.options.showWeather === true };
         if (this.element) {
              this.render();
         }
@@ -47,7 +46,7 @@ export class TrackPreviewComponent extends BaseComponent {
             <div class="segment-count-indicator-memphis">
                 ${totalSegments} Segments
             </div>
-            
+            ${this.raceData.showWeather && this.raceData.weather ? `<div class="weather-badge-memphis">${String(this.raceData.weather).toUpperCase()}</div>` : ''}
             <h3 class="track-title-memphis">
                 <span class="race-index">Race ${this.raceData.raceIndex}:</span> 
                 <span class="track-name-display">${this.track.name || 'Unknown Track'}</span>

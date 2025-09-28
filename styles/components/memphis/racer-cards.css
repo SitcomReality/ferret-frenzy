@@ -159,3 +159,5 @@
     from { box-shadow: 6px 6px 0 var(--accent-3), 0 0 20px rgba(255, 212, 0, 0.4); }
     to { box-shadow: 8px 8px 0 var(--accent-3), 0 0 30px rgba(255, 212, 0, 0.6); }
 }
+
+.racer-card-memphis .bet-quick { margin-top: 8px; width: 100%; }
