@@ -41,23 +41,46 @@
 .loading-indicator {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  padding: 10px 15px;
-  background: rgba(0, 123, 255, 0.1);
-  border: 1px solid var(--accent-color);
-  border-radius: 6px;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
   color: var(--accent-color);
   font-family: 'Orbitron', sans-serif;
   font-size: 14px;
   font-weight: 700;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .loading-spinner-small {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(0, 123, 255, 0.3);
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top: 2px solid var(--accent-color);
+  border-top: 3px solid var(--accent-color);
   animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Make the loading indicator center properly */
+#newGameLoading {
+  justify-content: center;
+  text-align: center;
+}
+
+/* Ensure advanced settings text is always below the button */
+.intro-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#toggleSettings {
+  margin-top: 8px;
 }
