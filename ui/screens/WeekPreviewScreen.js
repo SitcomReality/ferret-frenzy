@@ -1,3 +1,5 @@
+import { TrackPreviewComponent } from '../components/TrackPreviewComponent.js';
+
 export class WeekPreviewScreen {
   initialize(eventBus) { this.eventBus = eventBus; this.create(); }
   create() {
@@ -21,23 +23,20 @@ export class WeekPreviewScreen {
     this.el.querySelector('.week-title').textContent = `WEEK ${weekNum}`;
     const races = gameState?.raceWeek?.races || [];
     const racesGrid = this.el.querySelector('#wpRaces'); racesGrid.innerHTML = '';
+    
     races.forEach((race, idx) => {
-      const panel = document.createElement('div');
-      panel.className = 'track-preview-memphis';
-      const participants = race?.racers?.length || 0;
-      panel.innerHTML = `
-        <div class="weather-indicator-memphis" title="${race.weather||''}">${(race.weather||'').slice(0,1).toUpperCase()}</div>
-        <div class="track-title-memphis">Race ${idx+1}: ${race.track?.name||'Unknown Track'}</div>
-        <div class="track-visual-memphis"><div class="track-path-memphis"></div></div>
-        <div class="track-info-grid-memphis">
-          <div class="track-info-item-memphis"><div class="track-info-label-memphis">Surface</div><div class="track-info-value-memphis">${race.track?.surface||'Mixed'}</div></div>
-          <div class="track-info-item-memphis"><div class="track-info-label-memphis">Laps</div><div class="track-info-value-memphis">${race.track?.laps||'—'}</div></div>
-          <div class="track-info-item-memphis"><div class="track-info-label-memphis">Weather</div><div class="track-info-value-memphis">${race.weather||'—'}</div></div>
-        </div>
-        <div class="participant-count-memphis">${participants} racers</div>
-      `;
-      racesGrid.appendChild(panel);
+      // Pass required data and options to the component
+      const previewComp = new TrackPreviewComponent(null, {
+          raceIndex: idx + 1, // Pass index for title rendering
+      });
+      previewComp.setTrackData(race.track, {
+          participants: race.racers,
+          weather: race.weather,
+          segments: race.segments
+      });
+      racesGrid.appendChild(previewComp.createElement());
     });
+    
     const rosterEl = this.el.querySelector('#wpRoster'); rosterEl.innerHTML = '';
     const rosterFromWeekIds = gameState?.raceWeek?.selectedRacers;
     

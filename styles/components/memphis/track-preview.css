@@ -4,9 +4,10 @@
     border: 4px solid var(--border-color);
     border-radius: 16px;
     padding: 20px;
-    margin: 12px;
+    margin: 12px 0;
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .track-preview-memphis::before {
@@ -35,6 +36,21 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     position: relative;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.track-title-memphis .race-index {
+    color: var(--accent-color);
+    font-size: 1.2em;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.track-title-memphis .track-name-display {
+    color: var(--text-primary);
+    font-size: 1em;
+    font-weight: bold;
 }
 
 .track-title-memphis::after {
@@ -50,75 +66,83 @@
 
 .track-visual-memphis {
     width: 100%;
-    height: 120px;
+    height: auto;
+    min-height: 40px;
     background: var(--bg-secondary);
     border: 3px solid var(--border-color);
     border-radius: 8px;
     margin: 16px 0;
     position: relative;
     overflow: hidden;
+    padding: 8px;
 }
 
 .track-path-memphis {
-    position: absolute;
-    top: 50%;
-    left: 10%;
-    right: 10%;
-    height: 8px;
-    background: repeating-linear-gradient(
-        90deg,
-        var(--accent-2),
-        var(--accent-2) 20px,
-        transparent 20px,
-        transparent 30px
-    );
-    border-radius: 4px;
-    transform: translateY(-50%);
+    display: none;
 }
 
-.track-info-grid-memphis {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 12px;
-    margin-top: 16px;
+.track-sections-visual {
+    padding: 10px 0;
 }
 
-.track-info-item-memphis {
-    background: var(--accent-4);
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    padding: 8px;
-    text-align: center;
+.track-path-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
-.track-info-label-memphis {
-    font-size: 10px;
+.track-section-block {
+    height: 24px;
+    min-width: 25px;
+    flex-grow: 1;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color);
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+    max-width: 60px;
+}
+
+.track-info-grid-memphis { display: none; }
+
+.track-info-summary-memphis {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
+    margin: 0 0 12px 0;
+}
+
+.track-info-summary-memphis .track-info-label-memphis {
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-secondary);
-    margin-bottom: 4px;
+    margin: 0;
 }
 
-.track-info-value-memphis {
+.track-info-summary-memphis .track-info-value-memphis {
     font-family: 'Space Mono', monospace;
     font-weight: bold;
     font-size: 14px;
     color: var(--text-primary);
+    text-align: right;
+    max-width: 70%;
 }
 
-.weather-indicator-memphis {
+.segment-count-indicator-memphis {
     position: absolute;
     top: 16px;
     right: 16px;
-    background: var(--accent-3);
+    background: var(--accent-5);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
     border: 3px solid var(--border-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
     box-shadow: 3px 3px 0 var(--border-color);
 }
 
@@ -144,8 +168,8 @@
 }
 
 .races-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   padding: 4px;
 }

@@ -4,62 +4,88 @@ export class TrackPreviewComponent extends BaseComponent {
     constructor(container, options = {}) {
         super(container, options);
         this.track = null;
-        this.raceData = null;
+        this.raceData = {
+            raceIndex: options.raceIndex || 0
+        };
     }
 
     initialize() {
         super.initialize();
-        this.render();
     }
 
     setTrackData(track, raceData = {}) {
         this.track = track;
-        this.raceData = raceData;
+        // Merge raceIndex from options and new data
+        this.raceData = { ...this.raceData, ...raceData };
+        if (this.element) {
+             this.render();
+        }
+    }
+    
+    createElement() {
+        this.element = document.createElement('div');
         this.render();
+        return this.element;
     }
 
+
     render() {
-        if (!this.track) {
+        if (!this.track || !this.element) {
             this.element.innerHTML = '<div class="track-preview-placeholder">No track data available</div>';
             return;
         }
 
-        const weatherIcon = this.getWeatherIcon(this.raceData.weather || 'clear');
-        const participantCount = this.raceData.participants ? this.raceData.participants.length : 0;
-        const groundType = this.track.groundType || 'dirt';
+        const participants = this.raceData.participants ? this.raceData.participants.length : 0;
+        const groundTypesList = [...new Set(this.track.sections)];
+        const totalSegments = this.raceData.segments?.length || 0;
+        const numberOfSections = this.track.sections.length;
+        
+        const sectionsHtml = this.renderTrackSections();
 
+        this.element.className = 'track-preview-memphis';
         this.element.innerHTML = `
-            <div class="track-preview-memphis">
-                <div class="weather-indicator-memphis">${weatherIcon}</div>
-                
-                <h3 class="track-title-memphis">${this.track.name || 'Unknown Track'}</h3>
-                
-                <div class="track-visual-memphis">
-                    <div class="track-path-memphis"></div>
-                </div>
-                
-                <div class="track-info-grid-memphis">
-                    <div class="track-info-item-memphis">
-                        <div class="track-info-label-memphis">Length</div>
-                        <div class="track-info-value-memphis">${this.track.length || 800}m</div>
-                    </div>
-                    <div class="track-info-item-memphis">
-                        <div class="track-info-label-memphis">Surface</div>
-                        <div class="track-info-value-memphis">${groundType}</div>
-                    </div>
-                    <div class="track-info-item-memphis">
-                        <div class="track-info-label-memphis">Difficulty</div>
-                        <div class="track-info-value-memphis">${this.getDifficultyLevel()}</div>
-                    </div>
-                </div>
-                
-                <div class="participant-count-memphis">
-                    ${participantCount} Racers
-                </div>
+            <div class="segment-count-indicator-memphis">
+                ${totalSegments} Segments
+            </div>
+            
+            <h3 class="track-title-memphis">
+                <span class="race-index">Race ${this.raceData.raceIndex}:</span> 
+                <span class="track-name-display">${this.track.name || 'Unknown Track'}</span>
+            </h3>
+            
+            <div class="track-info-summary-memphis">
+                <div class="track-info-label-memphis">Surfaces:</div>
+                <div class="track-info-value-memphis">${groundTypesList.join(', ')}</div>
+            </div>
+
+            <div class="track-visual-memphis track-sections-visual">
+                <div class="track-path-container">${sectionsHtml}</div>
+            </div>
+            
+            <div class="participant-count-memphis">
+                ${participants} Racers
             </div>
         `;
 
         this.addInteractivity();
+    }
+    
+    renderTrackSections() {
+        if (!this.track?.sections) return '';
+        
+        // Generate a colored block for each section
+        const sections = this.track.sections;
+        let html = '';
+        
+        sections.forEach((type, index) => {
+            // Use legacy track CSS classes for ground type colors
+            const groundTypeClass = `groundType${type}`; 
+            
+            // Render one block per section.
+            html += `<div class="track-section-block ${groundTypeClass}" title="${type}"></div>`;
+        });
+        
+        return html;
     }
 
     addInteractivity() {
@@ -87,42 +113,7 @@ export class TrackPreviewComponent extends BaseComponent {
         }
     }
 
-    getWeatherIcon(weather) {
-        const weatherIcons = {
-            'clear': '☀️',
-            'sunny': '☀️',
-            'cloudy': '☁️',
-            'rainy': '🌧️',
-            'stormy': '⛈️',
-            'windy': '💨',
-            'foggy': '🌫️'
-        };
-        return weatherIcons[weather] || '☀️';
-    }
-
-    getDifficultyLevel() {
-        if (!this.track) return 'Normal';
-        
-        const length = this.track.length || 800;
-        const groundType = this.track.groundType || 'dirt';
-        
-        let difficulty = 'Normal';
-        
-        if (length > 1000) {
-            difficulty = 'Hard';
-        } else if (length < 600) {
-            difficulty = 'Easy';
-        }
-        
-        if (groundType === 'mud' || groundType === 'ice') {
-            difficulty = difficulty === 'Easy' ? 'Normal' : 'Hard';
-        }
-        
-        return difficulty;
-    }
-
     refresh() {
         this.render();
     }
 }
-
