@@ -1,1 +1,200 @@
-```\nui/components/EarningsPanel.js\n\nexport class EarningsPanel {\n  constructor() {\n    this.el = null;\n    this.earningsData = [];\n  }\n\n  create() {\n    this.el = document.createElement('section');\n    this.el.className = 'earnings-panel';\n    \n    this.el.innerHTML = `\n      <div class=\"earnings-header\">\n        <div class=\"comic-burst earnings-burst\">\n          <span class=\"burst-text\">MONEY TALKS!</span>\n        </div>\n        <h3 class=\"earnings-title\">WEEKLY EARNINGS REPORT</h3>\n        <div class=\"earnings-subtitle\" id=\"earningsSubtitle\">Prize money distribution</div>\n      </div>\n      \n      <div class=\"earnings-content\">\n        <div class=\"earnings-summary\">\n          <div class=\"total-purse\">\n            <div class=\"purse-label\">TOTAL WEEK PURSE</div>\n            <div class=\"purse-amount\" id=\"totalPurse\">$0</div>\n          </div>\n          <div class=\"earnings-stats\">\n            <div class=\"stat-item\">\n              <div class=\"stat-value\" id=\"avgEarnings\">$0</div>\n              <div class=\"stat-label\">Avg Earnings</div>\n            </div>\n            <div class=\"stat-item\">\n              <div class=\"stat-value\" id=\"topEarner\">--</div>\n              <div class=\"stat-label\">Top Earner</div>\n            </div>\n          </div>\n        </div>\n        \n        <div class=\"earnings-table-wrapper\">\n          <table class=\"earnings-table\" id=\"earningsTable\">\n            <thead>\n              <tr>\n                <th>Rank</th>\n                <th>Racer</th>\n                <th>Earnings</th>\n                <th>Races</th>\n                <th>Per Race</th>\n              </tr>\n            </thead>\n            <tbody id=\"earningsBody\"></tbody>\n          </table>\n        </div>\n        \n        <div class=\"earnings-footnote\">\n          <div class=\"memphis-decoration-line\"></div>\n          <div class=\"prize-breakdown\" id=\"prizeBreakdown\">\n            Prize Structure: 1st $500 • 2nd $300 • 3rd $200 • 4th $100\n          </div>\n        </div>\n      </div>\n    `;\n    \n    return this.el;\n  }\n\n  populateData(weekNumber, weekRaces = [], gameState = {}) {\n    const subtitle = this.el?.querySelector('#earningsSubtitle');\n    if (subtitle) {\n      subtitle.textContent = `Week ${weekNumber} • ${weekRaces.length} race${weekRaces.length === 1 ? '' : 's'}`;\n    }\n\n    this.earningsData = this.calculateEarnings(weekRaces);\n    this.updateSummary(this.earningsData);\n    this.renderEarningsTable(this.earningsData);\n  }\n\n  calculateEarnings(weekRaces) {\n    // Prize structure per race\n    const prizeStructure = [500, 300, 200, 100, 50, 25, 10, 5];\n    const racerEarnings = new Map();\n\n    weekRaces.forEach(race => {\n      const results = Array.isArray(race.results) ? race.results : [];\n      results.sort((a, b) => (a.position || 999) - (b.position || 999));\n\n      results.forEach((result, index) =>{\n        const racerName = result?.racer?.name || 'Unknown';\n        const prize = prizeStructure[index] || 0;\n        \n        if (!racerEarnings.has(racerName)){\n          racerEarnings.set(racerName, {\n            name: racerName,\n            totalEarnings: 0,\n            raceCount: 0,\n            bestFinish: 999,\n            winnings: []\n          });\n        }\n        \n        const racer = racerEarnings.get(racerName);\n        racer.totalEarnings += prize;\n        racer.raceCount += 1;\n        racer.bestFinish = Math.min(racer.bestFinish, result.position || index + 1);\n        racer.winnings.push({ race: race.track?.name || 'Unknown Track', prize, position: result.position || index + 1 });\n      });\n    });\n\n    // Convert to array and sort by earnings\n    const earningsArray = Array.from(racerEarnings.values()).map(racer => {\n      ...racer,\n      avgEarningsPerRace: racer.raceCount > 0 ? racer.totalEarnings / racer.raceCount : 0\n    }));\n\n    earningsArray.sort((a, b) => b.totalEarnings - a.totalEarnings);\n    return earningsArray;\n  }\n\n  updateSummary(earningsData) {\n    const totalPurse = earningsData.reduce((sum, racer) => sum + racer.totalEarnings, 0);\n    const avgEarnings = earningsData.length > 0 ? Math.round(totalPurse / earningsData.length) : 0;\n    const topEarner = earningsData.length > 0 ? earningsData[0].name : '--';\n\n    const totalPurseEl = this.el?.querySelector('#totalPurse');\n    const avgEarningsEl = this.el?.querySelector('#avgEarnings');\n    const topEarnerEl = this.el?.querySelector('#topEarner');\n\n    if (totalPurseEl) totalPurseEl.textContent = `$${totalPurse.toLocaleString()}`;\n    if (avgEarningsEl) avgEarningsEl.textContent = `$${avgEarnings}`;\n    if (topEarnerEl) topEarnerEl.textContent = topEarner;\n  }\n\n  renderEarningsTable(earningsData) {\n    const tbody = this.el?.querySelector('#earningsBody');\n    if (!tbody) return;\n\n    tbody.innerHTML = '';\n\n    earningsData.slice(0, 8).forEach((racer, index) =>{\n      const row = document.createElement('tr');\n      row.className = 'earnings-row';\n      \n      // Add special styling for top performers\n      if (index === 0) row.classList.add('top-earner');\n      if (index < 3) row.classList.add('podium-earner');\n\n      row.innerHTML = `\n        <td class=\"col-rank\">${index + 1}</td>\n        <td class=\"col-name\">${racer.name}</td>\n        <td class=\"col-earnings\">$${racer.totalEarnings.toLocaleString()}</td>\n        <td class=\"col-races\">${racer.raceCount}</td>\n        <td class=\"col-per-race\">$${Math.round(racer.avgEarningsPerRace).toFixed(2)}</td>\n      `;\n      \n      tbody.appendChild(row);\n    });\n  }\n\n  updatePrizeStructure(structure) {\n    const breakdown = this.el?.querySelector('#prizeBreakdown');\n    if (breakdown) {\n      const structureText = structure.map((prize, index) => \n        `${this.getPositionText(index + 1)} $${prize}`\n      ).join(' • ');\n      breakdown.textContent = `Prize Structure: ${structureText}`;\n    }\n  }\n\n  getPositionText(position) {\n    const suffixes = ['st', 'nd', 'rd'];\n    const suffix = suffixes[position - 1] || 'th';\n    return `${position}${suffix}`;\n  }\n\n  // Utility methods for external access\n  getTopEarner() {\n    return this.earningsData.length > 0 ? this.earningsData[0] : null;\n  }\n\n  getTotalPurse() {\n    return this.earningsData.reduce((sum, racer) => sum + racer.totalEarnings, 0);\n  }\n\n  getRacerEarnings(racerName) {\n    return this.earningsData.find(racer => racer.name === racerName) || null;\n  }\n\n  updateBurstText(text = 'MONEY TALKS!'){\n    const burstEl = this.el?.querySelector('.burst-text');\n    if (burstEl){\n      burstEl.textContent = text;\n    }\n  }\n\n  getElement() {\n    return this.el;\n  }\n\n\n```\n\nui/components/EarningsPanel.js\n\n export class EarningsPanel {\n  constructor() {\n    this.el = null;\n    this.earningsData = [];\n  }\n\n  create() {\n    this.el = document.createElement('section');\n    this.el.className = 'earnings-panel';\n    \n    this.el.innerHTML = `\n      <div class=\"earnings-header\">\n        <div class=\"comic-burst earnings-burst\">\n          <span class=\"burst-text\">MONEY TALKS!</span>\n        </div>\n        <h3 class=\"earnings-title\">WEEKLY EARNINGS REPORT</h3>\n        <div class=\"earnings-subtitle\" id=\"earningsSubtitle\">Prize money distribution</div>\n      </div>\n      \n      <div class=\"earnings-content\">\n        <div class=\"earnings-summary\">\n          <div class=\"total-purse\">\n            <div class=\"purse-label\">TOTAL WEEK PURSE</div>\n            <div class=\"purse-amount\" id=\"totalPurse\">$0</div>\n          </div>\n          <div class=\"earnings-stats\">\n            <div class=\"stat-item\">\n              <div class=\"stat-value\" id=\"avgEarnings\">$0</div>\n              <div class=\"stat-label\">Avg Earnings</div>\n            </div>\n            <div class=\"stat-item\">\n              <div class=\"stat-value\" id=\"topEarner\">--</div>\n              <div class=\"stat-label\">Top Earner</div>\n            </div>\n          </div>\n        </div>\n        \n        <div class=\"earnings-table-wrapper\">\n          <table class=\"earnings-table\" id=\"earningsTable\">\n            <thead>\n              <tr>\n                <th>Rank</th>\n                <th>Racer</th>\n                <th>Earnings</th>\n                <th>Races</th>\n                <th>Per Race</th>\n              </tr>\n            </thead>\n            <tbody id=\"earningsBody\"></tbody>\n          </table>\n        </div>\n        \n        <div class=\"earnings-footnote\">\n          <div class=\"memphis-decoration-line\"></div>\n          <div class=\"prize-breakdown\" id=\"prizeBreakdown\">\n            Prize Structure: 1st $500 • 2nd $300 • 3rd $200 • 4th $100\n          </div>\n        </div>\n      </div>\n    `;\n    \n    return this.el;\n  }\n\n  populateData(weekNumber, weekRaces = [], gameState = {}) {\n    const subtitle = this.el?.querySelector('#earningsSubtitle');\n    if (subtitle) {\n      subtitle.textContent = `Week ${weekNumber} • ${weekRaces.length} race${weekRaces.length === 1 ? '' : 's'}`;\n    }\n\n    this.earningsData = this.calculateEarnings(weekRaces);\n    this.updateSummary(this.earningsData);\n    this.renderEarningsTable(this.earningsData);\n  }\n\n  calculateEarnings(weekRaces) {\n    // Prize structure per race\n    const prizeStructure = [500, 300, 200, 100, 50, 25, 10, 5];\n    const racerEarnings = new Map();
+export class EarningsPanel {
+  constructor() {
+    this.el = null;
+    this.earningsData = [];
+  }
+
+  create() {
+    this.el = document.createElement('section');
+    this.el.className = 'earnings-panel';
+
+    this.el.innerHTML = `
+      <div class="earnings-header">
+        <div class="comic-burst earnings-burst">
+          <span class="burst-text">MONEY TALKS!</span>
+        </div>
+        <h3 class="earnings-title">WEEKLY EARNINGS REPORT</h3>
+        <div class="earnings-subtitle" id="earningsSubtitle">Prize money distribution</div>
+      </div>
+
+      <div class="earnings-content">
+        <div class="earnings-summary">
+          <div class="total-purse">
+            <div class="purse-label">TOTAL WEEK PURSE</div>
+            <div class="purse-amount" id="totalPurse">$0</div>
+          </div>
+          <div class="earnings-stats">
+            <div class="stat-item">
+              <div class="stat-value" id="avgEarnings">$0</div>
+              <div class="stat-label">Avg Earnings</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="topEarner">--</div>
+              <div class="stat-label">Top Earner</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="earnings-table-wrapper">
+          <table class="earnings-table" id="earningsTable">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Racer</th>
+                <th>Earnings</th>
+                <th>Races</th>
+                <th>Per Race</th>
+              </tr>
+            </thead>
+            <tbody id="earningsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="earnings-footnote">
+          <div class="memphis-decoration-line"></div>
+          <div class="prize-breakdown" id="prizeBreakdown">
+            Prize Structure: 1st $500 • 2nd $300 • 3rd $200 • 4th $100
+          </div>
+        </div>
+      </div>
+    `;
+
+    return this.el;
+  }
+
+  populateData(weekNumber, weekRaces = [], gameState = {}) {
+    const subtitle = this.el?.querySelector('#earningsSubtitle');
+    if (subtitle) {
+      subtitle.textContent = `Week ${weekNumber} • ${weekRaces.length} race${weekRaces.length === 1 ? '' : 's'}`;
+    }
+
+    this.earningsData = this.calculateEarnings(weekRaces);
+    this.updateSummary(this.earningsData);
+    this.renderEarningsTable(this.earningsData);
+  }
+
+  calculateEarnings(weekRaces) {
+    const prizeStructure = [500, 300, 200, 100, 50, 25, 10, 5];
+    const racerEarnings = new Map();
+
+    weekRaces.forEach(race => {
+      const results = Array.isArray(race.results) ? race.results : [];
+      // If results items are racer objects with position property or just racer ids, handle defensively
+      const sorted = results.slice().sort((a, b) => (a.position || 999) - (b.position || 999));
+
+      sorted.forEach((result, index) => {
+        const racerName = result?.racer?.name || (result?.name) || 'Unknown';
+        const prize = prizeStructure[index] || 0;
+
+        if (!racerEarnings.has(racerName)) {
+          racerEarnings.set(racerName, {
+            name: racerName,
+            totalEarnings: 0,
+            raceCount: 0,
+            bestFinish: 999,
+            winnings: []
+          });
+        }
+
+        const racer = racerEarnings.get(racerName);
+        racer.totalEarnings += prize;
+        racer.raceCount += 1;
+        racer.bestFinish = Math.min(racer.bestFinish, result.position || (index + 1));
+        racer.winnings.push({
+          race: race.track?.name || 'Unknown Track',
+          prize,
+          position: result.position || (index + 1)
+        });
+      });
+    });
+
+    const earningsArray = Array.from(racerEarnings.values()).map(racer => {
+      return {
+        ...racer,
+        avgEarningsPerRace: racer.raceCount > 0 ? racer.totalEarnings / racer.raceCount : 0
+      };
+    });
+
+    earningsArray.sort((a, b) => b.totalEarnings - a.totalEarnings);
+    return earningsArray;
+  }
+
+  updateSummary(earningsData) {
+    const totalPurse = earningsData.reduce((sum, racer) => sum + racer.totalEarnings, 0);
+    const avgEarnings = earningsData.length > 0 ? Math.round(totalPurse / earningsData.length) : 0;
+    const topEarner = earningsData.length > 0 ? earningsData[0].name : '--';
+
+    const totalPurseEl = this.el?.querySelector('#totalPurse');
+    const avgEarningsEl = this.el?.querySelector('#avgEarnings');
+    const topEarnerEl = this.el?.querySelector('#topEarner');
+
+    if (totalPurseEl) totalPurseEl.textContent = `$${totalPurse.toLocaleString()}`;
+    if (avgEarningsEl) avgEarningsEl.textContent = `$${avgEarnings}`;
+    if (topEarnerEl) topEarnerEl.textContent = topEarner;
+  }
+
+  renderEarningsTable(earningsData) {
+    const tbody = this.el?.querySelector('#earningsBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    earningsData.slice(0, 8).forEach((racer, index) => {
+      const row = document.createElement('tr');
+      row.className = 'earnings-row';
+
+      if (index === 0) row.classList.add('top-earner');
+      if (index < 3) row.classList.add('podium-earner');
+
+      row.innerHTML = `
+        <td class="col-rank">${index + 1}</td>
+        <td class="col-name">${racer.name}</td>
+        <td class="col-earnings">$${racer.totalEarnings.toLocaleString()}</td>
+        <td class="col-races">${racer.raceCount}</td>
+        <td class="col-per-race">$${(racer.avgEarningsPerRace || 0).toFixed(2)}</td>
+      `;
+
+      tbody.appendChild(row);
+    });
+  }
+
+  updatePrizeStructure(structure) {
+    const breakdown = this.el?.querySelector('#prizeBreakdown');
+    if (breakdown && Array.isArray(structure)) {
+      const structureText = structure.map((prize, index) =>
+        `${this.getPositionText(index + 1)} $${prize}`
+      ).join(' • ');
+      breakdown.textContent = `Prize Structure: ${structureText}`;
+    }
+  }
+
+  getPositionText(position) {
+    const suffixes = ['st', 'nd', 'rd'];
+    const suffix = suffixes[position - 1] || 'th';
+    return `${position}${suffix}`;
+  }
+
+  // Utility methods for external access
+  getTopEarner() {
+    return this.earningsData.length > 0 ? this.earningsData[0] : null;
+  }
+
+  getTotalPurse() {
+    return this.earningsData.reduce((sum, racer) => sum + racer.totalEarnings, 0);
+  }
+
+  getRacerEarnings(racerName) {
+    return this.earningsData.find(racer => racer.name === racerName) || null;
+  }
+
+  updateBurstText(text = 'MONEY TALKS!') {
+    const burstEl = this.el?.querySelector('.burst-text');
+    if (burstEl) {
+      burstEl.textContent = text;
+    }
+  }
+
+  getElement() {
+    return this.el;
+  }
+}
