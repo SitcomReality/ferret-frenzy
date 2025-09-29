@@ -146,10 +146,9 @@
 .pre-race-grid { display:grid; grid-template-columns: 1fr; gap:16px; align-items:start; }
 .pre-race-participants .pre-race-racers-list { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 
-/* Memphis Overlays */
-
+/* Memphis-styled live leaderboard positioning */
 .overlay-leaderboard-memphis {
-    position: absolute; top: 70px; right: 10px; z-index: 20;
+    position: absolute; top: 70px; left: 10px; z-index: 20;
     max-width: 250px;
     pointer-events: none;
     
@@ -163,13 +162,10 @@
     transition: opacity 0.3s;
 }
 
-.overlay-leaderboard-memphis:hover {
-    opacity: 1;
-}
-
 .overlay-leaderboard-memphis .leaderboard-header-memphis {
     margin-bottom: 8px;
     text-align: center;
+    color: var(--text-primary); /* Dark text for readability */
 }
 
 .overlay-leaderboard-memphis .comic-burst {
@@ -206,13 +202,9 @@
 .overlay-leaderboard-memphis .leaderboard-list-memphis li:nth-child(2) { font-weight: 600; color: var(--accent-5); }
 .overlay-leaderboard-memphis .leaderboard-list-memphis li:nth-child(3) { font-weight: 500; color: var(--accent-2); }
 
-/* The weather overlay also needs positioning adjustment */
-.overlay-weather {
-    /* Existing style: position:absolute; top:8px; left:8px; ... */
-}
-
+/* Adjust weather overlay position to avoid overlap */
 .overlay-weather-memphis { 
-    position:absolute; top: 70px; left:10px; z-index:2; 
+    position:absolute; top: 70px; right:10px; z-index:2; 
     background:var(--accent-2); 
     border:3px solid var(--border-color); 
     border-radius:8px; 
