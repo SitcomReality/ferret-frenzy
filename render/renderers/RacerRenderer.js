@@ -65,10 +65,11 @@ export class RacerRenderer {
     if (leaderList && race && Array.isArray(race.racers)) {
       const sorted = race.racers.slice().sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
       leaderList.innerHTML = '';
-      sorted.slice(0, 5).forEach((rid, i) => { 
+      sorted.slice(0, 8).forEach((rid, i) => { 
         const r = this.renderManager?.gameState?.racers.find(r => r.id === rid); 
         if (!r) return; 
         const li = document.createElement('li'); 
+        // Display position and racer name
         li.textContent = `${i + 1}. ${this.getRacerNameString(r)}`; 
         leaderList.appendChild(li); 
       });
