@@ -1,3 +1,8 @@
+import { WeekSummaryHeader } from '../components/WeekSummaryHeader.js';
+import { WeekRecapPanel } from '../components/WeekRecapPanel.js';
+import { StandingsPanel } from '../components/StandingsPanel.js';
+import { EarningsPanel } from '../components/EarningsPanel.js';
+
 export class WeekSummaryScreen {
   initialize(eventBus) { 
     this.eventBus = eventBus; 
@@ -92,6 +97,10 @@ export class WeekSummaryScreen {
     this.recap = new WeekRecapPanel(); recapHost.replaceWith(this.recap.create());
     const standingsWrap = this.el.querySelector('.stats-sidebar');
     this.standingsPanel = new StandingsPanel(); standingsWrap.appendChild(this.standingsPanel.create());
+    
+    // Inject Earnings Panel into the sidebar
+    const bettingRoundupHost = this.el.querySelector('#bettingRoundup');
+    this.earningsPanel = new EarningsPanel(); bettingRoundupHost.appendChild(this.earningsPanel.create());
 
     // Add event listeners
     this.el.querySelector('#wsNewWeek').addEventListener('click', () => {
@@ -116,6 +125,7 @@ export class WeekSummaryScreen {
     this.header?.updateDate(weekNumber);
     this.recap?.populateContent(weekNumber, weekRaces, gameState);
     this.standingsPanel?.setData(weekNumber, weekRaces, gameState);
+    this.earningsPanel?.populateData(weekNumber, weekRaces, gameState);
 
     // Update newspaper date
     const dateEl = this.el.querySelector('#newspaperDate');
