@@ -1,0 +1,73 @@
+.standings-header, .earnings-header {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.standings-title, .earnings-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 0.25rem;
+  background: var(--accent-3);
+  padding: 0.5rem;
+  border: 2px solid #141414;
+}
+
+.standings-subtitle, .earnings-subtitle {
+  font-size: 0.9rem;
+  text-align: center;
+  color: #666;
+  font-family: 'Courier New', monospace;
+}
+
+.standings-table-wrapper, .earnings-table-wrapper {
+    border: 2px solid #141414;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.standings-table, .earnings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.standings-table th, .earnings-table th {
+  border-bottom: 3px solid #141414;
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  background: #141414;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.standings-table td, .earnings-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ccc;
+}
+.standings-table .col-name, .earnings-table .col-name {
+    font-weight: bold;
+}
+
+.standings-table .col-rank {
+    font-weight: bold;
+    font-family: 'Space Mono', monospace;
+}
+
+.standings-row:nth-child(odd) {
+  background: rgba(0,0,0,0.03);
+}
+
+.standings-footnote, .earnings-footnote {
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #aaa;
+  text-align: center;
+}
+

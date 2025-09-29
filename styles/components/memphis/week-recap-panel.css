@@ -1,0 +1,152 @@
+.week-recap-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  position: relative;
+}
+
+.lead-story-section {
+    position: relative;
+}
+
+.lead-article .headline {
+  font-family: 'Space Mono', monospace;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.1;
+  color: #141414;
+}
+
+.lead-article .byline {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-family: serif;
+}
+
+.lead-article .article-meta {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  font-family: 'Courier New', monospace;
+}
+
+.article-paragraph {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  font-family: Georgia, serif;
+}
+
+.article-footer .memphis-decoration-line {
+    height: 4px;
+    background: #141414;
+    margin: 1rem 0;
+}
+.article-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.article-tags .tag {
+    font-size: 0.7rem;
+    background: var(--accent-2);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.highlight-box, .spotlight-racer {
+  margin-bottom: 1.5rem;
+}
+.highlight-box:last-child, .spotlight-racer:last-child {
+    margin-bottom: 0;
+}
+
+.highlight-title, .spotlight-title {
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  border-bottom: 4px double #141414;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  color: #141414;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.stat-item .stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'Space Mono', monospace;
+  color: var(--accent-color);
+}
+
+.stat-item .stat-label {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.spotlight-racer-card {
+  background: var(--accent-2);
+  color: white;
+  padding: 1rem;
+  border: 3px solid #141414;
+  text-align: center;
+  box-shadow: 4px 4px 0 #141414;
+}
+.spotlight-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: 'Space Mono', monospace;
+}
+.spotlight-achievement {
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+.spotlight-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+    background: rgba(0,0,0,0.1);
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+.spotlight-stat .stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: block;
+}
+.spotlight-stat .stat-unit {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+.spotlight-quote {
+    font-style: italic;
+    border-top: 1px dashed white;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+/* Burst placement */
+.top-story-burst {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  transform: rotate(-15deg);
+  z-index: 10;
+}
+
+.top-story-burst .burst-text {
+    font-size: 1.1rem;
+}
+
