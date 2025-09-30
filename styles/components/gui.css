@@ -202,6 +202,12 @@
 .overlay-leaderboard-memphis .leaderboard-list-memphis li:nth-child(2) { font-weight: 600; color: var(--accent-5); }
 .overlay-leaderboard-memphis .leaderboard-list-memphis li:nth-child(3) { font-weight: 500; color: var(--accent-2); }
 
+.overlay-leaderboard-memphis .leaderboard-list-memphis li.finished {
+    background: rgba(0,0,0,0.06);
+    border-left: 4px solid var(--accent-color);
+    font-weight: 700;
+}
+
 /* Adjust weather overlay position to avoid overlap */
 .overlay-weather-memphis { 
     position:absolute; top: 70px; right:10px; z-index:2; 

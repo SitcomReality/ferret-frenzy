@@ -62,18 +62,37 @@ export class RacerRenderer {
 
   updateLeaderboard(race) {
     const leaderList = document.getElementById('leaderList');
-    if (leaderList && race && Array.isArray(race.racers)) {
-      const sorted = race.racers.slice().sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
-      leaderList.innerHTML = '';
-      sorted.slice(0, 8).forEach((rid, i) => { 
-        const r = this.renderManager?.gameState?.racers.find(r => r.id === rid); 
-        if (!r) return; 
-        const li = document.createElement('li'); 
-        // Display position and racer name
-        li.textContent = `${i + 1}. ${this.getRacerNameString(r)}`; 
-        leaderList.appendChild(li); 
-      });
-    }
+    if (!leaderList || !race || !Array.isArray(race.racers)) return;
+
+    const finished = Array.isArray(race.results) ? race.results.slice() : [];
+    const finishedSet = new Set(finished);
+    const remaining = race.racers.filter(rid => !finishedSet.has(rid))
+      .sort((a, b) => (race.liveLocations[b] || 0) - (race.liveLocations[a] || 0));
+
+    leaderList.innerHTML = '';
+
+    // 1) Locked finished positions (cannot change)
+    finished.forEach((rid, i) => {
+      const r = this.renderManager?.gameState?.racers.find(rr => rr.id === rid);
+      if (!r) return;
+      const li = document.createElement('li');
+      li.className = 'finished';
+      li.setAttribute('data-position', String(i + 1));
+      li.innerHTML = `<span class="pos">${i + 1}.</span> <span class="name">${this.getRacerNameString(r)}</span> <span class="badge">🏁</span>`;
+      leaderList.appendChild(li);
+    });
+
+    // 2) Fill remaining positions live (up to 8 total)
+    const maxItems = 8;
+    const slotsUsed = finished.length;
+    remaining.slice(0, Math.max(0, maxItems - slotsUsed)).forEach((rid, idx) => {
+      const r = this.renderManager?.gameState?.racers.find(rr => rr.id === rid);
+      if (!r) return;
+      const li = document.createElement('li');
+      const pos = slotsUsed + idx + 1;
+      li.innerHTML = `<span class="pos">${pos}.</span> <span class="name">${this.getRacerNameString(r)}</span>`;
+      leaderList.appendChild(li);
+    });
   }
 
   getRacerNameString(racer) {
