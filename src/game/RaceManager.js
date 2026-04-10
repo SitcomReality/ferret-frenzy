@@ -1,3 +1,5 @@
+import { Race } from '../models/Race.js';
+
 /**
  * RaceManager - Core race management logic
  */
