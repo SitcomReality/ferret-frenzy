@@ -10,8 +10,8 @@
     justify-content: center;
     background-color: var(--accent-5);
     background-image: 
-        url('/memphis_squiggle.png'),
-        url('/memphis_grid.png');
+        url('/assets/images/memphis_squiggle.png'),
+        url('/assets/images/memphis_grid.png');
     background-repeat: repeat, repeat;
     background-size: 200px, 100px;
 }
