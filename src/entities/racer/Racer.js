@@ -1,6 +1,9 @@
 import { racerComponents } from './RacerComponents.js';
 import { FerretFactory } from './FerretFactory.js';
 
+// Factor for truncating speed to 4 decimal places: Math.trunc(v * 10000) / 10000
+const SPEED_PRECISION_FACTOR = 10000;
+
 /**
  * Racer - Lightweight entity that composes components
  * NOTE: This is becoming the new source of truth for racer objects.
@@ -191,7 +194,7 @@ export class Racer {
       returnSpeed += this.stats.boostPower || 800;
     }
 
-    returnSpeed = Math.trunc(returnSpeed * this.config.racerProperties.speedMultiplier * 10000) / 10000;
+    returnSpeed = Math.trunc(returnSpeed * this.config.racerProperties.speedMultiplier * SPEED_PRECISION_FACTOR) / SPEED_PRECISION_FACTOR;
 
     if (this.speedThisRace[this.speedThisRace.length - 1] !== returnSpeed) {
       this.speedThisRace.push(returnSpeed);
